@@ -30,7 +30,7 @@ export const EraFlow = ({ className }) => (
         <circle r="20" className="fill-ink-900" stroke={i === STOPS.length - 1 ? "#EE2424" : "rgba(255,255,255,0.15)"} strokeWidth="1.25">
           {i === STOPS.length - 1 && <animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="2.4s" repeatCount="indefinite" />}
         </circle>
-        <text y="42" textAnchor="middle" className="fill-slate-400" style={{ fontSize: 9.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.6, textTransform: "uppercase" }}>
+        <text y="42" textAnchor="middle" className="fill-[#B0B0B2]" style={{ fontSize: 9.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.6, textTransform: "uppercase" }}>
           {s.label}
         </text>
       </g>
