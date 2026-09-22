@@ -13,6 +13,7 @@ from emailer import notify_lead
 from auth import router as auth_router, seed_admin
 from admin import router as admin_router
 from chat import router as chat_router
+from press import router as press_router
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("solix")
@@ -72,6 +73,7 @@ app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(chat_router)
+app.include_router(press_router)
 
 app.add_middleware(
     CORSMiddleware,

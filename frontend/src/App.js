@@ -14,6 +14,7 @@ import Company from "@/pages/Company";
 import Careers from "@/pages/Careers";
 import Partners from "@/pages/Partners";
 import Newsroom from "@/pages/Newsroom";
+import PressRelease from "@/pages/PressRelease";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/NotFound";
 import AdminLogin from "@/pages/admin/AdminLogin";
@@ -44,6 +45,7 @@ function App() {
             <Route path="/careers" element={<Careers />} />
             <Route path="/partners" element={<Partners />} />
             <Route path="/newsroom" element={<Newsroom />} />
+            <Route path="/newsroom/:id" element={<PressRelease />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Route>

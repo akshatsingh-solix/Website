@@ -51,6 +51,12 @@ Rebuild the Solix Technologies website (https://www.solix.com/) from scratch as 
 - **Newsroom** (`/newsroom`, in Company nav + footer): featured release, press releases with category filters, coverage highlights, media kit (SVG logos + brand guidelines in `/public/brand/`, brand colors, copyable boilerplate), press contact card. Data in `data/newsroom.js`. Self-tested via screenshot (filters, asset download, no console errors).
 - Sales alert inbox: user chose to skip for now — still the test inbox `delivered@resend.dev`; set via Admin → Alerts & settings.
 
+### Iteration 4 (2026-06)
+- **Lead Status Tracking**: `PATCH /api/admin/submissions/{id}` {status: new|contacted|qualified, notes}; status filter on list/export, `by_status` in stats, status+notes columns in CSV. Admin dialog has status radio + private notes + save; status badge column and status dropdown filter; "Awaiting contact"/"Qualified" stat cards.
+- **Press Release Pages** (`/newsroom/:id`): 7 releases with full bodies (`data/newsroom.js`), hero image, quotes, boilerplate, media contact, share, related releases; **Download PDF** via `POST /api/press/pdf` (reportlab, `press.py`). Newsroom list + featured card link to detail pages.
+- **Sales inbox reminder**: amber banner on admin Leads page while alert recipient is still `delivered@resend.dev` (user has skipped providing a real address twice).
+- Self-tested via screenshots/curl (PDF download, status save, filter, banner). No testing_agent run this iteration.
+
 ## Notes / mock data
 - Customer logos, testimonials, leadership (except founder/CEO), jobs, timeline years, stats are illustrative MOCK content in `data/site.js` — replace with real content.
 - Resource "Continue reading" is a preview (no real article pages yet).

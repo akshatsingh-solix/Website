@@ -54,7 +54,7 @@ export default function Newsroom() {
                   </div>
                   <h2 className="mt-6 text-balance font-display text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">{featured.title}</h2>
                   <p className="mt-5 max-w-2xl text-base text-slate-300 md:text-lg">{featured.summary}</p>
-                  <Button asChild className="mt-8" data-testid="featured-release-cta"><Link to="/products/enterprise-edition">Explore Enterprise Edition <ArrowUpRight /></Link></Button>
+                  <Button asChild className="mt-8" data-testid="featured-release-cta"><Link to={`/newsroom/${featured.id}`}>Read the announcement <ArrowUpRight /></Link></Button>
                 </div>
               </div>
             </Reveal>
@@ -76,7 +76,7 @@ export default function Newsroom() {
             {list.length === 0 && <p className="py-12 text-center text-muted-foreground" data-testid="release-empty">No releases in this category yet.</p>}
             {list.map((p) => (
               <Item key={p.id}>
-                <article className="group grid gap-3 py-6 sm:grid-cols-12 sm:items-start" data-testid={`release-${p.id}`}>
+                <Link to={`/newsroom/${p.id}`} className="group grid gap-3 py-6 sm:grid-cols-12 sm:items-start" data-testid={`release-${p.id}`}>
                   <div className="font-mono text-xs text-muted-foreground sm:col-span-2">{fmt(p.date)}</div>
                   <div className="sm:col-span-8">
                     <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{p.category}</span>
@@ -84,9 +84,9 @@ export default function Newsroom() {
                     <p className="mt-2 text-sm text-muted-foreground">{p.summary}</p>
                   </div>
                   <div className="sm:col-span-2 sm:text-right">
-                    <a href={`mailto:${PRESS_CONTACT.email}?subject=${encodeURIComponent("Press release request: " + p.title)}`} className="inline-flex items-center gap-1 text-sm text-slate-300 hover:text-primary" data-testid={`release-request-${p.id}`}>Request full text <ArrowUpRight className="h-4 w-4" /></a>
+                    <span className="inline-flex items-center gap-1 text-sm text-slate-300 transition-colors group-hover:text-primary">Read release <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></span>
                   </div>
-                </article>
+                </Link>
               </Item>
             ))}
           </Stagger>
