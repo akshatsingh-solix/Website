@@ -111,6 +111,39 @@ export default function Company() {
         </div>
       </Section>
 
+      <Section bordered className="bg-ink-900/40" id="analyst-views">
+        <div className="container grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <SectionHeading eyebrow="Analyst Views" title="Independent perspective on where we fit." />
+          </div>
+          <Reveal delay={0.1} className="text-sm leading-relaxed text-slate-300 lg:col-span-7 md:text-base">
+            <p>Solix briefs industry analysts regularly on our platform strategy, from archiving and application retirement to governed Enterprise AI. If you're evaluating Solix as part of an analyst-led shortlist, your account team can share the relevant reports and briefing notes for your industry and use case.</p>
+          </Reveal>
+        </div>
+      </Section>
+
+      <Section bordered id="investor-relations">
+        <div className="container grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <SectionHeading eyebrow="Investor Relations" title="Independent and growing since 2002." />
+          </div>
+          <Reveal delay={0.1} className="text-sm leading-relaxed text-slate-300 lg:col-span-7 md:text-base">
+            <p>Solix has grown as an independent, privately held company for over two decades. For investment or partnership inquiries, reach our corporate development team through the contact form below.</p>
+          </Reveal>
+        </div>
+      </Section>
+
+      <Section bordered className="bg-ink-900/40" id="csr">
+        <div className="container grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <SectionHeading eyebrow="Corporate Social Responsibility" title="Stewardship, on and off the platform." />
+          </div>
+          <Reveal delay={0.1} className="text-sm leading-relaxed text-slate-300 lg:col-span-7 md:text-base">
+            <p>The same stewardship we apply to customer data guides how we operate as a company: annual volunteer days for every employee, data-minimization built into our own internal systems, and a hiring practice that reflects the global, regulated industries we serve.</p>
+          </Reveal>
+        </div>
+      </Section>
+
       <CTABand eyebrow="Join us" title="Build the data layer for the AI-driven enterprise." primary={{ label: "View open roles", to: "/careers" }} secondary={{ label: "Partner with us", to: "/partners" }} />
     </div>
   );

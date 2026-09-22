@@ -85,7 +85,7 @@ export const Footer = () => (
           {NAV.map((col) => {
             const subLinks = col.groups
               ? col.groups.map((g) => ({ label: g.heading, to: col.to }))
-              : col.items?.slice(0, 6);
+              : (col.items || col.simpleItems)?.slice(0, 6);
             return (
               <div key={col.label}>
                 <Link to={col.to} className="font-display text-sm font-semibold text-foreground">{col.label}</Link>

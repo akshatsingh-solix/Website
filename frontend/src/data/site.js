@@ -151,17 +151,31 @@ export const NAV = [
   {
     label: "Partners",
     to: "/partners",
+    simpleItems: [
+      { label: "Overview", to: "/partners" },
+      { label: "Our Partners", to: "/partners#our-partners" },
+      { label: "Cloud Partners / Hyperscalers", to: "/partners#cloud-partners-hyperscalers" },
+      { label: "Big Data Partners", to: "/partners#big-data-partners" },
+      { label: "OEM Partners", to: "/partners#oem-partners" },
+      { label: "Global Technology Partners", to: "/partners#global-technology-partners" },
+      { label: "Distribution Partners", to: "/partners#distribution-partners" },
+      { label: "Become A Partner", to: "/partners#become-a-partner" },
+      { label: "Partner Portal", to: "/services-support#support-portal" },
+    ],
   },
   {
     label: "Company",
     to: "/company",
-    blurb: "Founded in 2002 and headquartered in Santa Clara, California.",
-    featured: { title: "We're hiring", desc: "Build the data layer for the AI-driven enterprise.", to: "/careers" },
-    items: [
-      { label: "About Solix", to: "/company", icon: Building2 },
-      { label: "Careers", to: "/careers", icon: Sparkles },
-      { label: "Newsroom", to: "/newsroom", icon: Newspaper },
-      { label: "Contact", to: "/contact", icon: Mail },
+    simpleItems: [
+      { label: "Overview", to: "/company" },
+      { label: "Leadership", to: "/company#leadership" },
+      { label: "Analyst Views", to: "/company#analyst-views" },
+      { label: "Investor Relations", to: "/company#investor-relations" },
+      { label: "Careers", to: "/careers" },
+      { label: "Newsroom", to: "/newsroom" },
+      { label: "Blogs", to: "/resources?type=blog" },
+      { label: "Contact Us", to: "/contact" },
+      { label: "Corporate Social Responsibility", to: "/company#csr" },
     ],
   },
 ];
@@ -1016,10 +1030,11 @@ export const PERKS = [
 ];
 
 export const PARTNER_TIERS = [
-  { icon: Cloud, title: "Cloud Partners", desc: "Deploy SOLIXCloud and the Common Data Platform natively on the hyperscalers your enterprise already trusts.", partners: ["Amazon Web Services", "Microsoft Azure", "Google Cloud", "Oracle Cloud"] },
-  { icon: Layers, title: "Technology Partners", desc: "Certified integrations with the platforms that run your business.", partners: ["SAP", "Oracle", "Salesforce", "Workday", "ServiceNow", "Snowflake", "Databricks", "OpenAI"] },
-  { icon: Building2, title: "System Integrators", desc: "Global and regional SIs who deliver Solix programs from assessment to run.", partners: ["Accenture", "Deloitte", "Capgemini", "Infosys", "TCS", "Wipro"] },
-  { icon: FlaskConical, title: "Resellers & MSPs", desc: "Bring Solix to regulated mid-market customers with packaged managed offerings.", partners: ["Regional VARs", "Managed service providers", "Compliance consultancies"] },
+  { id: "cloud-partners-hyperscalers", icon: Cloud, title: "Cloud Partners / Hyperscalers", desc: "Deploy SOLIXCloud and the Common Data Platform natively on the hyperscalers your enterprise already trusts.", partners: ["Amazon Web Services", "Microsoft Azure", "Google Cloud", "Oracle Cloud"] },
+  { id: "big-data-partners", icon: Database, title: "Big Data Partners", desc: "Certified integrations with the data platforms your analysts and models already run on.", partners: ["Snowflake", "Databricks"] },
+  { id: "oem-partners", icon: Layers, title: "OEM Partners", desc: "Embedded and certified integrations with the enterprise platforms that run your business.", partners: ["SAP", "Oracle", "Salesforce", "Workday", "ServiceNow"] },
+  { id: "global-technology-partners", icon: FlaskConical, title: "Global Technology Partners", desc: "Model providers and global systems integrators who deliver Solix programs from assessment to run.", partners: ["OpenAI", "Accenture", "Deloitte", "Capgemini"] },
+  { id: "distribution-partners", icon: Building2, title: "Distribution Partners", desc: "Regional integrators, resellers and managed service providers who bring Solix to mid-market customers.", partners: ["Infosys", "TCS", "Wipro", "Regional VARs", "Managed service providers"] },
 ];
 
 export const PLATFORM_SECTIONS = [

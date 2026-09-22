@@ -34,6 +34,22 @@ const GroupedPanel = ({ item, onNavigate }) => (
   </div>
 );
 
+const SimpleLinksPanel = ({ item, onNavigate }) => (
+  <div className="grid gap-x-8 gap-y-1 p-8 sm:grid-cols-2 lg:grid-cols-4 lg:p-10" data-testid={`mega-panel-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
+    {item.simpleItems.map(({ label, to }) => (
+      <Link
+        key={label}
+        to={to}
+        onClick={onNavigate}
+        data-testid={`mega-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+        className="rounded-lg px-2 py-2.5 text-[15px] text-teal transition-colors duration-200 hover:bg-white/5 hover:text-foreground"
+      >
+        {label}
+      </Link>
+    ))}
+  </div>
+);
+
 const FlatPanel = ({ item, onNavigate }) => (
   <div className="grid lg:grid-cols-12" data-testid={`mega-panel-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
     <div className="relative border-b border-white/10 p-8 lg:col-span-4 lg:border-b-0 lg:border-r">
@@ -94,7 +110,13 @@ const MegaPanel = ({ item, onNavigate }) => (
   >
     <div className="container">
       <div className="max-h-[75vh] overflow-y-auto rounded-2xl border border-white/10 bg-ink-950/95 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
-        {item.groups ? <GroupedPanel item={item} onNavigate={onNavigate} /> : <FlatPanel item={item} onNavigate={onNavigate} />}
+        {item.groups ? (
+          <GroupedPanel item={item} onNavigate={onNavigate} />
+        ) : item.simpleItems ? (
+          <SimpleLinksPanel item={item} onNavigate={onNavigate} />
+        ) : (
+          <FlatPanel item={item} onNavigate={onNavigate} />
+        )}
       </div>
     </div>
   </motion.div>
@@ -104,7 +126,7 @@ const MobileNav = ({ onNavigate }) => (
   <div className="flex h-full flex-col">
     <Accordion type="single" collapsible className="mt-6 w-full">
       {NAV.map((item) => {
-        const flatItems = item.groups ? item.groups.flatMap((g) => g.items) : item.items;
+        const flatItems = item.groups ? item.groups.flatMap((g) => g.items) : item.items || item.simpleItems;
         if (!flatItems) {
           return (
             <Link
@@ -184,7 +206,7 @@ export const Navbar = () => {
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
           {NAV.map((item) => {
-            const hasDropdown = Boolean(item.items || item.groups);
+            const hasDropdown = Boolean(item.items || item.groups || item.simpleItems);
             return (
               <div key={item.label} onMouseEnter={() => hasDropdown && setOpen(item.label)} className="relative">
                 <NavLink
