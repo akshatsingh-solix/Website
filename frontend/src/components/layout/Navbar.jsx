@@ -196,7 +196,7 @@ export const Navbar = () => {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300",
-        scrolled || open ? "glass border-b border-white/10 bg-ink-950/75" : "border-b border-transparent bg-transparent"
+        scrolled || open ? "glass border-b border-white/10 bg-ink-950/95" : "border-b border-transparent bg-transparent"
       )}
       onMouseLeave={() => setOpen(null)}
       data-testid="site-header"

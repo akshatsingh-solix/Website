@@ -31,7 +31,7 @@ export default function Products() {
         </div>
       </Section>
 
-      {["Enterprise AI (EAI)", "Cloud Archive Products", "EAI Pharma", "Enterprise Foundation"].map((category, i) => (
+      {["Platform", "Enterprise AI (EAI)", "Cloud Archive Products", "EAI Pharma", "Enterprise Foundation"].map((category, i) => (
         <Section key={category} bordered className={i % 2 === 0 ? "bg-ink-900/40" : undefined}>
           <div className="container">
             <SectionHeading eyebrow="Products" title={category} />
