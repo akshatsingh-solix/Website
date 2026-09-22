@@ -13,10 +13,10 @@ const POINTS = [
 export const AISection = () => (
   <Section bordered className="overflow-hidden">
     <div className="container grid items-center gap-14 lg:grid-cols-12">
-      <Reveal className="relative lg:col-span-6">
+      <Reveal blur className="group relative lg:col-span-6">
         <div className="absolute -inset-10 rounded-full bg-teal/10 blur-3xl" />
         <div className="relative overflow-hidden rounded-3xl border border-white/10">
-          <img src="/Website/images/ai-neural.jpg" alt="Abstract neural lattice representing governed enterprise AI" className="aspect-[4/3] w-full object-cover" />
+          <img src="/Website/images/ai-neural.jpg" alt="Abstract neural lattice representing governed enterprise AI" className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 via-transparent to-transparent" />
           <div className="glass absolute bottom-5 left-5 right-5 rounded-xl p-4">
             <div className="flex items-center gap-3">

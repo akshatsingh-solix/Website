@@ -17,9 +17,9 @@ export const DataEras = () => (
     <div className="container">
       <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
         <SectionHeading className="lg:col-span-7" eyebrow="Every system, every era" title="One lifecycle. One platform. No dead ends." description="Most vendors serve one moment in a record's life. Solix follows the record from the day it is created to the day an AI agent asks about it, and every policy travels with it." />
-        <Reveal delay={0.1} className="lg:col-span-5">
+        <Reveal blur delay={0.1} className="lg:col-span-5 group">
           <div className="relative overflow-hidden rounded-3xl border border-white/10">
-            <img src="/Website/images/data-eras-ribbon.jpg" alt="Timeline ribbon from tape reels through servers to an AI core" className="aspect-[16/9] w-full object-cover" />
+            <img src="/Website/images/data-eras-ribbon.jpg" alt="Timeline ribbon from tape reels through servers to an AI core" className="aspect-[16/9] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
             <p className="absolute bottom-4 left-5 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-300">1980s tape → 2020s cloud → AI</p>
           </div>
