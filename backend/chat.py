@@ -9,7 +9,6 @@ from typing import List, Literal
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, ConfigDict
-from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
 
 from database import db, now_iso
 from knowledge import CONCIERGE_SYSTEM_PROMPT
@@ -18,7 +17,15 @@ from emailer import notify_lead
 logger = logging.getLogger("solix.chat")
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
-LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+try:
+    # Only available inside Emergent's build image. On any other host this
+    # import fails, so the concierge degrades to a 503 instead of the whole
+    # API failing to start.
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+except ImportError:
+    LlmChat = UserMessage = TextDelta = StreamDone = None
+
+LLM_KEY = os.environ.get("EMERGENT_LLM_KEY") if LlmChat is not None else None
 CHAT_MODEL = ("openai", "gpt-5.4-mini")
 HISTORY_LIMIT = 24
 EMAIL_RX = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")

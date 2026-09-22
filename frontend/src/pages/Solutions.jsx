@@ -14,7 +14,7 @@ export default function Solutions() {
         crumbs={[{ label: "Solutions" }]}
         title="Outcome-led programs, not licenses on a shelf."
         description="Every engagement starts with a number: dollars reclaimed, systems retired, requests automated, use cases shipped. Then we bring the platform to hit it."
-        image="/images/data-eras-ribbon.jpg"
+        image="/Website/images/data-eras-ribbon.jpg"
       />
 
       <Section>

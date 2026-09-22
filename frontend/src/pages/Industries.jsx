@@ -14,7 +14,7 @@ export default function Industries() {
         crumbs={[{ label: "Industries" }]}
         title="Where retention is measured in decades and data in petabytes."
         description="Solix serves the industries with the strictest regulators, the oldest systems and the highest stakes for getting AI right."
-        image="/images/ind-financial-services.jpg"
+        image="/Website/images/ind-financial-services.jpg"
       />
       <Section>
         <div className="container">

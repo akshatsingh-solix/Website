@@ -19,7 +19,7 @@ export const Hero = () => {
     <section className="relative overflow-hidden" data-testid="home-hero">
       <div className="absolute inset-0 grid-lines" />
       <div className="absolute inset-0 grain" />
-      <img src="/images/hero-architecture.jpg" alt="" className="absolute right-0 top-0 h-full w-full object-cover object-right opacity-30 lg:w-3/5" />
+      <img src="/Website/images/hero-architecture.jpg" alt="" className="absolute right-0 top-0 h-full w-full object-cover object-right opacity-30 lg:w-3/5" />
       <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/90 to-ink-950/30" />
       <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink-950 to-transparent" />
       <div className="absolute -left-40 top-20 h-[560px] w-[560px] rounded-full bg-primary/15 blur-3xl" />

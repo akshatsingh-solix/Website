@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Solix Technologies</title>
+    <script>
+      // GitHub Pages has no server-side routing, so a deep link (e.g. /Website/products)
+      // 404s here. Encode the path into a query string and redirect to index.html, which
+      // restores it via history.replaceState before React Router mounts.
+      var pathSegmentsToKeep = 1; // "/Website"
+      var l = window.location;
+      var path = l.pathname.split("/").slice(0, 1 + pathSegmentsToKeep).join("/");
+      var rest = l.pathname.slice(path.length);
+      l.replace(
+        path + "/?redirect=" + encodeURIComponent(rest + l.search) + l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
