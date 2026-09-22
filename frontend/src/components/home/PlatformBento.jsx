@@ -7,6 +7,22 @@ import { Stagger, Item } from "@/components/shared/Reveal";
 
 const spans = ["lg:col-span-7 lg:row-span-2", "lg:col-span-5", "lg:col-span-5", "lg:col-span-4", "lg:col-span-4", "lg:col-span-4", "lg:col-span-6", "lg:col-span-6"];
 
+// Curated highlight reel for the homepage bento - the full 26-product catalog
+// lives at /products, grouped by category. This grid's spans are hand-tuned
+// for exactly 8 cards, so it always shows a fixed, deliberate set rather than
+// mapping the whole PRODUCTS array (which broke the layout once the catalog
+// grew past 8).
+const FEATURED_SLUGS = [
+  "enterprise-ai",
+  "common-data-platform",
+  "data-ask",
+  "enterprise-archiving",
+  "application-retirement",
+  "ai-governance",
+  "data-preservation",
+  "enterprise-data-lake",
+];
+
 export const ProductCard = ({ product, className, large = false }) => {
   const Icon = product.icon;
   return (
@@ -53,11 +69,15 @@ export const PlatformBento = () => (
         </Link>
       </div>
       <Stagger className="mt-14 grid gap-4 lg:grid-cols-12">
-        {PRODUCTS.map((p, i) => (
-          <Item key={p.slug} className={cn(spans[i], "flex")}>
-            <ProductCard product={p} large={i === 0} className="w-full" />
-          </Item>
-        ))}
+        {FEATURED_SLUGS.map((slug, i) => {
+          const p = PRODUCTS.find((prod) => prod.slug === slug);
+          if (!p) return null;
+          return (
+            <Item key={p.slug} className={cn(spans[i], "flex")}>
+              <ProductCard product={p} large={i === 0} className="w-full" />
+            </Item>
+          );
+        })}
       </Stagger>
     </div>
   </Section>
