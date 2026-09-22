@@ -47,6 +47,10 @@ Rebuild the Solix Technologies website (https://www.solix.com/) from scratch as 
 - **Insights Article Pages** (`/resources/:slug`): 10 long-form articles in `data/articles.js` (block renderer `ArticleBody.jsx`), TOC, byline, share, related reads; gated ones unlock via download LeadForm (sessionStorage).
 - Testing: iteration_2 — backend 17/17, frontend 100%.
 
+### Iteration 3 (2026-06)
+- **Newsroom** (`/newsroom`, in Company nav + footer): featured release, press releases with category filters, coverage highlights, media kit (SVG logos + brand guidelines in `/public/brand/`, brand colors, copyable boilerplate), press contact card. Data in `data/newsroom.js`. Self-tested via screenshot (filters, asset download, no console errors).
+- Sales alert inbox: user chose to skip for now — still the test inbox `delivered@resend.dev`; set via Admin → Alerts & settings.
+
 ## Notes / mock data
 - Customer logos, testimonials, leadership (except founder/CEO), jobs, timeline years, stats are illustrative MOCK content in `data/site.js` — replace with real content.
 - Resource "Continue reading" is a preview (no real article pages yet).

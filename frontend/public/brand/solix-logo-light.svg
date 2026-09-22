@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="56" viewBox="0 0 240 56" fill="none">
+  <rect x="4" y="4" width="48" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="16" y="14" width="24" height="7" rx="2" fill="#F97316"/>
+  <rect x="16" y="24.5" width="24" height="7" rx="2" fill="#334155"/>
+  <rect x="16" y="35" width="24" height="7" rx="2" fill="#0EA5C6"/>
+  <text x="66" y="38" font-family="Outfit, Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="-1" fill="#020817">SOLIX<tspan fill="#F97316">.</tspan></text>
+</svg>

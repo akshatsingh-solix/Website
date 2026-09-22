@@ -1,0 +1,23 @@
+SOLIX TECHNOLOGIES — BRAND GUIDELINES (SUMMARY)
+
+Logo
+- Use the primary logo on dark backgrounds (solix-logo-dark.svg) and the light variant on white/light backgrounds.
+- Minimum clear space: height of the brand mark on all sides. Do not stretch, recolor, rotate or add effects.
+- The brand mark (three stacked bars: Ember, Slate, Electric Teal) may be used alone at 24px or larger.
+
+Colors
+- Midnight #020817 (primary background)
+- Ember #F97316 (primary action / highlight)
+- Electric Teal #00D4FF (secondary accent)
+- Slate #94A3B8 (secondary text)
+
+Typography
+- Headlines: Outfit (Medium / SemiBold)
+- Body: IBM Plex Sans (Regular / Medium)
+- Labels & data: JetBrains Mono
+
+Name usage
+- "Solix" or "Solix Technologies" — never "SOLIX Tech" or "Solix Inc" in running copy.
+- Product names: Solix Enterprise Edition, Solix Common Data Platform (CDP), Solix Enterprise Archiving, Solix Application Retirement, Solix Enterprise Data Lake, Solix eDiscovery, Solix Consumer Data Privacy, Solix Enterprise AI, SOLIXCloud.
+
+Media relations: press@solix.com · 1.888.GO.SOLIX

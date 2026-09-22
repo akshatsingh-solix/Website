@@ -73,6 +73,7 @@ export const NAV = [
       { label: "About Solix", to: "/company", icon: Building2 },
       { label: "Careers", to: "/careers", icon: Sparkles },
       { label: "Partners", to: "/partners", icon: Layers },
+      { label: "Newsroom", to: "/newsroom", icon: Newspaper },
       { label: "Contact", to: "/contact", icon: Mail },
     ],
   },
