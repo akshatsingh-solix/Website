@@ -23,7 +23,7 @@ export default function AdminLayout() {
             </div>
             <nav className="hidden items-center gap-1 sm:flex">
               {links.map((l) => (
-                <NavLink key={l.to} to={l.to} end={l.end} data-testid={`admin-nav-${l.label.toLowerCase().split(" ")[0]}`} className={({ isActive }) => cn("inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm transition-colors", isActive ? "bg-white/10 text-foreground" : "text-slate-300 hover:text-foreground")}>
+                <NavLink key={l.to} to={l.to} end={l.end} data-testid={`admin-nav-${l.label.toLowerCase().split(" ")[0]}`} className={({ isActive }) => cn("inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm transition-colors", isActive ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground")}>
                   <l.icon className="h-4 w-4" strokeWidth={1.5} /> {l.label}
                 </NavLink>
               ))}

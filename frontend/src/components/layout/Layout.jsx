@@ -10,7 +10,7 @@ import { pageTransitionVariants } from "@/components/shared/Reveal";
 export const Layout = () => {
   const location = useLocation();
   return (
-    <div className="relative min-h-screen bg-background text-foreground custom-cursor-area">
+    <div className="relative min-h-screen bg-background text-foreground">
       <CustomCursor />
       <ScrollToTop />
       <Navbar />

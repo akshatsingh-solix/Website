@@ -14,7 +14,7 @@ const TooltipBox = ({ active, payload, label }) => {
     <div className="rounded-xl border border-white/10 bg-ink-950/95 px-4 py-3 text-xs shadow-xl backdrop-blur">
       <p className="mb-2 font-mono text-muted-foreground">{label}</p>
       {payload.map((p) => (
-        <p key={p.dataKey} className="flex items-center gap-2 text-slate-300"><span className="h-2 w-2 rounded-full" style={{ background: p.stroke }} /> {p.name}: <span className="font-mono text-foreground">{p.value}</span></p>
+        <p key={p.dataKey} className="flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full" style={{ background: p.stroke }} /> {p.name}: <span className="font-mono text-foreground">{p.value}</span></p>
       ))}
     </div>
   );
@@ -44,9 +44,9 @@ export const GrowthChart = () => (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Indexed to 2019 = 100</p>
           <div className="flex flex-wrap gap-4 text-xs">
-            <span className="inline-flex items-center gap-2 text-slate-300"><span className="h-2 w-2 rounded-full bg-teal" /> Data volume</span>
-            <span className="inline-flex items-center gap-2 text-slate-300"><span className="h-2 w-2 rounded-full bg-slate-400" /> Cost, status quo</span>
-            <span className="inline-flex items-center gap-2 text-slate-300"><span className="h-2 w-2 rounded-full bg-primary" /> Cost with Solix</span>
+            <span className="inline-flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full bg-teal" /> Data volume</span>
+            <span className="inline-flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full bg-slate-400" /> Cost, status quo</span>
+            <span className="inline-flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full bg-primary" /> Cost with Solix</span>
           </div>
         </div>
         <div className="h-[320px]">
@@ -54,15 +54,15 @@ export const GrowthChart = () => (
             <AreaChart data={DATA} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
               <defs>
                 <linearGradient id="gVol" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0088CF" stopOpacity="0.35" /><stop offset="100%" stopColor="#0088CF" stopOpacity="0" /></linearGradient>
-                <linearGradient id="gSolix" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ED2423" stopOpacity="0.35" /><stop offset="100%" stopColor="#ED2423" stopOpacity="0" /></linearGradient>
+                <linearGradient id="gSolix" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#EE2424" stopOpacity="0.35" /><stop offset="100%" stopColor="#EE2424" stopOpacity="0" /></linearGradient>
               </defs>
               <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="year" tick={{ fill: "#64748b", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "#64748b", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="year" tick={{ fill: "#B0B0B2", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#B0B0B2", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
               <Tooltip content={<TooltipBox />} />
               <Area type="monotone" dataKey="volume" name="Data volume" stroke="#0088CF" strokeWidth={2} fill="url(#gVol)" />
-              <Area type="monotone" dataKey="costTraditional" name="Cost, status quo" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="5 5" fill="transparent" />
-              <Area type="monotone" dataKey="costSolix" name="Cost with Solix" stroke="#ED2423" strokeWidth={2.5} fill="url(#gSolix)" />
+              <Area type="monotone" dataKey="costTraditional" name="Cost, status quo" stroke="#B0B0B2" strokeWidth={1.5} strokeDasharray="5 5" fill="transparent" />
+              <Area type="monotone" dataKey="costSolix" name="Cost with Solix" stroke="#EE2424" strokeWidth={2.5} fill="url(#gSolix)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>

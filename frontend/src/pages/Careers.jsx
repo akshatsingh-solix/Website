@@ -42,7 +42,7 @@ export default function Careers() {
                     <span className="inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {j.location}</span>
                     <span className="inline-flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> {j.type}</span>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-sm text-slate-300 transition-colors group-hover:text-primary sm:col-span-1 sm:justify-end">
+                  <span className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-primary sm:col-span-1 sm:justify-end">
                     Apply <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </button>

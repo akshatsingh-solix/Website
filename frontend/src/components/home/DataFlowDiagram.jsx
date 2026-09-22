@@ -32,12 +32,12 @@ export const DataFlowDiagram = () => {
     <svg viewBox="0 0 620 380" className="h-auto w-full" role="img" aria-label="Enterprise systems flowing into the Solix Common Data Platform and out to AI, analytics and compliance">
       <defs>
         <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#ED2423" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="#ED2423" stopOpacity="0" />
+          <stop offset="0%" stopColor="#EE2424" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#EE2424" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="coreStroke" x1="0" x2="1">
           <stop offset="0%" stopColor="#0088CF" />
-          <stop offset="100%" stopColor="#ED2423" />
+          <stop offset="100%" stopColor="#EE2424" />
         </linearGradient>
       </defs>
 
@@ -45,7 +45,7 @@ export const DataFlowDiagram = () => {
         <Flow key={`l${i}`} d={`M ${leftX} ${y} C ${leftX + 60} ${y}, ${cx - 110} ${cy}, ${cx - 68} ${cy}`} delay={i * 0.45} />
       ))}
       {rightYs.map((y, i) => (
-        <Flow key={`r${i}`} d={`M ${cx + 68} ${cy} C ${cx + 110} ${cy}, ${rightX - 60} ${y}, ${rightX} ${y}`} delay={0.6 + i * 0.5} color="#ED2423" dur={2.8} />
+        <Flow key={`r${i}`} d={`M ${cx + 68} ${cy} C ${cx + 110} ${cy}, ${rightX - 60} ${y}, ${rightX} ${y}`} delay={0.6 + i * 0.5} color="#EE2424" dur={2.8} />
       ))}
 
       {SOURCES.map((s, i) => <Node key={s} x={leftX} y={leftYs[i]} label={s} side="left" />)}
@@ -58,7 +58,7 @@ export const DataFlowDiagram = () => {
           <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite" />
         </rect>
         <g transform="translate(0 -26)">
-          <circle r="11" fill="#ED2423" />
+          <circle r="11" fill="#EE2424" />
           <path d="M1.9 -9.1 -5.2 1.4h4.5l-1.9 8 8.1-11h-4.5l3.3-7.5Z" fill="#fff" />
         </g>
         <text y="16" textAnchor="middle" className="fill-white" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.4 }}>Common Data Platform</text>

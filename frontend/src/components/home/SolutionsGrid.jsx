@@ -21,13 +21,13 @@ export const SolutionCard = ({ s, detailed = false }) => {
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
       <div className="mt-6 flex flex-wrap gap-2">
         {related.map((p) => (
-          <Link key={p.slug} to={`/products/${p.slug}`} className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300 transition-colors hover:border-white/40 hover:text-foreground">
+          <Link key={p.slug} to={`/products/${p.slug}`} className="rounded-full border border-white/10 px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-white/40 hover:text-foreground">
             {p.name}
           </Link>
         ))}
       </div>
       {!detailed && (
-        <Link to={`/solutions#${s.id}`} className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-slate-300 transition-colors group-hover:text-primary">
+        <Link to={`/solutions#${s.id}`} className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-muted-foreground transition-colors group-hover:text-primary">
           Explore solution <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       )}

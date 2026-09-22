@@ -27,7 +27,7 @@ const inputCls = "h-11 rounded-lg border-white/15 bg-ink-900 px-4 focus-visible:
 
 const Field = ({ label, error, htmlFor, children, optional }) => (
   <div className="space-y-2">
-    <Label htmlFor={htmlFor} className="text-xs font-medium uppercase tracking-[0.12em] text-slate-400">
+    <Label htmlFor={htmlFor} className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
       {label} {optional && <span className="normal-case tracking-normal text-muted-foreground/70">(optional)</span>}
     </Label>
     {children}

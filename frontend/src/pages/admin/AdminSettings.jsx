@@ -49,7 +49,7 @@ export default function AdminSettings() {
             </div>
           </div>
           <div className="mt-6 space-y-2">
-            <Label htmlFor="alert-email" className="text-xs font-medium uppercase tracking-[0.12em] text-slate-400">Recipient email</Label>
+            <Label htmlFor="alert-email" className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Recipient email</Label>
             <Input id="alert-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="sales@yourcompany.com" className="h-11 rounded-lg border-white/15 bg-ink-900 px-4 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0" data-testid="admin-alert-email-input" />
             <p className="text-xs text-muted-foreground">Alerts are sent for: {settings?.alert_types?.join(", ") || "…"}. Newsletter sign-ups never trigger email.</p>
           </div>
@@ -73,7 +73,7 @@ export default function AdminSettings() {
                 <div className="flex items-center gap-3">
                   <span className={cn("rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em]", STATUS[n.status] || STATUS.skipped)}>{n.status}</span>
                   <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{n.type}</span>
-                  <span className="text-slate-300">{n.lead_email}</span>
+                  <span className="text-muted-foreground">{n.lead_email}</span>
                 </div>
                 <div className="text-right text-xs text-muted-foreground">
                   <p>{n.recipient ? `→ ${n.recipient}` : n.detail}</p>

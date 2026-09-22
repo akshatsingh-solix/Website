@@ -30,7 +30,7 @@ export default function Platform() {
                 {s.points.map((p) => (
                   <Item key={p} className="flex items-start gap-3">
                     <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/10 bg-ink-950 text-teal"><Check className="h-3.5 w-3.5" /></span>
-                    <span className="text-sm text-slate-300">{p}</span>
+                    <span className="text-sm text-muted-foreground">{p}</span>
                   </Item>
                 ))}
               </Stagger>

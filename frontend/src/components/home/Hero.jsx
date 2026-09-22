@@ -47,7 +47,7 @@ export const Hero = () => {
           >
             Put AI in the hands of <span className="text-gradient-accent">your business.</span>
           </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.18 }} className="mt-7 max-w-xl text-base leading-relaxed text-slate-300 md:text-lg">
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.18 }} className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
             Solix{" "}
             <span className="relative inline-block h-[1.625em] w-[9.5ch] overflow-hidden align-top text-teal">
               <AnimatePresence mode="wait">

@@ -63,13 +63,13 @@ export const IndustriesStrip = () => {
                 <div className="relative mt-8 grid gap-6 sm:grid-cols-2">
                   <div>
                     <p className="eyebrow mb-3">Challenges</p>
-                    <ul className="space-y-2 text-sm text-slate-300">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
                       {current.challenges.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-slate-500" />{c}</li>)}
                     </ul>
                   </div>
                   <div>
                     <p className="eyebrow mb-3 text-teal">Results</p>
-                    <ul className="space-y-2 text-sm text-slate-300">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
                       {current.results.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-teal" />{c}</li>)}
                     </ul>
                   </div>

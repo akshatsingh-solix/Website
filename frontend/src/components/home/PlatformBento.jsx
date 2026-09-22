@@ -46,7 +46,7 @@ export const ProductCard = ({ product, className, large = false }) => {
         </div>
         <h3 className={cn("relative mt-6 font-display font-medium tracking-tight", large ? "text-3xl sm:text-4xl" : "text-xl")}>{product.name}</h3>
         <p className={cn("relative mt-2 text-muted-foreground", large ? "max-w-md text-base" : "text-sm")}>{product.tagline}</p>
-        <span className="relative mt-6 inline-flex items-center gap-1.5 text-sm text-slate-300 transition-colors group-hover:text-primary">
+        <span className="relative mt-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors group-hover:text-primary">
           Learn more <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </span>
       </Link>
@@ -63,7 +63,7 @@ export const PlatformBento = () => (
           title="Built on the Common Data Platform. Delivered as outcomes."
           description="Every Solix product runs on one governed foundation, so archiving, retirement, privacy and AI share the same catalog, policies and Preservation Zone."
         />
-        <Link to="/products" className="link-underline shrink-0 text-sm text-slate-300 hover:text-foreground" data-testid="platform-view-all">
+        <Link to="/products" className="link-underline shrink-0 text-sm text-muted-foreground hover:text-foreground" data-testid="platform-view-all">
           View all products →
         </Link>
       </div>

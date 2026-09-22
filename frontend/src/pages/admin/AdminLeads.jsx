@@ -17,8 +17,8 @@ const TYPES = [
 const STATUSES = [
   { key: "all", label: "Any status" }, { key: "new", label: "New" }, { key: "contacted", label: "Contacted" }, { key: "qualified", label: "Qualified" },
 ];
-const STATUS_TONE = { new: "bg-white/5 text-slate-300 border-white/15", contacted: "bg-amber-500/10 text-amber-300 border-amber-500/30", qualified: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" };
-const TYPE_TONE = { demo: "bg-primary/15 text-primary border-primary/30", contact: "bg-teal/10 text-teal border-teal/30", partner: "bg-violet-500/10 text-violet-300 border-violet-500/30", career: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30", download: "bg-sky-500/10 text-sky-300 border-sky-500/30", newsletter: "bg-white/5 text-slate-300 border-white/15" };
+const STATUS_TONE = { new: "bg-white/5 text-muted-foreground border-white/15", contacted: "bg-amber-500/10 text-amber-300 border-amber-500/30", qualified: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" };
+const TYPE_TONE = { demo: "bg-primary/15 text-primary border-primary/30", contact: "bg-teal/10 text-teal border-teal/30", partner: "bg-violet-500/10 text-violet-300 border-violet-500/30", career: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30", download: "bg-sky-500/10 text-sky-300 border-sky-500/30", newsletter: "bg-white/5 text-muted-foreground border-white/15" };
 const PAGE_SIZE = 25;
 const TEST_INBOX = "delivered@resend.dev";
 
@@ -56,7 +56,7 @@ const LeadWorkflow = ({ lead, team, onSaved }) => {
           <p className="eyebrow mb-3">Status</p>
           <div className="flex flex-wrap gap-2" role="radiogroup">
             {STATUSES.slice(1).map((s) => (
-              <button key={s.key} role="radio" aria-checked={status === s.key} onClick={() => setStatus(s.key)} data-testid={`lead-status-${s.key}`} className={cn("rounded-full border px-3.5 py-1.5 text-sm transition-colors", status === s.key ? "border-primary bg-primary text-white" : "border-white/15 text-slate-300 hover:border-white/40")}>{s.label}</button>
+              <button key={s.key} role="radio" aria-checked={status === s.key} onClick={() => setStatus(s.key)} data-testid={`lead-status-${s.key}`} className={cn("rounded-full border px-3.5 py-1.5 text-sm transition-colors", status === s.key ? "border-primary bg-primary text-white" : "border-white/15 text-muted-foreground hover:border-white/40")}>{s.label}</button>
             ))}
           </div>
         </div>
@@ -199,15 +199,15 @@ export default function AdminLeads() {
       <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2" role="tablist" data-testid="admin-type-filters">
           {TYPES.map((t) => (
-            <button key={t.key} role="tab" aria-selected={type === t.key} onClick={() => setType(t.key)} data-testid={`admin-filter-${t.key}`} className={cn("rounded-full border px-3.5 py-1.5 text-sm transition-colors", type === t.key ? "border-primary bg-primary text-white" : "border-white/15 text-slate-300 hover:border-white/40 hover:text-foreground")}>
+            <button key={t.key} role="tab" aria-selected={type === t.key} onClick={() => setType(t.key)} data-testid={`admin-filter-${t.key}`} className={cn("rounded-full border px-3.5 py-1.5 text-sm transition-colors", type === t.key ? "border-primary bg-primary text-white" : "border-white/15 text-muted-foreground hover:border-white/40 hover:text-foreground")}>
               {t.label}{stats?.by_type && t.key !== "all" && <span className="ml-1.5 font-mono text-[10px] opacity-70">{stats.by_type[t.key] ?? 0}</span>}
             </button>
           ))}
           <span className="mx-1 hidden h-5 w-px bg-white/10 sm:block" />
-          <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filter by status" data-testid="admin-status-filter" className="h-9 rounded-full border border-white/15 bg-ink-900 px-3 text-sm text-slate-300 outline-none focus:border-primary/60">
+          <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filter by status" data-testid="admin-status-filter" className="h-9 rounded-full border border-white/15 bg-ink-900 px-3 text-sm text-muted-foreground outline-none focus:border-primary/60">
             {STATUSES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Filter by owner" data-testid="admin-owner-filter" className="h-9 rounded-full border border-white/15 bg-ink-900 px-3 text-sm text-slate-300 outline-none focus:border-primary/60">
+          <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Filter by owner" data-testid="admin-owner-filter" className="h-9 rounded-full border border-white/15 bg-ink-900 px-3 text-sm text-muted-foreground outline-none focus:border-primary/60">
             <option value="all">Any owner</option>
             <option value="unassigned">Unassigned{stats?.by_owner ? ` (${stats.by_owner.unassigned ?? 0})` : ""}</option>
             {team.map((m) => <option key={m.email} value={m.email}>{m.name}{stats?.by_owner ? ` (${stats.by_owner[m.email] ?? 0})` : ""}</option>)}
@@ -250,7 +250,7 @@ export default function AdminLeads() {
                     <p className="text-xs text-muted-foreground">{s.email}</p>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{s.company || "—"}</TableCell>
-                  <TableCell className="hidden max-w-[260px] truncate text-sm text-slate-300 lg:table-cell">{s.interest || s.role || s.resource || "—"}</TableCell>
+                  <TableCell className="hidden max-w-[260px] truncate text-sm text-muted-foreground lg:table-cell">{s.interest || s.role || s.resource || "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     {s.source === "chat" ? <span className="inline-flex items-center gap-1.5 text-xs text-teal"><Bot className="h-3.5 w-3.5" /> Sol chat</span> : <span className="text-xs text-muted-foreground">{s.source_page || "web"}</span>}
                   </TableCell>

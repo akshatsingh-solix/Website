@@ -39,9 +39,13 @@ module.exports = {
         // a mechanical rename across every consumer; the color itself is blue.
         teal: { DEFAULT: "#0088CF", dim: "#00669E" },
         ember: { DEFAULT: "#EE2424", deep: "#B91C1C" },
-        // Real Solix navy, not a generic slate - sourced from the brand
-        // guide's panel/footer colors (#0D192D, #1C2F43, #0B3765).
-        ink: { 950: "#0D192D", 900: "#112036", 800: "#1C2F43", 700: "#2C4A66" },
+        // Real Solix navy scale, from the SOLIX Brand Design System (Navy
+        // 950/900/800/700/600) - not a generic slate.
+        ink: { 950: "#0D192D", 900: "#112036", 800: "#1C2F43", 700: "#2C4A66", 600: "#3D6288" },
+        // Neutral scale from the brand system - replaces framework-default
+        // Tailwind slate/gray tokens that had crept into chart components.
+        grey: { 50: "#F5F5F5", 400: "#B0B0B2", 700: "#424242", 900: "#1D1D1D" },
+        "tint-blue": "#DDE9F2",
         chart: {
           1: "hsl(var(--chart-1))",
           2: "hsl(var(--chart-2))",

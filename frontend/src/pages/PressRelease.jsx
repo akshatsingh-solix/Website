@@ -80,7 +80,7 @@ export default function PressRelease() {
                 <p className="eyebrow">About Solix Technologies</p>
                 <Button variant="ghost" size="sm" onClick={() => copy(BOILERPLATE, "Boilerplate copied")} data-testid="press-copy-boilerplate"><Copy /> Copy</Button>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">{BOILERPLATE}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{BOILERPLATE}</p>
               <p className="mt-4 text-center font-mono text-xs text-muted-foreground">###</p>
             </div>
           </div>
@@ -89,8 +89,8 @@ export default function PressRelease() {
               <div className="rounded-2xl border border-white/10 bg-card p-5 text-sm" data-testid="press-contact-card">
                 <p className="eyebrow mb-3">Media contact</p>
                 <p className="font-medium">{PRESS_CONTACT.name}</p>
-                <a href={`mailto:${PRESS_CONTACT.email}?subject=${encodeURIComponent("Re: " + pr.title)}`} className="mt-2 flex items-center gap-2 text-slate-300 hover:text-primary"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
-                <p className="mt-1.5 text-slate-300">{PRESS_CONTACT.phone}</p>
+                <a href={`mailto:${PRESS_CONTACT.email}?subject=${encodeURIComponent("Re: " + pr.title)}`} className="mt-2 flex items-center gap-2 text-muted-foreground hover:text-primary"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
+                <p className="mt-1.5 text-muted-foreground">{PRESS_CONTACT.phone}</p>
               </div>
               <Link to="/newsroom#media-kit" className="group flex items-center justify-between rounded-2xl border border-white/10 bg-card p-5 text-sm card-hover" data-testid="press-media-kit-link">
                 <span><span className="block font-medium">Media kit</span><span className="text-xs text-muted-foreground">Logos, colors, guidelines</span></span>

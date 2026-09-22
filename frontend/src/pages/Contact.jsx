@@ -30,14 +30,14 @@ export default function Contact() {
                 aria-selected={mode.key === m.key}
                 onClick={() => setParams(interest ? { type: m.key, interest } : { type: m.key })}
                 data-testid={`contact-mode-${m.key}`}
-                className={cn("rounded-full px-4 py-2 text-sm transition-colors duration-200", mode.key === m.key ? "bg-primary text-white" : "text-slate-300 hover:text-foreground")}
+                className={cn("rounded-full px-4 py-2 text-sm transition-colors duration-200", mode.key === m.key ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground")}
               >
                 {m.label}
               </button>
             ))}
           </div>
           <h1 className="text-balance text-4xl font-medium tracking-tighter sm:text-5xl lg:text-6xl">{mode.title}</h1>
-          <p className="mt-6 max-w-md text-base leading-relaxed text-slate-300 md:text-lg">{mode.desc}</p>
+          <p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">{mode.desc}</p>
 
           <dl className="mt-12 space-y-6 text-sm">
             <div className="flex gap-4">
