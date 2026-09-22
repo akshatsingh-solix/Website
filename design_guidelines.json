@@ -1,0 +1,107 @@
+{
+  "typography": {
+    "fonts": {
+      "headings": "Outfit",
+      "body": "IBM Plex Sans",
+      "mono": "JetBrains Mono"
+    },
+    "scale": {
+      "h1": "text-5xl sm:text-6xl tracking-tighter font-medium",
+      "h2": "text-4xl sm:text-5xl tracking-tight font-medium",
+      "h3": "text-2xl sm:text-3xl tracking-tight font-medium",
+      "h4": "text-xl sm:text-2xl tracking-tight font-medium",
+      "body": "text-base leading-relaxed text-muted-foreground",
+      "small": "text-sm text-muted-foreground",
+      "overline": "text-xs font-bold uppercase tracking-[0.2em] text-primary"
+    },
+    "instructions": "Do NOT use Inter or Roboto. Apply tracking-tighter on headings larger than 32px. Use Outfit for all headings, IBM Plex Sans for body text. Use varying font weights (e.g., font-light, font-medium) to create tension."
+  },
+  "colors": {
+    "theme": "dark",
+    "primary": "#F97316",
+    "primary_foreground": "#FFFFFF",
+    "background": "#020817",
+    "foreground": "#F8FAFC",
+    "muted": "#0F172A",
+    "muted_foreground": "#94A3B8",
+    "accent": "#00D4FF",
+    "accent_foreground": "#FFFFFF",
+    "border": "rgba(255,255,255,0.1)",
+    "card": "#0B1120",
+    "card_foreground": "#F8FAFC",
+    "instructions": "Follow 'Old Money Tech' & 'Luxury' archetypes: use deep midnight blues/teals as the base with high-contrast vibrant orange (#F97316) for primary CTAs and electric teal (#00D4FF) for subtle highlights. Maintain a minimum 4.5:1 contrast ratio. Ensure text is accessible over gradients/images. Never use pure #000000."
+  },
+  "visual_enhancers": {
+    "surfaces": "Use Glassmorphism (Crystal/Apple variant) for Sticky Headers (backdrop-blur-xl bg-black/60 with 1px border-white/10). Use Grid Borders (technical look) for data-heavy sections and footers. Add subtle noise/grain texture to hero backgrounds.",
+    "gradients": "Do NOT use full-screen gradients. Use subtle radial glows (blur-3xl) behind key elements to create depth.",
+    "shadows": "Use ambient and direct shadows. E.g., shadow-[0_8px_32px_rgba(0,0,0,0.12)] for cards on hover."
+  },
+  "components": {
+    "navigation": "Sticky mega-menu with glassmorphism surface. Include Logo, Products, Solutions, Industries, Resources, Company. Right side: Contact CTA button. Must have z-50 and not overlap content.",
+    "buttons": "Pill-shaped or slightly rounded (rounded-md). Primary CTAs should use the vibrant orange with hover lift (-translate-y-1) and shadow-lg. Always define focus states (focus:ring-2 focus:ring-primary).",
+    "cards": "Flat background (card color), 1px subtle border, no initial shadow. On hover: slight lift, border color lightens, subtle shadow.",
+    "forms": "Use Shadcn Form, Input, Select, Textarea. Deep background for inputs with 1px solid border. Active/Focus state gets primary ring.",
+    "chatbot": "Floating AI widget (concierge) at bottom-right. Circular button. Clicking opens a modern chat window with chat history (Shadcn scroll-area).",
+    "icons": "Use lucide-react. Ensure all icons have stroke-width of 1.5 or 2 based on visual weight."
+  },
+  "layouts": {
+    "hero": "Asymmetric bento grid or large split layout. Max overlay opacity bg-black/50 for background images. Massive H1.",
+    "stats_band": "High-density grid (grid-cols-2 md:grid-cols-4). Massive typography for numbers (text-5xl+) with tiny overline labels.",
+    "solutions_grid": "Bento Grid Protocol (Tetris Grid). Asymmetric card spans (col-span-full md:col-span-8, col-span-4, etc.) to create visual tension.",
+    "industries": "Cardless or flat-rectangular cards with sharp edges. Use hover-reveals for more info.",
+    "footer": "Massive space (py-24). Include newsletter signup, sitemap links. Dark background. Very large brand logo/text at bottom."
+  },
+  "motion": {
+    "instructions": "All interactive elements MUST have hover and active state transitions. Use Framer Motion for staggered list entrances, scroll-triggered reveals, and micro-interactions on cards. Respect prefers-reduced-motion. Do NOT use 'transition: all', specify properties (e.g., transition-colors, transition-transform).",
+    "marquee": "Use a subtle editorial ribbon or kinetic marquee for customer logos. Very slow, smooth drift."
+  },
+  "accessibility": {
+    "instructions": "Ensure all form inputs have labels. Use ARIA attributes. Interactive elements must have data-testid attributes (e.g., data-testid='contact-submit-button'). Ensure 4.5:1 text contrast. Add focus indicators."
+  },
+  "images": {
+    "hero_backgrounds": [
+      {
+        "url": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRhdGElMjBuZXR3b3JrJTIwM2QlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc5MDA2OTIwOXww&ixlib=rb-4.1.0&q=85",
+        "description": "Blue background with lines and dots (Abstract Data Network) - Use for Hero section background"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1644325349124-d1756b79dd42?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGRhdGElMjBuZXR3b3JrJTIwM2QlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc5MDA2OTIwOXww&ixlib=rb-4.1.0&q=85",
+        "description": "Blue abstract background with lines and dots - Use for Data Lake or Platform section"
+      }
+    ],
+    "data_center": [
+      {
+        "url": "https://images.unsplash.com/photo-1784652852605-6945598f2af3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBkYXRhJTIwY2VudGVyJTIwc2VydmVyJTIwcm9vbXxlbnwwfHx8fDE3OTAwNjkyMTl8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Modern data center rows - Use for Solutions or About/Company page"
+      },
+      {
+        "url": "https://images.pexels.com/photos/17489163/pexels-photo-17489163.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Close-up of modern server unit - Use for Products list/detail page"
+      }
+    ],
+    "logos": [
+      {
+        "url": "https://images.pexels.com/photos/21898300/pexels-photo-21898300.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Pexels Logo - Use in Marquee"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1787837097254-660c5a75047d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHwyfHxjb21wYW55JTIwbG9nbyUyMHdoaXRlJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3OTAwNjkyMTR8MA&ixlib=rb-4.1.0&q=85",
+        "description": "ie logo - Use in Marquee"
+      }
+    ],
+    "instructions": "Use lucide-react icons for additional client logos in the marquee if needed. Use these images with careful overlays (e.g. bg-black/50) so text is always readable."
+  },
+  "universal_guidelines": {
+    "instructions": "Create depth through layered design elements with z-index hierarchy. Avoid generic centered layouts and simplistic gradients. Every interaction needs micro-animations. Use 2-3x more spacing than feels comfortable. Do NOT apply universal 'transition: all'. Prioritize optical alignment. Do not center-align the main App container."
+  },
+  "instructions_to_main_agent": {
+    "1": "Initialize React + FastAPI + MongoDB project structure. Setup Tailwind CSS with provided custom colors.",
+    "2": "Create multi-page routing (Home, Products, Solutions, Industries, Resources, Company, Careers, Partners, Contact).",
+    "3": "Implement sticky mega-menu for navigation.",
+    "4": "Build Home page with bento-grid layouts, animated hero, stats band, and marquee.",
+    "5": "Implement functional AI chatbot (site concierge) widget pinned to bottom right. Include chat history.",
+    "6": "Build Contact / Demo page with form submission connected to FastAPI backend, saved to MongoDB.",
+    "7": "Use Shadcn components for forms, scroll-areas, dialogs, cards, but heavily customize them to match the Luxury/Tech dark theme.",
+    "8": "Include data-testid attributes on all interactive elements."
+  }
+}
