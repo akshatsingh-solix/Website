@@ -8,12 +8,12 @@ const Block = ({ b }) => {
     case "h2":
       return <h2 id={slugify(b.text)} className="scroll-mt-28 pt-6 font-display text-2xl font-medium tracking-tight sm:text-3xl">{b.text}</h2>;
     case "p":
-      return <p className="text-base leading-[1.8] text-slate-300 md:text-lg">{b.text}</p>;
+      return <p className="text-base leading-[1.8] text-muted-foreground md:text-lg">{b.text}</p>;
     case "ul":
       return (
         <ul className="space-y-3">
           {b.items.map((it) => (
-            <li key={it} className="flex gap-3 text-base leading-relaxed text-slate-300 md:text-lg">
+            <li key={it} className="flex gap-3 text-base leading-relaxed text-muted-foreground md:text-lg">
               <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" /> {it}
             </li>
           ))}
@@ -33,7 +33,7 @@ const Block = ({ b }) => {
           <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
           <div>
             <p className="font-display font-medium text-teal">{b.title}</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-slate-300 md:text-base">{b.text}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground md:text-base">{b.text}</p>
           </div>
         </aside>
       );

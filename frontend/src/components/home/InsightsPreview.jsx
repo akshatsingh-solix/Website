@@ -25,7 +25,7 @@ export const ResourceCard = ({ r, className }) => {
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{r.desc}</p>
       <div className="mt-auto flex items-center justify-between pt-6 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {r.readTime} · {r.date}</span>
-        <span className="inline-flex items-center gap-1 text-slate-300 transition-colors group-hover:text-primary">
+        <span className="inline-flex items-center gap-1 text-muted-foreground transition-colors group-hover:text-primary">
           {r.gated ? "Get access" : "Read"} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </span>
       </div>
@@ -38,7 +38,7 @@ export const InsightsPreview = () => (
     <div className="container">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <SectionHeading eyebrow="Insights" title="Field notes from two decades of enterprise data." />
-        <Link to="/resources" className="link-underline shrink-0 text-sm text-slate-300 hover:text-foreground" data-testid="insights-view-all">
+        <Link to="/resources" className="link-underline shrink-0 text-sm text-muted-foreground hover:text-foreground" data-testid="insights-view-all">
           Browse all resources →
         </Link>
       </div>

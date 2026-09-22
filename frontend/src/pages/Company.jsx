@@ -28,7 +28,7 @@ export default function Company() {
           <div className="lg:col-span-5">
             <SectionHeading eyebrow="Mission" title="Activate every era of enterprise data, inside a perimeter of trust." />
           </div>
-          <Reveal delay={0.1} className="prose-solix text-base leading-relaxed text-slate-300 md:text-lg lg:col-span-7">
+          <Reveal delay={0.1} className="prose-solix text-base leading-relaxed text-muted-foreground md:text-lg lg:col-span-7">
             <p>Enterprises don't have a data problem. They have a data <em>history</em> problem: decades of systems, formats and regulations, each holding records the business still needs and regulators still expect.</p>
             <p>Solix built the Common Data Platform to give that history a home: governed, searchable, preserved. Then we built the products that put it to work, from archiving and application retirement to privacy automation and, now, governed Enterprise AI.</p>
             <p>Headquartered in Santa Clara, California with engineering in Hyderabad and teams across EMEA and APAC, we serve some of the most regulated organizations in the world.</p>
@@ -116,7 +116,7 @@ export default function Company() {
           <div className="lg:col-span-5">
             <SectionHeading eyebrow="Analyst Views" title="Independent perspective on where we fit." />
           </div>
-          <Reveal delay={0.1} className="text-sm leading-relaxed text-slate-300 lg:col-span-7 md:text-base">
+          <Reveal delay={0.1} className="text-sm leading-relaxed text-muted-foreground lg:col-span-7 md:text-base">
             <p>Solix briefs industry analysts regularly on our platform strategy, from archiving and application retirement to governed Enterprise AI. If you're evaluating Solix as part of an analyst-led shortlist, your account team can share the relevant reports and briefing notes for your industry and use case.</p>
           </Reveal>
         </div>
@@ -127,7 +127,7 @@ export default function Company() {
           <div className="lg:col-span-5">
             <SectionHeading eyebrow="Investor Relations" title="Independent and growing since 2002." />
           </div>
-          <Reveal delay={0.1} className="text-sm leading-relaxed text-slate-300 lg:col-span-7 md:text-base">
+          <Reveal delay={0.1} className="text-sm leading-relaxed text-muted-foreground lg:col-span-7 md:text-base">
             <p>Solix has grown as an independent, privately held company for over two decades. For investment or partnership inquiries, reach our corporate development team through the contact form below.</p>
           </Reveal>
         </div>
@@ -138,7 +138,7 @@ export default function Company() {
           <div className="lg:col-span-5">
             <SectionHeading eyebrow="Corporate Social Responsibility" title="Stewardship, on and off the platform." />
           </div>
-          <Reveal delay={0.1} className="text-sm leading-relaxed text-slate-300 lg:col-span-7 md:text-base">
+          <Reveal delay={0.1} className="text-sm leading-relaxed text-muted-foreground lg:col-span-7 md:text-base">
             <p>The same stewardship we apply to customer data guides how we operate as a company: annual volunteer days for every employee, data-minimization built into our own internal systems, and a hiring practice that reflects the global, regulated industries we serve.</p>
           </Reveal>
         </div>

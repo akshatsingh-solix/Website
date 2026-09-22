@@ -27,11 +27,11 @@ export const BrandMark = ({ name, className = "" }) => {
     >
       {icon ? (
         <span
-          className="h-7 w-full text-slate-400 transition-colors duration-300 [&_svg]:mx-auto [&_svg]:h-7 [&_svg]:w-auto [&_svg]:fill-current group-hover:[&_svg]:fill-[var(--brand)]"
+          className="h-7 w-full text-muted-foreground transition-colors duration-300 [&_svg]:mx-auto [&_svg]:h-7 [&_svg]:w-auto [&_svg]:fill-current group-hover:[&_svg]:fill-[var(--brand)]"
           dangerouslySetInnerHTML={{ __html: icon.svg }}
         />
       ) : (
-        <span className="font-display text-sm font-semibold tracking-tight text-slate-400 transition-colors duration-300 group-hover:text-foreground">
+        <span className="font-display text-sm font-semibold tracking-tight text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
           {name}
         </span>
       )}

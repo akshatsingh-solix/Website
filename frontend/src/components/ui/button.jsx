@@ -16,10 +16,9 @@ const buttonVariants = cva(
         outline:
           "border border-white/15 bg-transparent text-foreground hover:border-white/40 hover:bg-white/5",
         secondary:
-          "bg-white text-ink-950 hover:bg-slate-200 hover:-translate-y-0.5",
+          "bg-white text-ink-950 hover:bg-grey-50 hover:-translate-y-0.5",
         ghost: "text-muted-foreground hover:bg-white/5 hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        teal: "bg-teal text-ink-950 hover:bg-teal-dim hover:-translate-y-0.5",
       },
       size: {
         default: "h-10 px-5 py-2",

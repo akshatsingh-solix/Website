@@ -41,7 +41,7 @@ export const DataEras = () => (
                 <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">0{i + 1} · {e.era}</p>
                 <h3 className="mt-1.5 font-display text-lg font-medium leading-snug">{e.title}</h3>
                 <p className="mt-1.5 text-sm text-muted-foreground">{e.desc}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-xs text-slate-400 transition-colors group-hover:text-primary">Learn more <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" /></span>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors group-hover:text-primary">Learn more <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" /></span>
               </Link>
             </Item>
           ))}

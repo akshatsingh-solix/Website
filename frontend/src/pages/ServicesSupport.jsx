@@ -50,7 +50,7 @@ export default function ServicesSupport() {
               {s.points.map((p, idx) => (
                 <Item key={p} className="rounded-xl border border-white/10 bg-card/60 p-5">
                   <span className="font-mono text-xs text-muted-foreground">0{idx + 1}</span>
-                  <p className="mt-2 text-sm text-slate-300">{p}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{p}</p>
                 </Item>
               ))}
             </Stagger>

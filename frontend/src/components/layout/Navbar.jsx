@@ -55,7 +55,7 @@ const FlatPanel = ({ item, onNavigate }) => (
     <div className="relative border-b border-white/10 p-8 lg:col-span-4 lg:border-b-0 lg:border-r">
       <div className="absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
       <p className="eyebrow mb-3">{item.label}</p>
-      <p className="max-w-xs text-sm leading-relaxed text-slate-300">{item.blurb}</p>
+      <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{item.blurb}</p>
       <Link
         to={item.featured.to}
         onClick={onNavigate}
@@ -78,7 +78,7 @@ const FlatPanel = ({ item, onNavigate }) => (
           data-testid={`mega-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
           className="group flex items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-white/5"
         >
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-white/10 bg-ink-900 text-slate-300 transition-colors duration-200 group-hover:border-primary/50 group-hover:text-primary">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-white/10 bg-ink-900 text-muted-foreground transition-colors duration-200 group-hover:border-primary/50 group-hover:text-primary">
             <Icon className="h-5 w-5" strokeWidth={1.5} />
           </span>
           <span>
@@ -151,7 +151,7 @@ const MobileNav = ({ onNavigate }) => (
                   All {item.label}
                 </Link>
                 {flatItems.map(({ label, to }) => (
-                  <Link key={label} to={to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-foreground">
+                  <Link key={label} to={to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
                     {label}
                   </Link>
                 ))}
@@ -215,7 +215,7 @@ export const Navbar = () => {
                   className={({ isActive }) =>
                     cn(
                       "inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-sm transition-colors duration-200",
-                      isActive || open === item.label ? "text-foreground" : "text-slate-300 hover:text-foreground"
+                      isActive || open === item.label ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                     )
                   }
                 >

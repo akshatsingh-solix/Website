@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export const SolixMark = ({ className }) => (
   <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-    <circle cx="20" cy="20" r="20" fill="#ED2423" />
+    <circle cx="20" cy="20" r="20" fill="#EE2424" />
     <path d="M23.5 3.5 10.5 22.5h8.2L15.2 37 30 17h-8.2L26 3.5Z" fill="#FFFFFF" />
   </svg>
 );

@@ -48,7 +48,7 @@ const BookingCard = ({ name, email, company }) => (
   <div className="flex justify-start" data-testid="chat-booking-card">
     <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-teal/30 bg-teal/5 px-4 py-3 text-sm">
       <p className="flex items-center gap-2 font-display font-medium text-teal"><CalendarCheck className="h-4 w-4" /> Demo request saved</p>
-      <dl className="mt-2 space-y-0.5 text-xs text-slate-300">
+      <dl className="mt-2 space-y-0.5 text-xs text-muted-foreground">
         <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Name</dt><dd>{name}</dd></div>
         <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Email</dt><dd>{email}</dd></div>
         <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Company</dt><dd>{company}</dd></div>
@@ -187,7 +187,7 @@ export const ConciergeWidget = () => {
                         key={s}
                         onClick={() => send(s)}
                         data-testid="chat-suggestion"
-                        className="group flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-left text-sm text-slate-300 transition-[border-color,color,background-color] duration-200 hover:border-primary/50 hover:bg-white/5 hover:text-foreground"
+                        className="group flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-left text-sm text-muted-foreground transition-[border-color,color,background-color] duration-200 hover:border-primary/50 hover:bg-white/5 hover:text-foreground"
                       >
                         <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
                         {s}

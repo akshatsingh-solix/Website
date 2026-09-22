@@ -49,11 +49,11 @@ export default function AdminLogin() {
           <p className="mt-2 text-sm text-muted-foreground">Restricted to Solix administrators.</p>
           <form onSubmit={onSubmit} className="mt-8 space-y-5" data-testid="admin-login-form">
             <div className="space-y-2">
-              <Label htmlFor="admin-email" className="text-xs font-medium uppercase tracking-[0.12em] text-slate-400">Email</Label>
+              <Label htmlFor="admin-email" className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Email</Label>
               <Input id="admin-email" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} className={cls} data-testid="admin-email-input" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="admin-password" className="text-xs font-medium uppercase tracking-[0.12em] text-slate-400">Password</Label>
+              <Label htmlFor="admin-password" className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Password</Label>
               <Input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className={cls} data-testid="admin-password-input" required />
             </div>
             {error && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300" data-testid="admin-login-error">{error}</p>}

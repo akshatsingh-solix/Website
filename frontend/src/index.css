@@ -26,11 +26,13 @@
     --border: 209 40% 24%;
     --input: 209 40% 24%;
     --ring: 0 86% 54%;
-    --chart-1: 0 86% 54%;
-    --chart-2: 201 100% 41%;
-    --chart-3: 44 92% 62%;
+    /* Data accent triad from the brand system - charts and status only,
+       never UI chrome or CTAs: Deep Blue, Blue, Sky, Teal, Amber. */
+    --chart-1: 200 100% 26%;
+    --chart-2: 207 84% 46%;
+    --chart-3: 198 69% 50%;
     --chart-4: 179 46% 62%;
-    --chart-5: 207 84% 46%;
+    --chart-5: 44 92% 62%;
     --radius: 0.5rem;
   }
 
@@ -48,6 +50,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* A faint, fixed grid texture site-wide so plain-navy sections never
+       read as a dead flat void between content blocks - same treatment
+       the hero already used locally, just persistent and much fainter. */
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -72,12 +82,21 @@
     border: 2px solid #0D192D;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #3D6288;
   }
 
+  /* Scoped to `html`/`body` rather than a wrapper div, and !important:
+     Radix portals (Dialog, Select, Sheet, Tooltip, DropdownMenu - the
+     mobile nav and every dropdown/modal in the app) render into
+     document.body, outside any React-tree wrapper, so a class-scoped rule
+     never reaches them and the native cursor reappears the moment one
+     opens. !important is required too: Tailwind always emits @layer
+     utilities after @layer base, so a plain rule here would still lose to
+     any cursor-pointer/cursor-text utility class on the same element
+     (every shadcn form primitive sets one). */
   @media (hover: hover) and (pointer: fine) {
-    .custom-cursor-area, .custom-cursor-area * {
-      cursor: none;
+    html, html * {
+      cursor: none !important;
     }
   }
 
@@ -169,7 +188,7 @@
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(100deg, #fff 10%, #94a3b8 60%, #fff 90%);
+    background-image: linear-gradient(100deg, #fff 10%, #B0B0B2 60%, #fff 90%);
   }
 
   .text-gradient-accent {

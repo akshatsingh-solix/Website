@@ -36,7 +36,7 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
           <Reveal blur className="lg:col-span-8">
             {eyebrow && <p className="eyebrow mb-5">{eyebrow}</p>}
             <h1 className="text-balance text-fluid-h2 font-medium">{title}</h1>
-            {description && <p className="mt-6 max-w-2xl text-fluid-lead text-slate-300">{description}</p>}
+            {description && <p className="mt-6 max-w-2xl text-fluid-lead text-muted-foreground">{description}</p>}
           </Reveal>
           {children && <Reveal delay={0.1} className="lg:col-span-4 lg:justify-self-end">{children}</Reveal>}
         </div>

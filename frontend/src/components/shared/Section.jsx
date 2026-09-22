@@ -6,7 +6,7 @@ export const SectionHeading = ({ eyebrow, title, description, align = "left", cl
     {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
     <h2 className="text-balance text-fluid-h3 font-medium text-foreground">{title}</h2>
     {description && (
-      <p className={cn("mt-5 text-fluid-sm", light ? "text-slate-300" : "text-muted-foreground")}>{description}</p>
+      <p className={cn("mt-5 text-fluid-sm", light ? "text-muted-foreground" : "text-muted-foreground")}>{description}</p>
     )}
   </Reveal>
 );

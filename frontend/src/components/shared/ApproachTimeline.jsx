@@ -24,7 +24,7 @@ export const ApproachTimeline = () => (
             <h3 className="mt-3 font-display text-2xl font-medium">{s.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
             <ul className="mt-4 flex flex-wrap gap-2">
-              {s.outputs.map((o) => <li key={o} className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-slate-300">{o}</li>)}
+              {s.outputs.map((o) => <li key={o} className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-muted-foreground">{o}</li>)}
             </ul>
           </div>
           {i < STEPS.length - 1 && <span className="absolute -right-4 top-7 hidden h-2 w-2 rounded-full bg-white/40 lg:block" />}

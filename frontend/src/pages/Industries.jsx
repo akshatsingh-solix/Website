@@ -18,7 +18,7 @@ export default function Industries() {
       />
       <Section>
         <div className="container">
-          <Stagger className="grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+          <Stagger className="grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
             {INDUSTRIES.map((ind) => (
               <Item key={ind.slug} className="flex">
                 <Link
@@ -33,7 +33,7 @@ export default function Industries() {
                   </span>
                   <h3 className="relative mt-6 font-display text-2xl font-medium tracking-tight">{ind.name}</h3>
                   <p className="relative mt-3 text-sm text-muted-foreground opacity-80 transition-opacity group-hover:opacity-100">{ind.desc}</p>
-                  <span className="relative mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-slate-300 transition-colors group-hover:text-primary">
+                  <span className="relative mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-muted-foreground transition-colors group-hover:text-primary">
                     Explore <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                   </span>
                 </Link>

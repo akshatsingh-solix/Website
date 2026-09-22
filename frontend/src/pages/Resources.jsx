@@ -43,7 +43,7 @@ export default function Resources() {
                   data-testid={`resource-filter-${t.key}`}
                   className={cn(
                     "rounded-full border px-4 py-2 text-sm transition-[background-color,border-color,color] duration-200",
-                    type === t.key ? "border-primary bg-primary text-white" : "border-white/15 text-slate-300 hover:border-white/40 hover:text-foreground"
+                    type === t.key ? "border-primary bg-primary text-white" : "border-white/15 text-muted-foreground hover:border-white/40 hover:text-foreground"
                   )}
                 >
                   {t.label}

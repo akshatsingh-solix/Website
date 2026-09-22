@@ -35,8 +35,8 @@ export default function Newsroom() {
         <div className="rounded-2xl border border-white/10 bg-card/80 p-5 text-sm backdrop-blur lg:min-w-[260px]" data-testid="press-contact-card">
           <p className="eyebrow mb-3">Media inquiries</p>
           <p className="font-medium">{PRESS_CONTACT.name}</p>
-          <a href={`mailto:${PRESS_CONTACT.email}`} className="mt-2 flex items-center gap-2 text-slate-300 hover:text-primary" data-testid="press-email-link"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
-          <a href="tel:18884676549" className="mt-1.5 flex items-center gap-2 text-slate-300 hover:text-primary"><Phone className="h-4 w-4" /> {PRESS_CONTACT.phone}</a>
+          <a href={`mailto:${PRESS_CONTACT.email}`} className="mt-2 flex items-center gap-2 text-muted-foreground hover:text-primary" data-testid="press-email-link"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
+          <a href="tel:18884676549" className="mt-1.5 flex items-center gap-2 text-muted-foreground hover:text-primary"><Phone className="h-4 w-4" /> {PRESS_CONTACT.phone}</a>
         </div>
       </PageHero>
 
@@ -53,7 +53,7 @@ export default function Newsroom() {
                     <span className="text-muted-foreground">{fmt(featured.date)}</span>
                   </div>
                   <h2 className="mt-6 text-balance font-display text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">{featured.title}</h2>
-                  <p className="mt-5 max-w-2xl text-base text-slate-300 md:text-lg">{featured.summary}</p>
+                  <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">{featured.summary}</p>
                   <Button asChild className="mt-8" data-testid="featured-release-cta"><Link to={`/newsroom/${featured.id}`}>Read the announcement <ArrowUpRight /></Link></Button>
                 </div>
               </div>
@@ -68,7 +68,7 @@ export default function Newsroom() {
             <SectionHeading eyebrow="Press releases" title="Latest announcements." />
             <div className="flex flex-wrap gap-2" role="tablist" data-testid="release-filters">
               {CATS.map((c) => (
-                <button key={c} role="tab" aria-selected={cat === c} onClick={() => setCat(c)} data-testid={`release-filter-${c.toLowerCase()}`} className={cn("rounded-full border px-4 py-1.5 text-sm transition-colors", cat === c ? "border-primary bg-primary text-white" : "border-white/15 text-slate-300 hover:border-white/40 hover:text-foreground")}>{c}</button>
+                <button key={c} role="tab" aria-selected={cat === c} onClick={() => setCat(c)} data-testid={`release-filter-${c.toLowerCase()}`} className={cn("rounded-full border px-4 py-1.5 text-sm transition-colors", cat === c ? "border-primary bg-primary text-white" : "border-white/15 text-muted-foreground hover:border-white/40 hover:text-foreground")}>{c}</button>
               ))}
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function Newsroom() {
                     <p className="mt-2 text-sm text-muted-foreground">{p.summary}</p>
                   </div>
                   <div className="sm:col-span-2 sm:text-right">
-                    <span className="inline-flex items-center gap-1 text-sm text-slate-300 transition-colors group-hover:text-primary">Read release <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></span>
+                    <span className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-primary">Read release <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></span>
                   </div>
                 </Link>
               </Item>
@@ -142,7 +142,7 @@ export default function Newsroom() {
                 <p className="eyebrow">Company boilerplate</p>
                 <Button variant="ghost" size="sm" onClick={copyBoilerplate} data-testid="copy-boilerplate"><Copy /> Copy</Button>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">{BOILERPLATE}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{BOILERPLATE}</p>
             </div>
           </div>
         </div>

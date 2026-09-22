@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const LAYERS = [
-  { key: "activate", label: "Activate", items: [{ n: "Enterprise AI", to: "/products/enterprise-ai" }, { n: "Enterprise Edition workspace", to: "/products/enterprise-edition" }], fill: "#ED2423", text: "#fff" },
-  { key: "comply", label: "Comply", items: [{ n: "eDiscovery", to: "/products/ediscovery" }, { n: "Consumer Data Privacy", to: "/products/consumer-data-privacy" }], fill: "#334155", text: "#F1F5F9" },
-  { key: "optimize", label: "Optimize & Modernize", items: [{ n: "Enterprise Archiving", to: "/products/enterprise-archiving" }, { n: "Application Retirement", to: "/products/application-retirement" }, { n: "Enterprise Data Lake", to: "/products/enterprise-data-lake" }], fill: "#2C4A66", text: "#F1F5F9" },
+  { key: "activate", label: "Activate", items: [{ n: "Enterprise AI", to: "/products/enterprise-ai" }, { n: "Enterprise Edition workspace", to: "/products/enterprise-edition" }], fill: "#EE2424", text: "#fff" },
+  { key: "comply", label: "Comply", items: [{ n: "eDiscovery", to: "/products/ediscovery" }, { n: "Consumer Data Privacy", to: "/products/consumer-data-privacy" }], fill: "#1C2F43", text: "#F5F5F5" },
+  { key: "optimize", label: "Optimize & Modernize", items: [{ n: "Enterprise Archiving", to: "/products/enterprise-archiving" }, { n: "Application Retirement", to: "/products/application-retirement" }, { n: "Enterprise Data Lake", to: "/products/enterprise-data-lake" }], fill: "#2C4A66", text: "#F5F5F5" },
   { key: "foundation", label: "Foundation", items: [{ n: "Common Data Platform · 150+ connectors · Preservation Zone · Catalog", to: "/products/common-data-platform" }], fill: "#0088CF", text: "#0D192D" },
 ];
 
@@ -48,7 +48,7 @@ export const ArchitectureStack = () => (
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-200">{l.label}</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:col-span-8">
-            {l.items.map((it) => <Link key={it.n} to={it.to} className="rounded-full border border-white/10 px-3 py-1 text-sm text-slate-300 transition-colors hover:border-primary/60 hover:text-foreground">{it.n}</Link>)}
+            {l.items.map((it) => <Link key={it.n} to={it.to} className="rounded-full border border-white/10 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground">{it.n}</Link>)}
           </div>
         </motion.div>
       ))}
