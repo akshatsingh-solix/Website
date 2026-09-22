@@ -7,11 +7,11 @@ import { Stagger, Item } from "@/components/shared/Reveal";
 
 export const typeLabel = (key) => RESOURCE_TYPES.find((t) => t.key === key)?.label.replace(/s$/, "") ?? key;
 
-export const ResourceCard = ({ r, onOpen, className }) => {
+export const ResourceCard = ({ r, className }) => {
   const Icon = r.icon;
   return (
-    <button
-      onClick={() => onOpen?.(r)}
+    <Link
+      to={`/resources/${r.slug}`}
       data-testid={`resource-card-${r.id}`}
       className={cn("group flex h-full w-full flex-col rounded-2xl border border-white/10 bg-card p-6 text-left card-hover", className)}
     >
@@ -29,11 +29,11 @@ export const ResourceCard = ({ r, onOpen, className }) => {
           {r.gated ? "Get access" : "Read"} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </span>
       </div>
-    </button>
+    </Link>
   );
 };
 
-export const InsightsPreview = ({ onOpen }) => (
+export const InsightsPreview = () => (
   <Section bordered>
     <div className="container">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
@@ -45,7 +45,7 @@ export const InsightsPreview = ({ onOpen }) => (
       <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {RESOURCES.slice(0, 4).map((r) => (
           <Item key={r.id} className="flex">
-            <ResourceCard r={r} onOpen={onOpen} />
+            <ResourceCard r={r} />
           </Item>
         ))}
       </Stagger>

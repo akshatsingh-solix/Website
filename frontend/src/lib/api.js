@@ -11,7 +11,7 @@ export const fetchChatHistory = (sessionId) => api.get(`/chat/${sessionId}`).the
 
 export const clearChatHistory = (sessionId) => api.delete(`/chat/${sessionId}`);
 
-export async function streamChat({ sessionId, message, onDelta, onError, signal }) {
+export async function streamChat({ sessionId, message, onDelta, onEvent, onError, signal }) {
   const res = await fetch(`${API}/chat/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -36,6 +36,7 @@ export async function streamChat({ sessionId, message, onDelta, onError, signal 
       if (!line.startsWith("data:")) continue;
       const data = JSON.parse(line.slice(5));
       if (data.delta) onDelta(data.delta);
+      if (data.event) onEvent?.(data);
       if (data.error) onError?.(data.error);
     }
   }

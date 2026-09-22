@@ -7,7 +7,6 @@ import { PageHero } from "@/components/shared/PageHero";
 import { Section } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { ResourceCard } from "@/components/home/InsightsPreview";
-import { ResourceDialog } from "@/components/shared/ResourceDialog";
 import { CTABand } from "@/components/shared/CTABand";
 import { Input } from "@/components/ui/input";
 
@@ -15,7 +14,6 @@ export default function Resources() {
   const [params, setParams] = useSearchParams();
   const type = params.get("type") ?? "all";
   const [q, setQ] = useState("");
-  const [resource, setResource] = useState(null);
 
   const list = useMemo(
     () => RESOURCES.filter((r) => (type === "all" || r.type === type) && (q === "" || `${r.title} ${r.desc} ${r.tag}`.toLowerCase().includes(q.toLowerCase()))),
@@ -62,14 +60,13 @@ export default function Resources() {
             <p className="mt-16 text-center text-muted-foreground" data-testid="resources-empty">No resources match your search yet.</p>
           ) : (
             <Stagger key={`${type}-${q}`} className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {list.map((r) => <Item key={r.id} className="flex"><ResourceCard r={r} onOpen={setResource} /></Item>)}
+              {list.map((r) => <Item key={r.id} className="flex"><ResourceCard r={r} /></Item>)}
             </Stagger>
           )}
         </div>
       </Section>
 
       <CTABand eyebrow="Prefer a conversation?" title="Skip the reading list. Talk to an architect." />
-      <ResourceDialog resource={resource} onClose={() => setResource(null)} />
     </div>
   );
 }

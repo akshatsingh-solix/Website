@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bot, MessageSquare, RotateCcw, Send, Sparkles, X } from "lucide-react";
+import { Bot, CalendarCheck, MessageSquare, RotateCcw, Send, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CHAT_SUGGESTIONS } from "@/data/site";
 import { Button } from "@/components/ui/button";
@@ -17,15 +17,56 @@ const getSession = () => {
   return id;
 };
 
+const renderInline = (text) =>
+  text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong> : part
+  );
+
+const Markdown = ({ text }) => {
+  const lines = text.split("\n");
+  const out = [];
+  let list = null;
+  lines.forEach((line, i) => {
+    const m = /^\s*(?:[-*•]|\d+\.)\s+(.*)$/.exec(line);
+    if (m) {
+      list = list || [];
+      list.push(<li key={i}>{renderInline(m[1])}</li>);
+      return;
+    }
+    if (list) {
+      out.push(<ul key={`l${i}`} className="my-1.5 list-disc space-y-1 pl-5">{list}</ul>);
+      list = null;
+    }
+    if (line.trim() === "") return;
+    out.push(<p key={i} className="my-1 first:mt-0 last:mb-0">{renderInline(line)}</p>);
+  });
+  if (list) out.push(<ul key="last" className="my-1.5 list-disc space-y-1 pl-5">{list}</ul>);
+  return <>{out}</>;
+};
+
+const BookingCard = ({ name, email, company }) => (
+  <div className="flex justify-start" data-testid="chat-booking-card">
+    <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-teal/30 bg-teal/5 px-4 py-3 text-sm">
+      <p className="flex items-center gap-2 font-display font-medium text-teal"><CalendarCheck className="h-4 w-4" /> Demo request saved</p>
+      <dl className="mt-2 space-y-0.5 text-xs text-slate-300">
+        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Name</dt><dd>{name}</dd></div>
+        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Email</dt><dd>{email}</dd></div>
+        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Company</dt><dd>{company}</dd></div>
+      </dl>
+      <p className="mt-2 text-[11px] text-muted-foreground">A Solix expert will reach out within one business day.</p>
+    </div>
+  </div>
+);
+
 const Bubble = ({ role, content, streaming }) => (
   <div className={cn("flex", role === "user" ? "justify-end" : "justify-start")} data-testid={`chat-message-${role}`}>
     <div
       className={cn(
-        "max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-        role === "user" ? "rounded-br-md bg-primary text-white" : "rounded-bl-md border border-white/10 bg-ink-900 text-slate-200"
+        "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+        role === "user" ? "whitespace-pre-wrap rounded-br-md bg-primary text-white" : "rounded-bl-md border border-white/10 bg-ink-900 text-slate-200"
       )}
     >
-      {content}
+      {role === "user" ? content : <Markdown text={content} />}
       {streaming && <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 animate-blink bg-teal" />}
     </div>
   </div>
@@ -75,6 +116,15 @@ export const ConciergeWidget = () => {
         sessionId,
         message,
         onDelta: append,
+        onEvent: (evt) => {
+          if (evt.event === "demo_booked") {
+            setMessages((m) => {
+              const next = [...m];
+              const last = next.pop();
+              return [...next, { role: "booking", name: evt.name, email: evt.email, company: evt.company }, last];
+            });
+          }
+        },
         onError: (err) => append(err),
       });
     } catch {
@@ -146,7 +196,7 @@ export const ConciergeWidget = () => {
                   </div>
                 </div>
               )}
-              {messages.map((m, i) => <Bubble key={i} {...m} />)}
+              {messages.map((m, i) => (m.role === "booking" ? <BookingCard key={i} {...m} /> : <Bubble key={i} {...m} />))}
             </div>
 
             <form
