@@ -40,14 +40,24 @@ Rebuild the Solix Technologies website (https://www.solix.com/) from scratch as 
 - Backend submissions API + streaming AI concierge (GPT-5.4-mini) with Mongo-persisted multi-turn history
 - Testing: iteration_1 — backend 100% (11/11 pytest), frontend 100% (all flows incl. chat streaming, forms → DB)
 
+### Iteration 2 (2026-06) — all four next-action features
+- **Lead Email Alerts**: Emergent-managed email (`emailer.py`, guardrail gate) sends an HTML alert for demo/contact/partner/career/download (never newsletter) to the configured recipient; delivery log in `notifications` collection. Recipient = `settings.alert_email` (set in admin) → fallback env `SALES_ALERT_EMAIL` (currently the test inbox `delivered@resend.dev` — user must set a real sales inbox in Admin → Alerts & settings).
+- **Admin Leads Dashboard** (`/admin/login`, `/admin`, `/admin/settings`): single seeded admin (bcrypt + JWT bearer, 5-attempt lockout), stats, type filters, debounced search, pagination, lead detail dialog, delete, CSV export, alert recipient setting + delivery log. Backend: `auth.py`, `admin.py`.
+- **Chat Demo Booking**: `create_demo_request` tool in `chat.py` (LlmChat.with_tools + stream loop); saves `type=demo, source=chat`, emits SSE `demo_booked`, frontend renders BookingCard; assistant markdown (bold/bullets) rendered.
+- **Insights Article Pages** (`/resources/:slug`): 10 long-form articles in `data/articles.js` (block renderer `ArticleBody.jsx`), TOC, byline, share, related reads; gated ones unlock via download LeadForm (sessionStorage).
+- Testing: iteration_2 — backend 17/17, frontend 100%.
+
 ## Notes / mock data
 - Customer logos, testimonials, leadership (except founder/CEO), jobs, timeline years, stats are illustrative MOCK content in `data/site.js` — replace with real content.
 - Resource "Continue reading" is a preview (no real article pages yet).
 
 ## Backlog
-- P1: Admin view for submissions (table + CSV export), email notifications (Resend) on new leads
-- P1: Real resource/article pages (CMS or Markdown), newsroom/press page
+- P1: Set a real sales inbox for alerts (Admin → Alerts & settings) — currently test inbox
+- P1: Lead status workflow in admin (new / contacted / qualified), notes per lead
+- P1: Newsroom/press page; CMS or Markdown-backed articles with admin editing
 - P2: Search across site, locale switcher, cookie consent banner
-- P2: Move content from `data/site.js` to backend collections with admin editing
-- P2: Chat: lead capture inside chat (email handoff), "Book a demo" tool-call
+- P2: Move content from `data/site.js` to backend collections
 - P2: FastAPI lifespan instead of on_event; env-driven chat model name
+
+## Env (backend/.env)
+MONGO_URL, DB_NAME, CORS_ORIGINS, EMERGENT_LLM_KEY, EMERGENT_EMAIL_KEY, EMAIL_FROM_NAME, SALES_ALERT_EMAIL, JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD
