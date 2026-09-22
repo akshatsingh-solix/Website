@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Logo } from "@/components/shared/Logo";
+import { Magnetic } from "@/components/shared/Reveal";
 
 const MegaPanel = ({ item, onNavigate }) => (
   <motion.div
@@ -162,9 +163,11 @@ export const Navbar = () => {
           <Button asChild variant="ghost" size="sm" data-testid="nav-contact">
             <Link to="/contact?type=contact">Contact</Link>
           </Button>
-          <Button asChild size="sm" data-testid="nav-demo">
-            <Link to="/contact">Request a demo <ArrowRight /></Link>
-          </Button>
+          <Magnetic strength={0.2}>
+            <Button asChild size="sm" data-testid="nav-demo">
+              <Link to="/contact">Request a demo <ArrowRight /></Link>
+            </Button>
+          </Magnetic>
         </div>
 
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

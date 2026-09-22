@@ -44,6 +44,13 @@ module.exports = {
           5: "hsl(var(--chart-5))",
         },
       },
+      fontSize: {
+        "fluid-sm": ["clamp(0.875rem, 0.83rem + 0.2vw, 1rem)", { lineHeight: "1.6" }],
+        "fluid-h1": ["clamp(2.75rem, 2rem + 3.6vw, 5.5rem)", { lineHeight: "0.98", letterSpacing: "-0.035em" }],
+        "fluid-h2": ["clamp(2rem, 1.6rem + 1.9vw, 3.5rem)", { lineHeight: "1.04", letterSpacing: "-0.03em" }],
+        "fluid-h3": ["clamp(1.5rem, 1.3rem + 0.9vw, 2.25rem)", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
+        "fluid-lead": ["clamp(1.0625rem, 1rem + 0.3vw, 1.25rem)", { lineHeight: "1.6" }],
+      },
       keyframes: {
         "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
         "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
@@ -54,6 +61,17 @@ module.exports = {
         shimmer: { "0%": { backgroundPosition: "-200% 0" }, "100%": { backgroundPosition: "200% 0" } },
         "fade-up": { "0%": { opacity: "0", transform: "translateY(16px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
         blink: { "0%, 100%": { opacity: "1" }, "50%": { opacity: "0" } },
+        "aurora-drift-1": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(4%, 6%) scale(1.08)" },
+          "66%": { transform: "translate(-3%, 3%) scale(0.96)" },
+        },
+        "aurora-drift-2": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "40%": { transform: "translate(-5%, -4%) scale(1.1)" },
+          "70%": { transform: "translate(3%, -5%) scale(0.94)" },
+        },
+        "spin-slow": { to: { transform: "rotate(360deg)" } },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -65,6 +83,9 @@ module.exports = {
         shimmer: "shimmer 3s linear infinite",
         "fade-up": "fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
         blink: "blink 1s step-end infinite",
+        "aurora-1": "aurora-drift-1 22s ease-in-out infinite",
+        "aurora-2": "aurora-drift-2 26s ease-in-out infinite",
+        "spin-slow": "spin-slow 40s linear infinite",
       },
     },
   },

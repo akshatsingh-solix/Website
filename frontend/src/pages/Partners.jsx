@@ -2,6 +2,7 @@ import { PARTNER_BENEFITS, PARTNER_TIERS } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
+import { BrandMark } from "@/components/shared/BrandMark";
 import { LeadForm } from "@/components/forms/LeadForm";
 
 export default function Partners() {
@@ -17,14 +18,14 @@ export default function Partners() {
 
       <Section>
         <div className="container">
-          <Stagger className="grid gap-4 md:grid-cols-2">
+          <Stagger className="grid gap-6 lg:grid-cols-2">
             {PARTNER_TIERS.map((t) => (
-              <Item key={t.title} className="rounded-2xl border border-white/10 bg-card p-7 card-hover" data-testid={`partner-tier-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
+              <Item key={t.title} className="surface-elevated p-7 card-hover" data-testid={`partner-tier-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
                 <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-ink-950 text-teal"><t.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                 <h3 className="mt-6 font-display text-2xl font-medium">{t.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {t.partners.map((p) => <span key={p} className="rounded-full border border-white/10 px-3 py-1 font-display text-sm text-slate-300">{p}</span>)}
+                <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {t.partners.map((p) => <BrandMark key={p} name={p} />)}
                 </div>
               </Item>
             ))}

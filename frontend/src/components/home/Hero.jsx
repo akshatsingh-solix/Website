@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Play, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataFlowDiagram } from "./DataFlowDiagram";
+import { Magnetic, AuroraField } from "@/components/shared/Reveal";
 
 const WORDS = ["activates", "governs", "preserves", "unlocks"];
 const ease = [0.22, 1, 0.36, 1];
@@ -15,14 +16,23 @@ export const Hero = () => {
     return () => clearInterval(t);
   }, []);
 
+  const { scrollY } = useScroll();
+  const imgY = useTransform(scrollY, [0, 800], [0, 160]);
+  const imgScale = useTransform(scrollY, [0, 800], [1, 1.12]);
+
   return (
     <section className="relative overflow-hidden" data-testid="home-hero">
       <div className="absolute inset-0 grid-lines" />
       <div className="absolute inset-0 grain" />
-      <img src="/Website/images/hero-architecture.jpg" alt="" className="absolute right-0 top-0 h-full w-full object-cover object-right opacity-30 lg:w-3/5" />
+      <AuroraField />
+      <motion.img
+        src="/Website/images/hero-architecture.jpg"
+        alt=""
+        style={{ y: imgY, scale: imgScale }}
+        className="absolute right-0 top-0 h-full w-full object-cover object-right opacity-25 lg:w-3/5"
+      />
       <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/90 to-ink-950/30" />
       <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink-950 to-transparent" />
-      <div className="absolute -left-40 top-20 h-[560px] w-[560px] rounded-full bg-primary/15 blur-3xl" />
 
       <div className="container relative grid min-h-[92vh] items-center gap-12 pt-32 pb-20 lg:grid-cols-12 lg:pt-36">
         <div className="lg:col-span-7">
@@ -33,9 +43,9 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.08 }}
-            className="text-balance text-5xl font-medium leading-[1.02] tracking-tighter sm:text-6xl lg:text-7xl"
+            className="text-balance text-fluid-h1 font-medium"
           >
-            Put AI in the hands of <span className="text-primary">your business.</span>
+            Put AI in the hands of <span className="text-gradient-accent">your business.</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.18 }} className="mt-7 max-w-xl text-base leading-relaxed text-slate-300 md:text-lg">
             Solix{" "}
@@ -57,12 +67,16 @@ export const Hero = () => {
             your enterprise data. Every system. Every era. So the people who know your business can build the solutions they need, inside the trust perimeter IT defines.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease, delay: 0.3 }} className="mt-10 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" data-testid="hero-demo-button">
-              <Link to="/contact">Request a demo <ArrowRight /></Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" data-testid="hero-explore-button">
-              <Link to="/products/enterprise-edition"><Play className="fill-current" /> Explore Enterprise Edition</Link>
-            </Button>
+            <Magnetic strength={0.25}>
+              <Button asChild size="lg" data-testid="hero-demo-button">
+                <Link to="/contact">Request a demo <ArrowRight /></Link>
+              </Button>
+            </Magnetic>
+            <Magnetic strength={0.25}>
+              <Button asChild size="lg" variant="outline" data-testid="hero-explore-button">
+                <Link to="/products/enterprise-edition"><Play className="fill-current" /> Explore Enterprise Edition</Link>
+              </Button>
+            </Magnetic>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.5 }} className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-teal" strokeWidth={1.5} /> SOC 2 · HIPAA · GDPR ready</span>
