@@ -53,14 +53,14 @@ export const GrowthChart = () => (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={DATA} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
               <defs>
-                <linearGradient id="gVol" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00D4FF" stopOpacity="0.35" /><stop offset="100%" stopColor="#00D4FF" stopOpacity="0" /></linearGradient>
+                <linearGradient id="gVol" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0088CF" stopOpacity="0.35" /><stop offset="100%" stopColor="#0088CF" stopOpacity="0" /></linearGradient>
                 <linearGradient id="gSolix" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ED2423" stopOpacity="0.35" /><stop offset="100%" stopColor="#ED2423" stopOpacity="0" /></linearGradient>
               </defs>
               <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.06)" />
               <XAxis dataKey="year" tick={{ fill: "#64748b", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "#64748b", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
               <Tooltip content={<TooltipBox />} />
-              <Area type="monotone" dataKey="volume" name="Data volume" stroke="#00D4FF" strokeWidth={2} fill="url(#gVol)" />
+              <Area type="monotone" dataKey="volume" name="Data volume" stroke="#0088CF" strokeWidth={2} fill="url(#gVol)" />
               <Area type="monotone" dataKey="costTraditional" name="Cost, status quo" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="5 5" fill="transparent" />
               <Area type="monotone" dataKey="costSolix" name="Cost with Solix" stroke="#ED2423" strokeWidth={2.5} fill="url(#gSolix)" />
             </AreaChart>

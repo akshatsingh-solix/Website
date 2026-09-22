@@ -10,7 +10,7 @@ const Node = ({ x, y, label, side }) => (
   </g>
 );
 
-const Flow = ({ d, delay = 0, color = "#00D4FF", dur = 3.2 }) => (
+const Flow = ({ d, delay = 0, color = "#0088CF", dur = 3.2 }) => (
   <>
     <path d={d} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="1" />
     <path d={d} fill="none" stroke={color} strokeWidth="1" strokeDasharray="6 14" className="animate-dash" style={{ opacity: 0.45 }} />
@@ -36,7 +36,7 @@ export const DataFlowDiagram = () => {
           <stop offset="100%" stopColor="#ED2423" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="coreStroke" x1="0" x2="1">
-          <stop offset="0%" stopColor="#00D4FF" />
+          <stop offset="0%" stopColor="#0088CF" />
           <stop offset="100%" stopColor="#ED2423" />
         </linearGradient>
       </defs>

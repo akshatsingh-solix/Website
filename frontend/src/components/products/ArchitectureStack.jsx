@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 const LAYERS = [
   { key: "activate", label: "Activate", items: [{ n: "Enterprise AI", to: "/products/enterprise-ai" }, { n: "Enterprise Edition workspace", to: "/products/enterprise-edition" }], fill: "#ED2423", text: "#fff" },
   { key: "comply", label: "Comply", items: [{ n: "eDiscovery", to: "/products/ediscovery" }, { n: "Consumer Data Privacy", to: "/products/consumer-data-privacy" }], fill: "#334155", text: "#F1F5F9" },
-  { key: "optimize", label: "Optimize & Modernize", items: [{ n: "Enterprise Archiving", to: "/products/enterprise-archiving" }, { n: "Application Retirement", to: "/products/application-retirement" }, { n: "Enterprise Data Lake", to: "/products/enterprise-data-lake" }], fill: "#1E293B", text: "#F1F5F9" },
-  { key: "foundation", label: "Foundation", items: [{ n: "Common Data Platform · 150+ connectors · Preservation Zone · Catalog", to: "/products/common-data-platform" }], fill: "#00D4FF", text: "#020817" },
+  { key: "optimize", label: "Optimize & Modernize", items: [{ n: "Enterprise Archiving", to: "/products/enterprise-archiving" }, { n: "Application Retirement", to: "/products/application-retirement" }, { n: "Enterprise Data Lake", to: "/products/enterprise-data-lake" }], fill: "#2C4A66", text: "#F1F5F9" },
+  { key: "foundation", label: "Foundation", items: [{ n: "Common Data Platform · 150+ connectors · Preservation Zone · Catalog", to: "/products/common-data-platform" }], fill: "#0088CF", text: "#0D192D" },
 ];
 
 const W = 320, H = 110, DX = 0, DY = 62;
