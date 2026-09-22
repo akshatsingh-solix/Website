@@ -3,9 +3,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { Layout } from "@/components/layout/Layout";
 import { AdminAuthProvider, RequireAdmin } from "@/components/admin/AdminAuth";
 import Home from "@/pages/Home";
+import Platform from "@/pages/Platform";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import Solutions from "@/pages/Solutions";
+import ServicesSupport from "@/pages/ServicesSupport";
 import Industries from "@/pages/Industries";
 import IndustryDetail from "@/pages/IndustryDetail";
 import Resources from "@/pages/Resources";
@@ -34,9 +36,11 @@ function App() {
           </Route>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/platform" element={<Platform />} />
             <Route path="/products" element={<Products />} />
             <Route path="/products/:slug" element={<ProductDetail />} />
             <Route path="/solutions" element={<Solutions />} />
+            <Route path="/services-support" element={<ServicesSupport />} />
             <Route path="/industries" element={<Industries />} />
             <Route path="/industries/:slug" element={<IndustryDetail />} />
             <Route path="/resources" element={<Resources />} />

@@ -16,11 +16,12 @@ export default function Partners() {
         image="/Website/images/partners-ecosystem.jpg"
       />
 
-      <Section>
+      <Section id="our-partners">
         <div className="container">
-          <Stagger className="grid gap-6 lg:grid-cols-2">
+          <SectionHeading eyebrow="Our Partners" title="An ecosystem organized by what you need done." />
+          <Stagger className="mt-14 grid gap-6 lg:grid-cols-2">
             {PARTNER_TIERS.map((t) => (
-              <Item key={t.title} className="surface-elevated p-7 card-hover" data-testid={`partner-tier-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
+              <Item key={t.id} id={t.id} className="surface-elevated scroll-mt-28 p-7 card-hover" data-testid={`partner-tier-${t.id}`}>
                 <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-ink-950 text-teal"><t.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                 <h3 className="mt-6 font-display text-2xl font-medium">{t.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>

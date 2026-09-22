@@ -44,7 +44,7 @@ export const SolutionsGrid = () => (
         description="Six programs, each with a measurable target and a proven path. Mix and match: they share one foundation."
       />
       <Stagger className="mt-14 grid gap-4 lg:grid-cols-12">
-        {SOLUTIONS.map((s) => (
+        {SOLUTIONS.slice(0, 6).map((s) => (
           <Item key={s.id} className={cn("flex", s.span)}>
             <SolutionCard s={s} />
           </Item>
