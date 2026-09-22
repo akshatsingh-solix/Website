@@ -36,6 +36,8 @@ export const fetchStats = () => adminApi.get("/admin/stats").then((r) => r.data)
 export const fetchLeads = (params) => adminApi.get("/admin/submissions", { params }).then((r) => r.data);
 export const deleteLead = (id) => adminApi.delete(`/admin/submissions/${id}`);
 export const updateLead = (id, body) => adminApi.patch(`/admin/submissions/${id}`, body).then((r) => r.data);
+export const fetchTeam = () => adminApi.get("/admin/team").then((r) => r.data);
+export const saveTeam = (members) => adminApi.put("/admin/team", { members }).then((r) => r.data);
 export const fetchSettings = () => adminApi.get("/admin/settings").then((r) => r.data);
 export const saveSettings = (body) => adminApi.put("/admin/settings", body).then((r) => r.data);
 export const fetchNotifications = () => adminApi.get("/admin/notifications").then((r) => r.data);

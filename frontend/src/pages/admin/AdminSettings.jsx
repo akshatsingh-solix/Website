@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { fetchNotifications, fetchSettings, formatApiError, saveSettings } from "@/lib/adminApi";
+import { TeamCard } from "@/components/admin/TeamCard";
 
 const STATUS = { sent: "text-emerald-300 border-emerald-500/30 bg-emerald-500/10", failed: "text-red-300 border-red-500/30 bg-red-500/10", skipped: "text-amber-300 border-amber-500/30 bg-amber-500/10" };
 
@@ -35,10 +36,11 @@ export default function AdminSettings() {
   return (
     <div data-testid="admin-settings-page">
       <p className="eyebrow mb-2">Alerts & settings</p>
-      <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">Where new leads get announced.</h1>
+      <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">Where new leads get announced, and who works them.</h1>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-12">
-        <form onSubmit={onSave} className="rounded-2xl border border-white/10 bg-card p-6 lg:col-span-5" data-testid="admin-alert-form">
+        <div className="space-y-6 lg:col-span-5">
+        <form onSubmit={onSave} className="rounded-2xl border border-white/10 bg-card p-6" data-testid="admin-alert-form">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-ink-950 text-primary"><BellRing className="h-5 w-5" strokeWidth={1.5} /></span>
             <div>
@@ -53,6 +55,8 @@ export default function AdminSettings() {
           </div>
           <Button type="submit" className="mt-6" disabled={saving || !settings} data-testid="admin-alert-save">{saving ? <Loader2 className="animate-spin" /> : <Check />} Save recipient</Button>
         </form>
+        <TeamCard />
+        </div>
 
         <div className="rounded-2xl border border-white/10 bg-card p-6 lg:col-span-7">
           <div className="flex items-center gap-3">
