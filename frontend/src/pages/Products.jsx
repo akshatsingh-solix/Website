@@ -31,16 +31,18 @@ export default function Products() {
         </div>
       </Section>
 
-      <Section bordered className="bg-ink-900/40">
-        <div className="container">
-          <SectionHeading eyebrow="All products" title="Explore the portfolio." />
-          <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {PRODUCTS.map((p) => (
-              <Item key={p.slug} className="flex"><ProductCard product={p} className="w-full" /></Item>
-            ))}
-          </Stagger>
-        </div>
-      </Section>
+      {["Enterprise AI (EAI)", "Cloud Archive Products", "EAI Pharma", "Enterprise Foundation"].map((category, i) => (
+        <Section key={category} bordered className={i % 2 === 0 ? "bg-ink-900/40" : undefined}>
+          <div className="container">
+            <SectionHeading eyebrow="Products" title={category} />
+            <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {PRODUCTS.filter((p) => p.category === category).map((p) => (
+                <Item key={p.slug} className="flex"><ProductCard product={p} className="w-full" /></Item>
+              ))}
+            </Stagger>
+          </div>
+        </Section>
+      ))}
 
       <CTABand />
     </div>

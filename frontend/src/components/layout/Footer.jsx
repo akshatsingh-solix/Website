@@ -81,21 +81,28 @@ export const Footer = () => (
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8 lg:grid-cols-5">
-          {NAV.map((col) => (
-            <div key={col.label}>
-              <Link to={col.to} className="font-display text-sm font-semibold text-foreground">{col.label}</Link>
-              <ul className="mt-4 space-y-2.5">
-                {col.items.map((it) => (
-                  <li key={it.label}>
-                    <Link to={it.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground" data-testid={`footer-link-${it.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
-                      {it.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8 lg:grid-cols-4">
+          {NAV.map((col) => {
+            const subLinks = col.groups
+              ? col.groups.map((g) => ({ label: g.heading, to: col.to }))
+              : col.items?.slice(0, 6);
+            return (
+              <div key={col.label}>
+                <Link to={col.to} className="font-display text-sm font-semibold text-foreground">{col.label}</Link>
+                {subLinks && (
+                  <ul className="mt-4 space-y-2.5">
+                    {subLinks.map((it) => (
+                      <li key={it.label}>
+                        <Link to={it.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground" data-testid={`footer-link-${it.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
+                          {it.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
