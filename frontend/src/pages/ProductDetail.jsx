@@ -52,7 +52,7 @@ export default function ProductDetail() {
           </div>
           <Reveal delay={0.12} className="rounded-3xl border border-white/10 bg-card p-5 sm:p-8 lg:col-span-7">
             <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Before = 100 · lower is better unless noted as coverage</p>
-            <OutcomeChart data={product.chart} accent={product.accent === "teal" ? "#00D4FF" : "#ED2423"} />
+            <OutcomeChart data={product.chart} accent={product.accent === "teal" ? "#0088CF" : "#ED2423"} />
           </Reveal>
         </div>
       </Section>

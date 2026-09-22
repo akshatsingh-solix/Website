@@ -3,9 +3,9 @@ import { Stagger, Item } from "@/components/shared/Reveal";
 
 const RINGS = [
   { value: 24, suffix: "", pct: 100, label: "Years of enterprise data stewardship", color: "#ED2423" },
-  { value: 150, suffix: "+", pct: 88, label: "Application connectors on the platform", color: "#00D4FF" },
+  { value: 150, suffix: "+", pct: 88, label: "Application connectors on the platform", color: "#0088CF" },
   { value: 80, suffix: "%", pct: 80, label: "Typical infrastructure cost reduction", color: "#ED2423" },
-  { value: 30, suffix: "+", pct: 62, label: "Privacy regulations covered by templates", color: "#00D4FF" },
+  { value: 30, suffix: "+", pct: 62, label: "Privacy regulations covered by templates", color: "#0088CF" },
   { value: 4, suffix: "", pct: 45, label: "Continents with Solix teams", color: "#94A3B8" },
 ];
 

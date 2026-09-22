@@ -71,6 +71,41 @@ export const Magnetic = ({ children, strength = 0.35, className }) => {
   );
 };
 
+/** 3D cursor-tracked tilt, for cards that should feel physically present rather than flat. */
+export const Tilt = ({ children, className, max = 8 }) => {
+  const ref = useRef(null);
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 300, damping: 25 });
+  const sry = useSpring(ry, { stiffness: 300, damping: 25 });
+
+  const onMouseMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    ry.set(px * max * 2);
+    rx.set(-py * max * 2);
+  };
+  const onMouseLeave = () => {
+    rx.set(0);
+    ry.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={{ rotateX: srx, rotateY: sry, transformPerspective: 800 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
 /** Scroll-linked vertical drift, for depth between foreground content and background imagery/blobs. */
 export const Parallax = ({ children, className, range = 60 }) => {
   const ref = useRef(null);

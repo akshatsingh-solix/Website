@@ -3,6 +3,7 @@ import { ArrowRight, Bot, Lock, Route, ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/shared/Section";
 import { Reveal } from "@/components/shared/Reveal";
+import { NeuralField } from "./NeuralField";
 
 const POINTS = [
   { icon: Lock, title: "Trust perimeter", desc: "Access, masking and retention policies travel with every query, prompt and answer." },
@@ -15,8 +16,9 @@ export const AISection = () => (
     <div className="container grid items-center gap-14 lg:grid-cols-12">
       <Reveal blur className="group relative lg:col-span-6">
         <div className="absolute -inset-10 rounded-full bg-teal/10 blur-3xl" />
-        <div className="relative overflow-hidden rounded-3xl border border-white/10">
-          <img src="/Website/images/ai-neural.jpg" alt="Abstract neural lattice representing governed enterprise AI" className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
+        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/10 bg-ink-950">
+          <div className="grid-lines absolute inset-0 opacity-30" />
+          <NeuralField className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 via-transparent to-transparent" />
           <div className="glass absolute bottom-5 left-5 right-5 rounded-xl p-4">
             <div className="flex items-center gap-3">

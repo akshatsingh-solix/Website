@@ -33,9 +33,15 @@ module.exports = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        teal: { DEFAULT: "#00D4FF", dim: "#0EA5C6" },
-        ember: { DEFAULT: "#ED2423", deep: "#B91C1C" },
-        ink: { 950: "#020817", 900: "#0B1120", 800: "#0F172A", 700: "#1E293B" },
+        // Brand blue, replacing the earlier generic cyan - matches the Solix
+        // brand guide's button/hyperlink blue (#0088CF) instead of an
+        // off-the-shelf "AI startup" teal. Class name kept as `teal` to avoid
+        // a mechanical rename across every consumer; the color itself is blue.
+        teal: { DEFAULT: "#0088CF", dim: "#00669E" },
+        ember: { DEFAULT: "#EE2424", deep: "#B91C1C" },
+        // Real Solix navy, not a generic slate - sourced from the brand
+        // guide's panel/footer colors (#0D192D, #1C2F43, #0B3765).
+        ink: { 950: "#0D192D", 900: "#112036", 800: "#1C2F43", 700: "#2C4A66" },
         chart: {
           1: "hsl(var(--chart-1))",
           2: "hsl(var(--chart-2))",
