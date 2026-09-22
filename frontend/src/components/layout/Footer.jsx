@@ -54,7 +54,7 @@ export const Footer = () => (
     <div className="container relative pt-20 pb-10 sm:pt-24">
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <Logo />
+          <Logo tagline />
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted-foreground">
             Solix Technologies activates enterprise data across every system and every era, so businesses can put AI to work inside the trust perimeter IT defines.
           </p>

@@ -5,6 +5,7 @@ import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
+import { NumbersRings } from "@/components/company/NumbersRings";
 import { Button } from "@/components/ui/button";
 
 export default function Company() {
@@ -36,6 +37,13 @@ export default function Company() {
       </Section>
 
       <Section bordered className="bg-ink-900/40">
+        <div className="container">
+          <SectionHeading eyebrow="By the numbers" title="Scale is our normal operating condition." align="center" />
+          <div className="mt-14"><NumbersRings /></div>
+        </div>
+      </Section>
+
+      <Section bordered>
         <div className="container">
           <SectionHeading eyebrow="Values" title="What we optimize for." />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -1,7 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="56" viewBox="0 0 240 56" fill="none">
-  <rect x="4" y="4" width="48" height="48" rx="8" fill="#0B1120" stroke="#1E293B"/>
-  <rect x="16" y="14" width="24" height="7" rx="2" fill="#F97316"/>
-  <rect x="16" y="24.5" width="24" height="7" rx="2" fill="#CBD5E1"/>
-  <rect x="16" y="35" width="24" height="7" rx="2" fill="#00D4FF"/>
-  <text x="66" y="38" font-family="Outfit, Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="-1" fill="#F8FAFC">SOLIX<tspan fill="#F97316">.</tspan></text>
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="72" viewBox="0 0 320 72" fill="none">
+  <circle cx="36" cy="36" r="30" fill="#ED2423"/>
+  <path d="M41.3 11.3 21.8 39.8h12.3L28.9 61.5 51 31.5H38.7L45 11.3Z" fill="#FFFFFF"/>
+  <text x="80" y="43" font-family="Outfit, Arial, sans-serif" font-size="34" font-weight="600" letter-spacing="5" fill="#F8FAFC">SOLIX</text>
+  <text x="80" y="60" font-family="'IBM Plex Sans', Arial, sans-serif" font-size="11" fill="#94A3B8">Empowering the Data-driven Enterprise</text>
 </svg>

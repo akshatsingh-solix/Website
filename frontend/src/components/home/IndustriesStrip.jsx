@@ -52,13 +52,15 @@ export const IndustriesStrip = () => {
                 className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-card p-8 sm:p-10"
                 data-testid="industry-detail-panel"
               >
+                <img src={current.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
+                <div className="absolute inset-0 bg-gradient-to-r from-card via-card/90 to-card/50" />
                 <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
-                <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-ink-950 text-primary">
+                <span className="relative grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-ink-950 text-primary">
                   <Icon className="h-6 w-6" strokeWidth={1.5} />
                 </span>
-                <h3 className="mt-6 text-balance font-display text-2xl font-medium tracking-tight sm:text-3xl">{current.headline}</h3>
-                <p className="mt-4 max-w-xl text-muted-foreground">{current.desc}</p>
-                <div className="mt-8 grid gap-6 sm:grid-cols-2">
+                <h3 className="relative mt-6 text-balance font-display text-2xl font-medium tracking-tight sm:text-3xl">{current.headline}</h3>
+                <p className="relative mt-4 max-w-xl text-muted-foreground">{current.desc}</p>
+                <div className="relative mt-8 grid gap-6 sm:grid-cols-2">
                   <div>
                     <p className="eyebrow mb-3">Challenges</p>
                     <ul className="space-y-2 text-sm text-slate-300">
@@ -72,7 +74,7 @@ export const IndustriesStrip = () => {
                     </ul>
                   </div>
                 </div>
-                <Link to={`/industries/${current.slug}`} className="mt-8 inline-flex items-center gap-1.5 text-sm text-primary link-underline" data-testid="industry-detail-link">
+                <Link to={`/industries/${current.slug}`} className="relative mt-8 inline-flex items-center gap-1.5 text-sm text-primary link-underline" data-testid="industry-detail-link">
                   Explore {current.name} <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </motion.div>

@@ -115,6 +115,7 @@ export const PRODUCTS = [
       { value: "1", label: "governed platform instead of six point tools" },
       { value: "0", label: "copies of sensitive data outside policy" },
     ],
+    chart: [{ metric: "Time to first AI use case", before: 100, after: 10, unit: "weeks (index)" }, { metric: "Point tools in the stack", before: 100, after: 17, unit: "count (index)" }, { metric: "Sensitive data copies", before: 100, after: 0, unit: "copies (index)" }],
   },
   {
     slug: "common-data-platform",
@@ -125,7 +126,7 @@ export const PRODUCTS = [
       "The enterprise-scale data platform that connects to 150+ applications, ingests structured and unstructured data, and provides the governed Preservation Zone that powers every Solix solution. Deployable today.",
     icon: Layers,
     accent: "teal",
-    image: "/images/platform-cube.jpg",
+    image: "/images/prod-cdp.jpg",
     features: [
       { title: "150+ connectors", desc: "SAP, Oracle, PeopleSoft, Salesforce, Workday, ServiceNow, mainframe, email and files." },
       { title: "Preservation Zone", desc: "Immutable, WORM-capable storage with retention, legal hold and defensible deletion." },
@@ -144,6 +145,7 @@ export const PRODUCTS = [
       { value: "150+", label: "application connectors" },
       { value: "3", label: "deployment models, one control plane" },
     ],
+    chart: [{ metric: "Time to onboard a new source", before: 100, after: 20, unit: "days (index)" }, { metric: "Storage cost per TB", before: 100, after: 12, unit: "$ (index)" }, { metric: "Catalog coverage", before: 35, after: 100, unit: "% of estate" }],
   },
   {
     slug: "enterprise-archiving",
@@ -154,7 +156,7 @@ export const PRODUCTS = [
       "Tier inactive records from ERP, CRM, databases and files to a low-cost, compliant archive with full-text search, retention policies and legal hold, while production gets faster and cheaper.",
     icon: Archive,
     accent: "ember",
-    image: "/images/platform-cube.jpg",
+    image: "/images/prod-archiving.jpg",
     features: [
       { title: "Policy-based tiering", desc: "Business rules decide what moves, when and where." },
       { title: "Transparent access", desc: "Users query archived data from familiar screens and reports." },
@@ -173,6 +175,7 @@ export const PRODUCTS = [
       { value: "3x", label: "faster batch and reporting cycles" },
       { value: "100%", label: "audit-ready retention" },
     ],
+    chart: [{ metric: "Production database size", before: 100, after: 35, unit: "TB (index)" }, { metric: "Infrastructure cost", before: 100, after: 20, unit: "$ (index)" }, { metric: "Batch & reporting time", before: 100, after: 33, unit: "hours (index)" }],
   },
   {
     slug: "enterprise-data-lake",
@@ -183,7 +186,7 @@ export const PRODUCTS = [
       "Consolidate structured, semi-structured and unstructured data into an open, catalogued lake with self-service access, quality controls and lineage, ready for BI, data science and AI.",
     icon: Database,
     accent: "teal",
-    image: "/images/ai-neural.jpg",
+    image: "/images/prod-data-lake.jpg",
     features: [
       { title: "Open table formats", desc: "Iceberg and Parquet with time travel and schema evolution." },
       { title: "Data quality", desc: "Rules, anomaly detection and scorecards per dataset." },
@@ -202,6 +205,7 @@ export const PRODUCTS = [
       { value: "1", label: "catalog for lake, archive and apps" },
       { value: "∞", label: "consumers, zero copies" },
     ],
+    chart: [{ metric: "Time analysts spend finding data", before: 100, after: 40, unit: "hours (index)" }, { metric: "Data copies per team", before: 100, after: 0, unit: "copies (index)" }, { metric: "Certified datasets", before: 20, after: 100, unit: "% of catalog" }],
   },
   {
     slug: "application-retirement",
@@ -212,7 +216,7 @@ export const PRODUCTS = [
       "Decommission redundant, obsolete and legacy applications while preserving data with full business context for reporting, compliance and eDiscovery. Eliminate licenses, hardware and specialist skills.",
     icon: PowerOff,
     accent: "ember",
-    image: "/images/company-office.jpg",
+    image: "/images/prod-retirement.jpg",
     features: [
       { title: "Any application", desc: "SAP ECC, Oracle EBS, PeopleSoft, JDE, Lotus Notes, mainframe, custom." },
       { title: "Context preserved", desc: "Retain relationships, attachments and business views." },
@@ -231,6 +235,7 @@ export const PRODUCTS = [
       { value: "90%", label: "faster than manual decommissioning" },
       { value: "0", label: "compliance gaps" },
     ],
+    chart: [{ metric: "Legacy run cost", before: 100, after: 8, unit: "$ (index)" }, { metric: "Decommission time per app", before: 100, after: 10, unit: "weeks (index)" }, { metric: "Records still accessible", before: 100, after: 100, unit: "%" }],
   },
   {
     slug: "ediscovery",
@@ -241,7 +246,7 @@ export const PRODUCTS = [
       "Search across archived and live data, place legal holds, cull and review, and produce defensible records for litigation, audits and investigations, all on the same governed platform.",
     icon: Scale,
     accent: "teal",
-    image: "/images/platform-cube.jpg",
+    image: "/images/prod-ediscovery.jpg",
     features: [
       { title: "Unified search", desc: "Email, documents, structured records and chat in one query." },
       { title: "Legal hold", desc: "Custodian-based holds with notifications and audit." },
@@ -260,6 +265,7 @@ export const PRODUCTS = [
       { value: "hrs", label: "from request to hold" },
       { value: "1", label: "source of truth for legal and IT" },
     ],
+    chart: [{ metric: "Outside review cost", before: 100, after: 30, unit: "$ (index)" }, { metric: "Request to legal hold", before: 100, after: 4, unit: "hours (index)" }, { metric: "Sources searched per request", before: 40, after: 100, unit: "% of estate" }],
   },
   {
     slug: "consumer-data-privacy",
@@ -270,7 +276,7 @@ export const PRODUCTS = [
       "Discover and classify personal data across the enterprise, automate DSAR and right-to-be-forgotten requests, enforce consent and retention, and demonstrate compliance with GDPR, CCPA, HIPAA and more.",
     icon: ShieldCheck,
     accent: "ember",
-    image: "/images/ai-neural.jpg",
+    image: "/images/prod-privacy.jpg",
     features: [
       { title: "PII discovery", desc: "ML classification across structured and unstructured data." },
       { title: "DSAR automation", desc: "Intake, verification, fulfilment and reporting workflows." },
@@ -289,6 +295,7 @@ export const PRODUCTS = [
       { value: "30+", label: "regulations covered by templates" },
       { value: "1", label: "privacy view across the enterprise" },
     ],
+    chart: [{ metric: "Manual effort per DSAR", before: 100, after: 5, unit: "hours (index)" }, { metric: "Fulfilment time", before: 100, after: 6, unit: "hours (index)" }, { metric: "Systems covered", before: 45, after: 100, unit: "% of estate" }],
   },
   {
     slug: "enterprise-ai",
@@ -318,6 +325,7 @@ export const PRODUCTS = [
       { value: "100%", label: "answers traceable to source" },
       { value: "0", label: "shadow data copies" },
     ],
+    chart: [{ metric: "Time to production copilot", before: 100, after: 15, unit: "weeks (index)" }, { metric: "Answers traceable to source", before: 20, after: 100, unit: "%" }, { metric: "Shadow data exports", before: 100, after: 0, unit: "copies (index)" }],
   },
 ];
 
@@ -331,14 +339,14 @@ export const SOLUTIONS = [
 ];
 
 export const INDUSTRIES = [
-  { slug: "financial-services", icon: Landmark, name: "Financial Services", headline: "Compliance-grade archives and AI for banks, brokers and asset managers.", desc: "Meet SEC 17a-4, FINRA and Basel retention while shrinking core banking and trading system footprints.", challenges: ["Books-and-records retention across email, chat and trades", "Legacy core systems too costly to run and too risky to retire", "AI initiatives blocked by data lineage and privacy concerns"], results: ["WORM-compliant preservation with supervisory search", "Retired 40+ legacy applications at a top-20 US bank", "Governed RAG for advisor copilots on trusted client data"] },
-  { slug: "healthcare", icon: HeartPulse, name: "Healthcare & Life Sciences", headline: "Protect patient data. Preserve clinical history. Accelerate research.", desc: "Archive legacy EHRs, retire acquired systems and enable HIPAA-compliant analytics and AI.", challenges: ["Dozens of legacy EHR/EMR systems after M&A", "HIPAA retention and breach exposure", "Research data locked in silos"], results: ["Legacy EHR retirement with clinician-friendly access", "Automated PHI discovery and minimization", "Governed research lake for clinical analytics"] },
-  { slug: "manufacturing", icon: Factory, name: "Manufacturing", headline: "Leaner ERP. Longer product memory. Smarter operations.", desc: "Archive SAP and Oracle history, retire plant-level systems and unify OT/IT data for predictive AI.", challenges: ["ERP growth slowing month-end and upgrades", "Decades of product and quality records to preserve", "OT and IT data never meet"], results: ["S/4HANA migration 50% smaller via archive-first", "Preserved 25 years of quality records for audits", "Predictive maintenance on unified plant data"] },
-  { slug: "public-sector", icon: Building2, name: "Public Sector", headline: "Transparent, compliant, cost-effective records for the public.", desc: "Meet records management mandates, respond to FOIA quickly and modernize aging systems within budget.", challenges: ["Strict records schedules and FOIA response times", "Aging systems with retiring specialist staff", "Budget pressure and cloud mandates"], results: ["Sub-day FOIA search across archived records", "Retired mainframe systems ahead of staff attrition", "FedRAMP-aligned deployments"] },
-  { slug: "retail", icon: ShoppingBag, name: "Retail & CPG", headline: "Every transaction preserved. Every customer respected.", desc: "Manage explosive POS and e-commerce growth, automate consumer privacy and power personalization safely.", challenges: ["Billions of transactions inflating databases", "CCPA/GDPR consumer requests at volume", "Personalization needs trusted, consented data"], results: ["POS archive cut database size 70%", "DSAR automation across 30+ systems", "Consent-aware customer 360 for AI"] },
-  { slug: "energy", icon: Zap, name: "Energy & Utilities", headline: "Regulatory memory for critical infrastructure.", desc: "Preserve asset, meter and safety records for decades while retiring legacy systems and enabling grid analytics.", challenges: ["Multi-decade regulatory retention", "Legacy asset systems after mergers", "Smart-meter data volumes"], results: ["Preserved 12 PB of meter and asset history", "Retired 60 applications post-merger", "Governed lake for grid reliability AI"] },
-  { slug: "telecom", icon: RadioTower, name: "Telecommunications", headline: "CDR-scale data management, subscriber privacy built in.", desc: "Archive call detail and billing records, retire legacy BSS/OSS and unlock churn and network AI.", challenges: ["Petabytes of CDR and billing data", "Lawful intercept and retention obligations", "Legacy BSS/OSS after consolidation"], results: ["Petabyte CDR archive with second-level search", "Automated subscriber privacy workflows", "Churn models on unified subscriber data"] },
-  { slug: "insurance", icon: Umbrella, name: "Insurance", headline: "Policies and claims preserved for the life of the promise.", desc: "Retire legacy policy administration systems, meet retention rules and enable underwriting AI.", challenges: ["Long-tail policy and claims retention", "Multiple PAS platforms after acquisitions", "Underwriting AI needs historical claims"], results: ["Retired legacy PAS with full claim history access", "Retention by product line and jurisdiction", "Claims history lake for pricing models"] },
+  { slug: "financial-services", image: "/images/ind-financial-services.jpg", icon: Landmark, name: "Financial Services", headline: "Compliance-grade archives and AI for banks, brokers and asset managers.", desc: "Meet SEC 17a-4, FINRA and Basel retention while shrinking core banking and trading system footprints.", challenges: ["Books-and-records retention across email, chat and trades", "Legacy core systems too costly to run and too risky to retire", "AI initiatives blocked by data lineage and privacy concerns"], results: ["WORM-compliant preservation with supervisory search", "Retired 40+ legacy applications at a top-20 US bank", "Governed RAG for advisor copilots on trusted client data"] },
+  { slug: "healthcare", image: "/images/ind-healthcare.jpg", icon: HeartPulse, name: "Healthcare & Life Sciences", headline: "Protect patient data. Preserve clinical history. Accelerate research.", desc: "Archive legacy EHRs, retire acquired systems and enable HIPAA-compliant analytics and AI.", challenges: ["Dozens of legacy EHR/EMR systems after M&A", "HIPAA retention and breach exposure", "Research data locked in silos"], results: ["Legacy EHR retirement with clinician-friendly access", "Automated PHI discovery and minimization", "Governed research lake for clinical analytics"] },
+  { slug: "manufacturing", image: "/images/ind-manufacturing.jpg", icon: Factory, name: "Manufacturing", headline: "Leaner ERP. Longer product memory. Smarter operations.", desc: "Archive SAP and Oracle history, retire plant-level systems and unify OT/IT data for predictive AI.", challenges: ["ERP growth slowing month-end and upgrades", "Decades of product and quality records to preserve", "OT and IT data never meet"], results: ["S/4HANA migration 50% smaller via archive-first", "Preserved 25 years of quality records for audits", "Predictive maintenance on unified plant data"] },
+  { slug: "public-sector", image: "/images/ind-public-sector.jpg", icon: Building2, name: "Public Sector", headline: "Transparent, compliant, cost-effective records for the public.", desc: "Meet records management mandates, respond to FOIA quickly and modernize aging systems within budget.", challenges: ["Strict records schedules and FOIA response times", "Aging systems with retiring specialist staff", "Budget pressure and cloud mandates"], results: ["Sub-day FOIA search across archived records", "Retired mainframe systems ahead of staff attrition", "FedRAMP-aligned deployments"] },
+  { slug: "retail", image: "/images/ind-retail.jpg", icon: ShoppingBag, name: "Retail & CPG", headline: "Every transaction preserved. Every customer respected.", desc: "Manage explosive POS and e-commerce growth, automate consumer privacy and power personalization safely.", challenges: ["Billions of transactions inflating databases", "CCPA/GDPR consumer requests at volume", "Personalization needs trusted, consented data"], results: ["POS archive cut database size 70%", "DSAR automation across 30+ systems", "Consent-aware customer 360 for AI"] },
+  { slug: "energy", image: "/images/ind-energy.jpg", icon: Zap, name: "Energy & Utilities", headline: "Regulatory memory for critical infrastructure.", desc: "Preserve asset, meter and safety records for decades while retiring legacy systems and enabling grid analytics.", challenges: ["Multi-decade regulatory retention", "Legacy asset systems after mergers", "Smart-meter data volumes"], results: ["Preserved 12 PB of meter and asset history", "Retired 60 applications post-merger", "Governed lake for grid reliability AI"] },
+  { slug: "telecom", image: "/images/ind-telecom.jpg", icon: RadioTower, name: "Telecommunications", headline: "CDR-scale data management, subscriber privacy built in.", desc: "Archive call detail and billing records, retire legacy BSS/OSS and unlock churn and network AI.", challenges: ["Petabytes of CDR and billing data", "Lawful intercept and retention obligations", "Legacy BSS/OSS after consolidation"], results: ["Petabyte CDR archive with second-level search", "Automated subscriber privacy workflows", "Churn models on unified subscriber data"] },
+  { slug: "insurance", image: "/images/ind-insurance.jpg", icon: Umbrella, name: "Insurance", headline: "Policies and claims preserved for the life of the promise.", desc: "Retire legacy policy administration systems, meet retention rules and enable underwriting AI.", challenges: ["Long-tail policy and claims retention", "Multiple PAS platforms after acquisitions", "Underwriting AI needs historical claims"], results: ["Retired legacy PAS with full claim history access", "Retention by product line and jurisdiction", "Claims history lake for pricing models"] },
 ];
 
 export const LOGOS = [

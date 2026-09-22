@@ -1,7 +1,9 @@
 import { Hero } from "@/components/home/Hero";
 import { LogoMarquee } from "@/components/home/LogoMarquee";
 import { StatsBand } from "@/components/home/StatsBand";
+import { DataEras } from "@/components/home/DataEras";
 import { PlatformBento } from "@/components/home/PlatformBento";
+import { GrowthChart } from "@/components/home/GrowthChart";
 import { SolutionsGrid } from "@/components/home/SolutionsGrid";
 import { AISection } from "@/components/home/AISection";
 import { IndustriesStrip } from "@/components/home/IndustriesStrip";
@@ -15,7 +17,9 @@ export default function Home() {
       <Hero />
       <LogoMarquee />
       <StatsBand />
+      <DataEras />
       <PlatformBento />
+      <GrowthChart />
       <SolutionsGrid />
       <AISection />
       <IndustriesStrip />

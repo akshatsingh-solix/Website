@@ -95,11 +95,12 @@ export const MEDIA_KIT = [
   { label: "Primary logo (dark backgrounds)", file: "/brand/solix-logo-dark.svg", meta: "SVG" },
   { label: "Primary logo (light backgrounds)", file: "/brand/solix-logo-light.svg", meta: "SVG" },
   { label: "Brand mark", file: "/brand/solix-mark.svg", meta: "SVG" },
+  { label: "Official logo (print, light backgrounds)", file: "/brand/solix-logo.png", meta: "PNG" },
   { label: "Brand guidelines", file: "/brand/solix-brand-guidelines.txt", meta: "TXT" },
 ];
 
 export const BRAND_COLORS = [
-  { name: "Midnight", hex: "#020817" }, { name: "Ember", hex: "#F97316" }, { name: "Electric Teal", hex: "#00D4FF" }, { name: "Slate", hex: "#94A3B8" },
+  { name: "Midnight", hex: "#020817" }, { name: "Solix Red", hex: "#ED2423" }, { name: "Electric Teal", hex: "#00D4FF" }, { name: "Slate", hex: "#94A3B8" },
 ];
 
 export const BOILERPLATE = "Solix Technologies, Inc. is an enterprise data management and AI company headquartered in Santa Clara, California. Founded in 2002, Solix helps regulated, data-intensive organizations activate data from every system and every era through the Solix Common Data Platform, Enterprise Archiving, Application Retirement, Enterprise Data Lake, eDiscovery, Consumer Data Privacy and Enterprise AI. Solix Enterprise Edition puts AI in the hands of the business, inside the trust perimeter IT defines. Learn more at solix.com.";

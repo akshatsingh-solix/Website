@@ -1,5 +1,6 @@
 import io
 import re
+from pathlib import Path
 from typing import List, Optional
 from xml.sax.saxutils import escape
 
@@ -11,11 +12,11 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import LETTER
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable, Table, TableStyle, Image
 
 router = APIRouter(prefix="/api/press", tags=["press"])
 
-EMBER = colors.HexColor("#F97316")
+EMBER = colors.HexColor("#ED2423")
 INK = colors.HexColor("#020817")
 SLATE = colors.HexColor("#475569")
 
@@ -64,7 +65,9 @@ async def press_pdf(req: PressPdfRequest):
     doc = SimpleDocTemplate(buf, pagesize=LETTER, leftMargin=0.9 * inch, rightMargin=0.9 * inch, topMargin=0.8 * inch, bottomMargin=0.8 * inch, title=req.title, author="Solix Technologies")
     story = []
 
-    header = Table([[Paragraph("<b>SOLIX</b><font color='#F97316'>.</font>", ParagraphStyle("logo", fontName="Helvetica-Bold", fontSize=16, textColor=INK)), Paragraph("PRESS RELEASE", ParagraphStyle("pr", fontName="Helvetica-Bold", fontSize=8, textColor=SLATE, alignment=2))]], colWidths=[3.4 * inch, 3.3 * inch])
+    logo_path = Path(__file__).resolve().parent.parent / "frontend" / "public" / "brand" / "solix-logo.png"
+    logo = Image(str(logo_path), width=1.5 * inch, height=0.78 * inch) if logo_path.exists() else Paragraph("<b>SOLIX</b>", ParagraphStyle("logo", fontName="Helvetica-Bold", fontSize=16, textColor=INK))
+    header = Table([[logo, Paragraph("PRESS RELEASE", ParagraphStyle("pr", fontName="Helvetica-Bold", fontSize=8, textColor=SLATE, alignment=2))]], colWidths=[3.4 * inch, 3.3 * inch])
     header.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("BOTTOMPADDING", (0, 0), (-1, -1), 8)]))
     story += [header, HRFlowable(width="100%", thickness=1.2, color=EMBER, spaceAfter=14)]
     story += [Paragraph(f"{_clean(req.category).upper()} &nbsp;·&nbsp; {_clean(req.date)}", s["eyebrow"]), Paragraph(_clean(req.title), s["title"]), Paragraph(_clean(req.summary), s["summary"])]

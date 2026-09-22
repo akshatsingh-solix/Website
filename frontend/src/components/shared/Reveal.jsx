@@ -15,13 +15,14 @@ export const Reveal = ({ children, delay = 0, y = 28, className, once = true, ..
   </motion.div>
 );
 
-export const Stagger = ({ children, className, stagger = 0.08 }) => (
+export const Stagger = ({ children, className, stagger = 0.08, ...rest }) => (
   <motion.div
     initial="hidden"
     whileInView="show"
     viewport={{ once: true, margin: "-60px" }}
     variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
     className={className}
+    {...rest}
   >
     {children}
   </motion.div>

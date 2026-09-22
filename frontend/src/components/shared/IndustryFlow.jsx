@@ -1,0 +1,34 @@
+import { AlertTriangle, ArrowRight, CheckCircle2, Layers } from "lucide-react";
+import { Reveal } from "@/components/shared/Reveal";
+
+export const IndustryFlow = ({ industry }) => (
+  <div className="grid gap-4 lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-stretch" data-testid="industry-flow">
+    <Reveal className="rounded-2xl border border-white/10 bg-card p-7">
+      <p className="eyebrow mb-5 flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> Challenges</p>
+      <ul className="space-y-4">
+        {industry.challenges.map((c) => (
+          <li key={c} className="flex gap-3 text-sm text-slate-200"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-500" />{c}</li>
+        ))}
+      </ul>
+    </Reveal>
+    <div className="hidden items-center lg:flex"><ArrowRight className="h-6 w-6 text-white/30" /></div>
+    <Reveal delay={0.08} className="relative overflow-hidden rounded-2xl border border-teal/25 bg-card p-7">
+      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-teal/15 blur-3xl" />
+      <p className="eyebrow mb-5 flex items-center gap-2 text-teal"><Layers className="h-4 w-4" /> Solix approach</p>
+      <ol className="space-y-4 text-sm text-slate-200">
+        <li className="flex gap-3"><span className="font-mono text-xs text-teal">01</span> Assess the estate: systems, volumes, retention, cost.</li>
+        <li className="flex gap-3"><span className="font-mono text-xs text-teal">02</span> Archive, retire or preserve on the Common Data Platform.</li>
+        <li className="flex gap-3"><span className="font-mono text-xs text-teal">03</span> Publish governed data products for compliance, analytics and AI.</li>
+      </ol>
+    </Reveal>
+    <div className="hidden items-center lg:flex"><ArrowRight className="h-6 w-6 text-white/30" /></div>
+    <Reveal delay={0.16} className="rounded-2xl border border-primary/30 bg-card p-7 glow-ember">
+      <p className="eyebrow mb-5 flex items-center gap-2"><CheckCircle2 className="h-4 w-4" /> Results</p>
+      <ul className="space-y-4">
+        {industry.results.map((c) => (
+          <li key={c} className="flex gap-3 text-sm text-slate-200"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />{c}</li>
+        ))}
+      </ul>
+    </Reveal>
+  </div>
+);

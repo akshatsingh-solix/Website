@@ -27,7 +27,7 @@ export const Hero = () => {
       <div className="container relative grid min-h-[92vh] items-center gap-12 pt-32 pb-20 lg:grid-cols-12 lg:pt-36">
         <div className="lg:col-span-7">
           <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="eyebrow mb-6 flex items-center gap-3">
-            <span className="h-px w-8 bg-primary" /> Solix Enterprise Edition
+            <span className="h-px w-8 bg-primary" /> Empowering the Data-driven Enterprise
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}

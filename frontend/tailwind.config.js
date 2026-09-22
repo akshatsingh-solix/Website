@@ -34,7 +34,7 @@ module.exports = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         teal: { DEFAULT: "#00D4FF", dim: "#0EA5C6" },
-        ember: { DEFAULT: "#F97316", deep: "#EA580C" },
+        ember: { DEFAULT: "#ED2423", deep: "#B91C1C" },
         ink: { 950: "#020817", 900: "#0B1120", 800: "#0F172A", 700: "#1E293B" },
         chart: {
           1: "hsl(var(--chart-1))",

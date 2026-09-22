@@ -12,7 +12,7 @@ export default function Partners() {
         crumbs={[{ label: "Company", to: "/company" }, { label: "Partners" }]}
         title="An ecosystem built around the customer's data, not ours."
         description="Hyperscalers, platform vendors, system integrators and resellers deliver Solix programs worldwide. Join them."
-        image="/images/platform-cube.jpg"
+        image="/images/partners-ecosystem.jpg"
       />
 
       <Section>

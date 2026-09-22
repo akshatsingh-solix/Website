@@ -7,7 +7,7 @@ Logo
 
 Colors
 - Midnight #020817 (primary background)
-- Ember #F97316 (primary action / highlight)
+- Solix Red #ED2423 (primary action / highlight, brand mark)
 - Electric Teal #00D4FF (secondary accent)
 - Slate #94A3B8 (secondary text)
 
