@@ -16,7 +16,7 @@ export default function Company() {
         crumbs={[{ label: "Company" }]}
         title="Stewards of enterprise data since 2002."
         description="Solix was founded on a simple conviction: enterprise data deserves lifecycle-long stewardship. Two decades later, that conviction is the foundation the AI-driven enterprise runs on."
-        image="/images/company-office.jpg"
+        image="/Website/images/company-office.jpg"
       >
         <Button asChild size="lg" variant="outline" data-testid="company-careers-button">
           <Link to="/careers">We're hiring <ArrowRight /></Link>

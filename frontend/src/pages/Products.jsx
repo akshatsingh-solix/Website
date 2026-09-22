@@ -17,7 +17,7 @@ export default function Products() {
         crumbs={[{ label: "Products" }]}
         title="One platform. Every era of your data. Eight ways to put it to work."
         description="Solix products are not point tools bolted together. They are capabilities on a single governed foundation, so a record archived today is searchable by legal tomorrow and usable by an AI agent next quarter."
-        image="/images/prod-cdp.jpg"
+        image="/Website/images/prod-cdp.jpg"
       >
         <Button asChild size="lg" data-testid="products-hero-demo">
           <Link to="/contact">Request a demo <ArrowRight /></Link>

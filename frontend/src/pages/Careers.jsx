@@ -17,7 +17,7 @@ export default function Careers() {
         crumbs={[{ label: "Company", to: "/company" }, { label: "Careers" }]}
         title="Do the hardest work in enterprise data. Ship it to the biggest customers."
         description="We are engineers, architects, consultants and sellers who take petabytes and decades as normal operating conditions. If that sounds like your kind of problem, we'd like to meet you."
-        image="/images/culture-careers.jpg"
+        image="/Website/images/culture-careers.jpg"
       />
 
       <Section>

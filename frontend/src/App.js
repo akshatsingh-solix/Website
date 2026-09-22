@@ -24,7 +24,7 @@ import AdminSettings from "@/pages/admin/AdminSettings";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/Website">
       <AdminAuthProvider>
         <Routes>
           <Route path="/admin/login" element={<AdminLogin />} />

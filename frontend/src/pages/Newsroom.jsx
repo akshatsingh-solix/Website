@@ -44,7 +44,7 @@ export default function Newsroom() {
         <Section className="pb-10 sm:pb-12">
           <div className="container">
             <Reveal className="group relative overflow-hidden rounded-3xl border border-white/10 bg-card" data-testid="featured-release">
-              <img src="/images/hero-architecture.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-30 transition-transform duration-700 group-hover:scale-[1.03]" />
+              <img src="/Website/images/hero-architecture.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-30 transition-transform duration-700 group-hover:scale-[1.03]" />
               <div className="absolute inset-0 bg-gradient-to-r from-card via-card/90 to-card/30" />
               <div className="relative grid gap-8 p-8 sm:p-12 lg:grid-cols-12">
                 <div className="lg:col-span-8">

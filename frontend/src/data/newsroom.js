@@ -1,6 +1,6 @@
 export const PRESS_RELEASES = [
   {
-    id: "enterprise-edition-launch", date: "2026-06-02", year: "2026", category: "Product", featured: true, image: "/images/hero-architecture.jpg",
+    id: "enterprise-edition-launch", date: "2026-06-02", year: "2026", category: "Product", featured: true, image: "/Website/images/hero-architecture.jpg",
     title: "Solix Launches Enterprise Edition to Put AI in the Hands of the Business",
     summary: "New edition unifies the Common Data Platform, Preservation Zone and Enterprise AI builder workspace so business teams can create governed agents on data from every system and every era.",
     body: [
@@ -14,7 +14,7 @@ export const PRESS_RELEASES = [
     ],
   },
   {
-    id: "empower-2026", date: "2026-05-14", year: "2026", category: "Event", image: "/images/company-office.jpg",
+    id: "empower-2026", date: "2026-05-14", year: "2026", category: "Event", image: "/Website/images/company-office.jpg",
     title: "Solix Empower 2026 Returns to Santa Clara, October 14-15",
     summary: "Annual customer summit expands to 40+ sessions and hands-on labs on archive-first cloud programs, retirement factories and governed RAG.",
     body: [
@@ -26,7 +26,7 @@ export const PRESS_RELEASES = [
     ],
   },
   {
-    id: "utility-merger-case", date: "2026-04-08", year: "2026", category: "Customer", image: "/images/platform-cube.jpg",
+    id: "utility-merger-case", date: "2026-04-08", year: "2026", category: "Customer", image: "/Website/images/platform-cube.jpg",
     title: "Combined Utility Retires 60 Applications and Preserves 12 PB on Solix CDP",
     summary: "Post-merger program eliminates $18M in annual run cost while meeting multi-decade regulatory retention.",
     body: [
@@ -38,7 +38,7 @@ export const PRESS_RELEASES = [
     ],
   },
   {
-    id: "privacy-templates", date: "2026-03-11", year: "2026", category: "Product", image: "/images/ai-neural.jpg",
+    id: "privacy-templates", date: "2026-03-11", year: "2026", category: "Product", image: "/Website/images/ai-neural.jpg",
     title: "Solix Consumer Data Privacy Adds 12 New Regulatory Templates",
     summary: "Coverage expands to 30+ jurisdictions with automated DSAR routing and evidence packs for state-level US privacy laws.",
     body: [
@@ -49,7 +49,7 @@ export const PRESS_RELEASES = [
     ],
   },
   {
-    id: "aws-competency", date: "2025-11-19", year: "2025", category: "Partner", image: "/images/platform-cube.jpg",
+    id: "aws-competency", date: "2025-11-19", year: "2025", category: "Partner", image: "/Website/images/platform-cube.jpg",
     title: "Solix Achieves Expanded Cloud Partner Competencies for Data & Analytics",
     summary: "Recognition for archive-first migration patterns and governed data lake deployments on hyperscaler platforms.",
     body: [
@@ -60,7 +60,7 @@ export const PRESS_RELEASES = [
     ],
   },
   {
-    id: "enterprise-ai-ga", date: "2025-09-24", year: "2025", category: "Product", image: "/images/ai-neural.jpg",
+    id: "enterprise-ai-ga", date: "2025-09-24", year: "2025", category: "Product", image: "/Website/images/ai-neural.jpg",
     title: "Solix Enterprise AI Reaches General Availability",
     summary: "Governed retrieval, agent studio and evaluation services ship on the Common Data Platform with bring-your-own-model support.",
     body: [
@@ -71,7 +71,7 @@ export const PRESS_RELEASES = [
     ],
   },
   {
-    id: "hyderabad-expansion", date: "2025-06-05", year: "2025", category: "Company", image: "/images/company-office.jpg",
+    id: "hyderabad-expansion", date: "2025-06-05", year: "2025", category: "Company", image: "/Website/images/company-office.jpg",
     title: "Solix Expands Hyderabad Engineering Center",
     summary: "New facility doubles platform engineering capacity to support petabyte-scale customer programs.",
     body: [
@@ -92,11 +92,11 @@ export const COVERAGE = [
 ];
 
 export const MEDIA_KIT = [
-  { label: "Primary logo (dark backgrounds)", file: "/brand/solix-logo-dark.svg", meta: "SVG" },
-  { label: "Primary logo (light backgrounds)", file: "/brand/solix-logo-light.svg", meta: "SVG" },
-  { label: "Brand mark", file: "/brand/solix-mark.svg", meta: "SVG" },
-  { label: "Official logo (print, light backgrounds)", file: "/brand/solix-logo.png", meta: "PNG" },
-  { label: "Brand guidelines", file: "/brand/solix-brand-guidelines.txt", meta: "TXT" },
+  { label: "Primary logo (dark backgrounds)", file: "/Website/brand/solix-logo-dark.svg", meta: "SVG" },
+  { label: "Primary logo (light backgrounds)", file: "/Website/brand/solix-logo-light.svg", meta: "SVG" },
+  { label: "Brand mark", file: "/Website/brand/solix-mark.svg", meta: "SVG" },
+  { label: "Official logo (print, light backgrounds)", file: "/Website/brand/solix-logo.png", meta: "PNG" },
+  { label: "Brand guidelines", file: "/Website/brand/solix-brand-guidelines.txt", meta: "TXT" },
 ];
 
 export const BRAND_COLORS = [
