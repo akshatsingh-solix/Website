@@ -22,7 +22,7 @@ const Share = ({ title }) => {
     await navigator.clipboard?.writeText(url);
     toast.success("Link copied");
   };
-  const cls = "grid h-9 w-9 place-items-center rounded-full border border-white/10 text-muted-foreground transition-[color,border-color] hover:border-white/40 hover:text-foreground";
+  const cls = "grid h-9 w-9 place-items-center rounded-full border border-line/10 text-muted-foreground transition-[color,border-color] hover:border-line/40 hover:text-foreground";
   return (
     <div className="flex gap-2" data-testid="article-share">
       <a className={cls} aria-label="Share on LinkedIn" target="_blank" rel="noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}><Linkedin className="h-4 w-4" /></a>
@@ -58,7 +58,7 @@ export default function Article() {
         description={article.summary}
         compact
       >
-        <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-card/80 p-5 text-sm backdrop-blur lg:min-w-[260px]">
+        <div className="flex flex-col gap-4 rounded-2xl border border-line/10 bg-card/80 p-5 text-sm backdrop-blur lg:min-w-[260px]">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-primary/30 to-teal/20 font-display text-sm font-semibold">{r.author.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>
             <div>
@@ -69,7 +69,7 @@ export default function Article() {
           <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {r.date}</span>
             <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {r.readTime}</span>
-            {r.gated && <span className="inline-flex items-center gap-1.5 text-primary">{unlocked ? <Check className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />} {unlocked ? "Unlocked" : "Gated"}</span>}
+            {r.gated && <span className="inline-flex items-center gap-1.5 text-primary-ink">{unlocked ? <Check className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />} {unlocked ? "Unlocked" : "Gated"}</span>}
           </div>
           <Share title={r.title} />
         </div>
@@ -80,7 +80,7 @@ export default function Article() {
           <aside className="order-2 lg:order-1 lg:col-span-3">
             <div className="lg:sticky lg:top-28 space-y-10">
               <ArticleTOC blocks={article.body} />
-              <div className="rounded-2xl border border-white/10 bg-card p-5">
+              <div className="rounded-2xl border border-line/10 bg-card p-5">
                 <p className="eyebrow mb-2">Talk to an expert</p>
                 <p className="text-sm text-muted-foreground">See how this applies to your systems and data volumes.</p>
                 <Button asChild size="sm" className="mt-4" data-testid="article-sidebar-demo">
@@ -109,7 +109,7 @@ export default function Article() {
         </div>
       </Section>
 
-      <Section bordered className="bg-ink-900/40">
+      <Section bordered className="bg-muted">
         <div className="container">
           <SectionHeading eyebrow="Related reads" title="Keep going." />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-3">

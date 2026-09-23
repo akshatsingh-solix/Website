@@ -37,7 +37,7 @@ export default function IndustryDetail() {
         </div>
       </Section>
 
-      <Section bordered className="bg-ink-900/40">
+      <Section bordered className="bg-muted">
         <div className="container">
           <SectionHeading eyebrow="Recommended products" title={`What ${ind.name.toLowerCase()} leaders start with.`} />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-3">
@@ -52,10 +52,10 @@ export default function IndustryDetail() {
           <Stagger className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {others.map((o) => (
               <Item key={o.slug} className="flex">
-                <Link to={`/industries/${o.slug}`} className="group relative flex w-full items-end overflow-hidden rounded-2xl border border-white/10 bg-card p-5 aspect-[4/3]" data-testid={`industry-related-${o.slug}`}>
-                  <img src={o.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50 transition-[opacity,transform] duration-500 group-hover:scale-105 group-hover:opacity-70" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
-                  <span className="relative flex items-center gap-2 font-display text-lg font-medium"><o.icon className="h-4 w-4 text-primary" strokeWidth={1.5} /> {o.name}</span>
+                <Link to={`/industries/${o.slug}`} className="dark group relative flex aspect-[4/3] w-full items-end overflow-hidden rounded-2xl border border-line/10 bg-background p-5 text-foreground shadow-soft" data-testid={`industry-related-${o.slug}`}>
+                  <img src={o.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                  <span className="relative flex items-center gap-2 font-display text-lg font-medium"><o.icon className="h-4 w-4 text-primary-ink" strokeWidth={1.5} /> {o.name}</span>
                 </Link>
               </Item>
             ))}

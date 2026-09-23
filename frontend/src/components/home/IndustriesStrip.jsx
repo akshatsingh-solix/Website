@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
@@ -12,33 +12,46 @@ export const IndustriesStrip = () => {
   const current = INDUSTRIES.find((i) => i.slug === active);
   const Icon = current.icon;
 
+  // Warm the cache for every industry render once the page is idle, so
+  // hovering down the list swaps images instantly instead of popping in.
+  useEffect(() => {
+    const warm = () => INDUSTRIES.forEach((ind) => { const img = new Image(); img.src = ind.image; });
+    const id = "requestIdleCallback" in window ? window.requestIdleCallback(warm) : setTimeout(warm, 1500);
+    return () => ("cancelIdleCallback" in window ? window.cancelIdleCallback(id) : clearTimeout(id));
+  }, []);
+
   return (
-    <Section bordered>
+    <Section className="bg-background" id="industries">
       <div className="container">
-        <SectionHeading eyebrow="Industries" title="Regulated. Data-intensive. Trusted at petabyte scale." />
-        <div className="mt-14 grid gap-10 lg:grid-cols-12">
+        <SectionHeading chapter="07" eyebrow="Industries" title="Regulated. Data-intensive. Trusted at petabyte scale." />
+        <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:gap-10">
           <Reveal className="lg:col-span-5">
-            <ul className="divide-y divide-white/10 border-y border-white/10" data-testid="industries-list">
-              {INDUSTRIES.map((ind) => (
-                <li key={ind.slug}>
-                  <button
-                    onMouseEnter={() => setActive(ind.slug)}
-                    onFocus={() => setActive(ind.slug)}
-                    onClick={() => setActive(ind.slug)}
-                    data-testid={`industry-tab-${ind.slug}`}
-                    className={cn(
-                      "group flex w-full items-center justify-between py-4 text-left transition-colors duration-200",
-                      active === ind.slug ? "text-foreground" : "text-muted-foreground hover:text-slate-200"
-                    )}
-                  >
-                    <span className="flex items-center gap-4">
-                      <span className={cn("h-px transition-[width,background-color] duration-300", active === ind.slug ? "w-8 bg-primary" : "w-3 bg-white/20")} />
-                      <span className="font-display text-xl sm:text-2xl">{ind.name}</span>
-                    </span>
-                    <ArrowUpRight className={cn("h-5 w-5 transition-[opacity,transform] duration-300", active === ind.slug ? "opacity-100" : "opacity-0 -translate-x-2")} />
-                  </button>
-                </li>
-              ))}
+            <ul className="divide-y divide-line/10 border-y border-line/10" data-testid="industries-list">
+              {INDUSTRIES.map((ind, idx) => {
+                const on = active === ind.slug;
+                return (
+                  <li key={ind.slug}>
+                    <button
+                      onMouseEnter={() => setActive(ind.slug)}
+                      onFocus={() => setActive(ind.slug)}
+                      onClick={() => setActive(ind.slug)}
+                      aria-pressed={on}
+                      data-testid={`industry-tab-${ind.slug}`}
+                      className={cn(
+                        "group flex w-full items-center justify-between gap-4 py-3.5 text-left transition-colors duration-200",
+                        on ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <span className="flex items-center gap-4">
+                        <span className="w-6 font-mono text-[10px] tracking-[0.16em] text-muted-foreground">{String(idx + 1).padStart(2, "0")}</span>
+                        <span className={cn("h-px transition-[width,background-color] duration-300", on ? "w-8 bg-primary" : "w-3 bg-line/20")} />
+                        <span className="font-display text-lg sm:text-xl">{ind.name}</span>
+                      </span>
+                      <ArrowUpRight className={cn("h-5 w-5 shrink-0 text-primary-ink transition-[opacity,transform] duration-300", on ? "opacity-100" : "-translate-x-2 opacity-0")} />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </Reveal>
           <div className="lg:col-span-7">
@@ -49,34 +62,39 @@ export const IndustriesStrip = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-card p-8 sm:p-10"
+                className="flex h-full flex-col overflow-hidden rounded-3xl border border-line/10 bg-card shadow-soft"
                 data-testid="industry-detail-panel"
               >
-                <img src={current.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
-                <div className="absolute inset-0 bg-gradient-to-r from-card via-card/90 to-card/50" />
-                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
-                <span className="relative grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-ink-950 text-primary">
-                  <Icon className="h-6 w-6" strokeWidth={1.5} />
-                </span>
-                <h3 className="relative mt-6 text-balance font-display text-2xl font-medium tracking-tight sm:text-3xl">{current.headline}</h3>
-                <p className="relative mt-4 max-w-xl text-muted-foreground">{current.desc}</p>
-                <div className="relative mt-8 grid gap-6 sm:grid-cols-2">
-                  <div>
-                    <p className="eyebrow mb-3">Challenges</p>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      {current.challenges.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-slate-500" />{c}</li>)}
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="eyebrow mb-3 text-teal">Results</p>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      {current.results.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-teal" />{c}</li>)}
-                    </ul>
+                <div className="dark relative h-52 shrink-0 overflow-hidden bg-background sm:h-60">
+                  <img src={current.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent" />
+                  <div className="absolute bottom-5 left-6 right-6 flex items-end gap-4 sm:left-8">
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lift">
+                      <Icon className="h-6 w-6" strokeWidth={1.5} />
+                    </span>
+                    <h3 className="text-balance font-display text-xl font-medium leading-tight tracking-tight text-foreground sm:text-2xl">{current.headline}</h3>
                   </div>
                 </div>
-                <Link to={`/industries/${current.slug}`} className="relative mt-8 inline-flex items-center gap-1.5 text-sm text-primary link-underline" data-testid="industry-detail-link">
-                  Explore {current.name} <ArrowUpRight className="h-4 w-4" />
-                </Link>
+                <div className="flex flex-1 flex-col p-6 sm:p-8">
+                  <p className="max-w-xl text-muted-foreground">{current.desc}</p>
+                  <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                    <div>
+                      <p className="eyebrow mb-3">Challenges</p>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        {current.challenges.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />{c}</li>)}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="eyebrow mb-3 !text-teal">Results</p>
+                      <ul className="space-y-2 text-sm text-foreground">
+                        {current.results.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-teal" />{c}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                  <Link to={`/industries/${current.slug}`} className="mt-auto inline-flex items-center gap-1.5 self-start pt-6 text-sm font-medium text-primary-ink link-underline" data-testid="industry-detail-link">
+                    Explore {current.name} <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>

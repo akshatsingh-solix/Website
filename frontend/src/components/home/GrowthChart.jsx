@@ -11,7 +11,7 @@ const DATA = Array.from({ length: 8 }, (_, i) => {
 const TooltipBox = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-white/10 bg-ink-950/95 px-4 py-3 text-xs shadow-xl backdrop-blur">
+    <div className="rounded-xl border border-line/10 bg-popover/95 px-4 py-3 text-xs text-popover-foreground shadow-lift backdrop-blur">
       <p className="mb-2 font-mono text-muted-foreground">{label}</p>
       {payload.map((p) => (
         <p key={p.dataKey} className="flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full" style={{ background: p.stroke }} /> {p.name}: <span className="font-mono text-foreground">{p.value}</span></p>
@@ -27,25 +27,25 @@ const FACTS = [
 ];
 
 export const GrowthChart = () => (
-  <Section bordered>
+  <Section className="bg-background" id="the-challenge">
     <div className="container grid items-center gap-12 lg:grid-cols-12">
       <div className="lg:col-span-5">
-        <SectionHeading eyebrow="The economics" title="Data compounds. Your budget shouldn't." description="Every year the estate grows and the inactive share grows faster. Archive-first programs on the Common Data Platform decouple infrastructure cost from data growth." />
+        <SectionHeading chapter="01" eyebrow="The challenge" title="Data compounds. Your budget shouldn't." description="Every year the estate grows and the inactive share grows faster. Archive-first programs on the Common Data Platform decouple infrastructure cost from data growth." />
         <Reveal delay={0.1} className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-          {FACTS.map((f) => (
-            <div key={f.label} className="flex items-baseline gap-4 border-l-2 border-primary/60 pl-4">
-              <span className="font-display text-2xl font-medium tracking-tight text-foreground">{f.value}</span>
-              <span className="text-xs text-muted-foreground">{f.label}</span>
+          {FACTS.map((f, i) => (
+            <div key={f.label} className={`rounded-xl border border-line/10 bg-muted/60 py-3 pl-4 pr-3 border-l-[3px] ${i === 2 ? "border-l-primary" : "border-l-teal"}`}>
+              <span className="block font-display text-2xl font-semibold tracking-tight text-foreground">{f.value}</span>
+              <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{f.label}</span>
             </div>
           ))}
         </Reveal>
       </div>
-      <Reveal delay={0.15} className="rounded-3xl border border-white/10 bg-card p-6 sm:p-8 lg:col-span-7" data-testid="growth-chart">
+      <Reveal delay={0.15} className="surface-elevated rounded-3xl p-5 sm:p-8 lg:col-span-7" data-testid="growth-chart">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Indexed to 2019 = 100</p>
           <div className="flex flex-wrap gap-4 text-xs">
             <span className="inline-flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full bg-teal" /> Data volume</span>
-            <span className="inline-flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full bg-slate-400" /> Cost, status quo</span>
+            <span className="inline-flex items-center gap-2 text-muted-foreground"><span className="h-0.5 w-3 bg-ink-600" /> Cost, status quo</span>
             <span className="inline-flex items-center gap-2 text-muted-foreground"><span className="h-2 w-2 rounded-full bg-primary" /> Cost with Solix</span>
           </div>
         </div>
@@ -53,15 +53,15 @@ export const GrowthChart = () => (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={DATA} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
               <defs>
-                <linearGradient id="gVol" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0088CF" stopOpacity="0.35" /><stop offset="100%" stopColor="#0088CF" stopOpacity="0" /></linearGradient>
-                <linearGradient id="gSolix" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#EE2424" stopOpacity="0.35" /><stop offset="100%" stopColor="#EE2424" stopOpacity="0" /></linearGradient>
+                <linearGradient id="gVol" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0088CF" stopOpacity="0.22" /><stop offset="100%" stopColor="#0088CF" stopOpacity="0" /></linearGradient>
+                <linearGradient id="gSolix" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#EE2424" stopOpacity="0.25" /><stop offset="100%" stopColor="#EE2424" stopOpacity="0" /></linearGradient>
               </defs>
-              <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="year" tick={{ fill: "#B0B0B2", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "#B0B0B2", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
-              <Tooltip content={<TooltipBox />} />
+              <CartesianGrid vertical={false} stroke="rgba(13,25,45,0.07)" />
+              <XAxis dataKey="year" tick={{ fill: "#3D6288", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#3D6288", fontSize: 11, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} />
+              <Tooltip content={<TooltipBox />} cursor={{ stroke: "rgba(13,25,45,0.2)", strokeDasharray: "3 3" }} />
               <Area type="monotone" dataKey="volume" name="Data volume" stroke="#0088CF" strokeWidth={2} fill="url(#gVol)" />
-              <Area type="monotone" dataKey="costTraditional" name="Cost, status quo" stroke="#B0B0B2" strokeWidth={1.5} strokeDasharray="5 5" fill="transparent" />
+              <Area type="monotone" dataKey="costTraditional" name="Cost, status quo" stroke="#3D6288" strokeWidth={1.5} strokeDasharray="5 5" fill="transparent" />
               <Area type="monotone" dataKey="costSolix" name="Cost with Solix" stroke="#EE2424" strokeWidth={2.5} fill="url(#gSolix)" />
             </AreaChart>
           </ResponsiveContainer>

@@ -43,7 +43,7 @@ export default function Resources() {
                   data-testid={`resource-filter-${t.key}`}
                   className={cn(
                     "rounded-full border px-4 py-2 text-sm transition-[background-color,border-color,color] duration-200",
-                    type === t.key ? "border-primary bg-primary text-white" : "border-white/15 text-muted-foreground hover:border-white/40 hover:text-foreground"
+                    type === t.key ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:border-line/40 hover:text-foreground"
                   )}
                 >
                   {t.label}
@@ -52,7 +52,7 @@ export default function Resources() {
             </div>
             <div className="relative lg:w-72">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search resources" className="h-11 rounded-full border-white/15 bg-ink-900 pl-11 focus-visible:ring-primary" data-testid="resource-search-input" aria-label="Search resources" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search resources" className="h-11 rounded-full border-line/15 bg-background pl-11 focus-visible:ring-primary" data-testid="resource-search-input" aria-label="Search resources" />
             </div>
           </div>
 

@@ -21,8 +21,8 @@ export default function Partners() {
           <SectionHeading eyebrow="Our Partners" title="An ecosystem organized by what you need done." />
           <Stagger className="mt-14 grid gap-6 lg:grid-cols-2">
             {PARTNER_TIERS.map((t) => (
-              <Item key={t.id} id={t.id} className="surface-elevated scroll-mt-28 p-7 card-hover" data-testid={`partner-tier-${t.id}`}>
-                <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-ink-950 text-teal"><t.icon className="h-5 w-5" strokeWidth={1.5} /></span>
+              <Item key={t.id} id={t.id} className="surface-elevated scroll-mt-28 p-7 card-hover lg:[&:last-child:nth-child(odd)]:col-span-2" data-testid={`partner-tier-${t.id}`}>
+                <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-teal"><t.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                 <h3 className="mt-6 font-display text-2xl font-medium">{t.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>
                 <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -34,7 +34,7 @@ export default function Partners() {
         </div>
       </Section>
 
-      <Section bordered className="bg-ink-900/40" id="become-a-partner">
+      <Section bordered className="bg-muted" id="become-a-partner">
         <div className="container grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading eyebrow="Become a partner" title="Grow with the platform regulated enterprises already trust." />
@@ -50,7 +50,7 @@ export default function Partners() {
               ))}
             </Reveal>
           </div>
-          <Reveal delay={0.15} className="rounded-2xl border border-white/10 bg-card p-6 sm:p-8 lg:col-span-7">
+          <Reveal delay={0.15} className="rounded-2xl border border-line/10 bg-card p-6 sm:p-8 lg:col-span-7">
             <LeadForm
               type="partner"
               submitLabel="Apply to partner"

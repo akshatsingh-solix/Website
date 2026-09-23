@@ -30,7 +30,7 @@ const OfficeNode = ({ city, region, x, y, delay }) => (
       <animate attributeName="opacity" values="0.6;0;0.6" dur="3.2s" begin={`${delay}s`} repeatCount="indefinite" />
     </circle>
     <circle r="4.5" fill="#EE2424" />
-    <text y="-22" textAnchor="middle" className="fill-white" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600 }}>{city}</text>
+    <text y="-22" textAnchor="middle" className="fill-foreground" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600 }}>{city}</text>
     <text y="-9" textAnchor="middle" className="fill-[#B0B0B2]" style={{ fontSize: 8.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.8, textTransform: "uppercase" }}>{region}</text>
   </g>
 );
@@ -63,9 +63,9 @@ export const GlobalNetworkMap = () => (
 
     <circle cx={cx} cy={cy} r="70" fill="url(#hubGlow)" />
     <g transform={`translate(${cx} ${cy})`}>
-      <circle r="20" className="fill-ink-950" stroke="#EE2424" strokeWidth="1.25" />
+      <circle r="20" className="fill-background" stroke="#EE2424" strokeWidth="1.25" />
       <path d="M2.4 -11.4 -6.5 1.8h5.6l-2.4 10 10.1-13.8h-5.6l4.1-9.4Z" fill="#EE2424" />
-      <text y="34" textAnchor="middle" className="fill-white" style={{ fontSize: 11, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.3 }}>One governed platform</text>
+      <text y="34" textAnchor="middle" className="fill-foreground" style={{ fontSize: 11, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.3 }}>One governed platform</text>
     </g>
 
     {NODES.map((n, i) => <OfficeNode key={n.city} {...n} delay={i * 0.5} />)}

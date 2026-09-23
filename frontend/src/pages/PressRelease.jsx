@@ -45,7 +45,7 @@ export default function PressRelease() {
     }
   };
 
-  const iconCls = "grid h-9 w-9 place-items-center rounded-full border border-white/10 text-muted-foreground transition-[color,border-color] hover:border-white/40 hover:text-foreground";
+  const iconCls = "grid h-9 w-9 place-items-center rounded-full border border-line/10 text-muted-foreground transition-[color,border-color] hover:border-line/40 hover:text-foreground";
 
   return (
     <article data-testid={`press-release-${pr.id}`}>
@@ -57,7 +57,7 @@ export default function PressRelease() {
         image={pr.image}
         compact
       >
-        <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-card/80 p-5 text-sm backdrop-blur lg:min-w-[260px]">
+        <div className="inline-flex flex-wrap items-center gap-4 rounded-2xl border border-line/10 bg-card/80 p-4 text-sm shadow-soft backdrop-blur">
           <p className="inline-flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4" /> {fmt(pr.date)}</p>
           <Button onClick={downloadPdf} disabled={busy} data-testid="press-download-pdf">{busy ? <Loader2 className="animate-spin" /> : <Download />} Download PDF</Button>
           <div className="flex gap-2" data-testid="press-share">
@@ -71,11 +71,11 @@ export default function PressRelease() {
       <Section className="py-16 sm:py-20">
         <div className="container grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
-            <Reveal className="mb-8 overflow-hidden rounded-3xl border border-white/10">
+            <Reveal className="mb-8 overflow-hidden rounded-3xl border border-line/10">
               <img src={pr.image} alt="" className="aspect-[21/9] w-full object-cover" data-testid="press-hero-image" />
             </Reveal>
             <ArticleBody blocks={pr.body} />
-            <div className="mt-12 rounded-2xl border border-white/10 bg-card p-6" data-testid="press-boilerplate">
+            <div className="mt-12 rounded-2xl border border-line/10 bg-card p-6" data-testid="press-boilerplate">
               <div className="flex items-center justify-between">
                 <p className="eyebrow">About Solix Technologies</p>
                 <Button variant="ghost" size="sm" onClick={() => copy(BOILERPLATE, "Boilerplate copied")} data-testid="press-copy-boilerplate"><Copy /> Copy</Button>
@@ -86,15 +86,15 @@ export default function PressRelease() {
           </div>
           <aside className="lg:col-span-4">
             <div className="lg:sticky lg:top-28 space-y-4">
-              <div className="rounded-2xl border border-white/10 bg-card p-5 text-sm" data-testid="press-contact-card">
+              <div className="rounded-2xl border border-line/10 bg-card p-5 text-sm" data-testid="press-contact-card">
                 <p className="eyebrow mb-3">Media contact</p>
                 <p className="font-medium">{PRESS_CONTACT.name}</p>
-                <a href={`mailto:${PRESS_CONTACT.email}?subject=${encodeURIComponent("Re: " + pr.title)}`} className="mt-2 flex items-center gap-2 text-muted-foreground hover:text-primary"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
+                <a href={`mailto:${PRESS_CONTACT.email}?subject=${encodeURIComponent("Re: " + pr.title)}`} className="mt-2 flex items-center gap-2 text-muted-foreground hover:text-primary-ink"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
                 <p className="mt-1.5 text-muted-foreground">{PRESS_CONTACT.phone}</p>
               </div>
-              <Link to="/newsroom#media-kit" className="group flex items-center justify-between rounded-2xl border border-white/10 bg-card p-5 text-sm card-hover" data-testid="press-media-kit-link">
+              <Link to="/newsroom#media-kit" className="group flex items-center justify-between rounded-2xl border border-line/10 bg-card p-5 text-sm card-hover" data-testid="press-media-kit-link">
                 <span><span className="block font-medium">Media kit</span><span className="text-xs text-muted-foreground">Logos, colors, guidelines</span></span>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary-ink" />
               </Link>
               <Button asChild variant="outline" className="w-full" data-testid="press-back"><Link to="/newsroom"><ArrowLeft /> All announcements</Link></Button>
             </div>
@@ -102,15 +102,15 @@ export default function PressRelease() {
         </div>
       </Section>
 
-      <Section bordered className="bg-ink-900/40">
+      <Section bordered className="bg-muted">
         <div className="container">
           <SectionHeading eyebrow="More announcements" title="Recent from Solix." />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-3">
             {others.map((p) => (
               <Item key={p.id} className="flex">
-                <Link to={`/newsroom/${p.id}`} className="group flex w-full flex-col rounded-2xl border border-white/10 bg-card p-6 card-hover" data-testid={`press-related-${p.id}`}>
+                <Link to={`/newsroom/${p.id}`} className="group flex w-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid={`press-related-${p.id}`}>
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{p.category} · {fmt(p.date)}</span>
-                  <h3 className="mt-4 font-display text-lg font-medium leading-snug transition-colors group-hover:text-primary">{p.title}</h3>
+                  <h3 className="mt-4 font-display text-lg font-medium leading-snug transition-colors group-hover:text-primary-ink">{p.title}</h3>
                   <p className="mt-3 text-sm text-muted-foreground">{p.summary}</p>
                 </Link>
               </Item>

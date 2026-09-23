@@ -63,7 +63,7 @@ const Bubble = ({ role, content, streaming }) => (
     <div
       className={cn(
         "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-        role === "user" ? "whitespace-pre-wrap rounded-br-md bg-primary text-white" : "rounded-bl-md border border-white/10 bg-ink-900 text-slate-200"
+        role === "user" ? "whitespace-pre-wrap rounded-br-md bg-primary text-white" : "rounded-bl-md border border-line/10 bg-muted text-foreground"
       )}
     >
       {role === "user" ? content : <Markdown text={content} />}
@@ -152,25 +152,25 @@ export const ConciergeWidget = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-24 right-4 z-[60] flex h-[min(620px,calc(100vh-7rem))] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-950 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.9)] sm:right-6"
+            className="fixed bottom-24 right-4 z-[60] flex h-[min(620px,calc(100vh-7rem))] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-line/10 bg-background shadow-[0_2px_8px_rgba(13,25,45,0.06),0_40px_100px_-30px_rgba(13,25,45,0.45)] sm:right-6"
             data-testid="chat-panel"
             role="dialog"
             aria-label="Solix AI concierge"
           >
-            <div className="relative flex items-center gap-3 border-b border-white/10 px-4 py-3">
+            <div className="dark relative flex items-center gap-3 bg-background px-4 py-3 text-foreground">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
-              <span className="relative grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary">
+              <span className="relative grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary-ink">
                 <Bot className="h-5 w-5" strokeWidth={1.75} />
-                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-ink-950 bg-teal" />
+                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-teal" />
               </span>
               <div className="flex-1">
                 <p className="font-display text-sm font-semibold">Sol · Solix AI Concierge</p>
                 <p className="text-[11px] text-muted-foreground">Answers about products, solutions and next steps</p>
               </div>
-              <button onClick={reset} aria-label="New conversation" data-testid="chat-reset-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground">
+              <button onClick={reset} aria-label="New conversation" data-testid="chat-reset-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-line/5 hover:text-foreground">
                 <RotateCcw className="h-4 w-4" />
               </button>
-              <button onClick={() => setOpen(false)} aria-label="Close chat" data-testid="chat-close-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground">
+              <button onClick={() => setOpen(false)} aria-label="Close chat" data-testid="chat-close-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-line/5 hover:text-foreground">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -178,7 +178,7 @@ export const ConciergeWidget = () => {
             <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4" data-testid="chat-messages">
               {messages.length === 0 && (
                 <div className="space-y-4">
-                  <div className="rounded-2xl rounded-bl-md border border-white/10 bg-ink-900 px-4 py-3 text-sm text-slate-200">
+                  <div className="rounded-2xl rounded-bl-md border border-line/10 bg-muted px-4 py-3 text-sm text-foreground">
                     Hi, I'm Sol. Ask me anything about Solix — archiving, application retirement, governed AI, pricing conversations, or how to get a demo.
                   </div>
                   <div className="grid gap-2">
@@ -187,9 +187,9 @@ export const ConciergeWidget = () => {
                         key={s}
                         onClick={() => send(s)}
                         data-testid="chat-suggestion"
-                        className="group flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-left text-sm text-muted-foreground transition-[border-color,color,background-color] duration-200 hover:border-primary/50 hover:bg-white/5 hover:text-foreground"
+                        className="group flex items-center gap-2 rounded-xl border border-line/10 px-3 py-2.5 text-left text-sm text-muted-foreground transition-[border-color,color,background-color] duration-200 hover:border-primary/40 hover:bg-muted hover:text-foreground"
                       >
-                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
+                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary-ink" />
                         {s}
                       </button>
                     ))}
@@ -204,7 +204,7 @@ export const ConciergeWidget = () => {
                 e.preventDefault();
                 send();
               }}
-              className="flex items-center gap-2 border-t border-white/10 p-3"
+              className="flex items-center gap-2 border-t border-line/10 p-3"
             >
               <input
                 ref={inputRef}
@@ -213,7 +213,7 @@ export const ConciergeWidget = () => {
                 placeholder="Ask about Solix…"
                 disabled={busy}
                 data-testid="chat-input"
-                className="h-11 flex-1 rounded-full border border-white/10 bg-ink-900 px-4 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
+                className="h-11 flex-1 rounded-full border border-line/15 bg-muted/60 px-4 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
               />
               <Button type="submit" size="icon" disabled={busy || !input.trim()} aria-label="Send" data-testid="chat-send-button" className="h-11 w-11 rounded-full">
                 <Send className="h-4 w-4" />

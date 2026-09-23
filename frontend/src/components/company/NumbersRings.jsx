@@ -6,7 +6,7 @@ const RINGS = [
   { value: 150, suffix: "+", pct: 88, label: "Application connectors on the platform", color: "#0088CF" },
   { value: 80, suffix: "%", pct: 80, label: "Typical infrastructure cost reduction", color: "#EE2424" },
   { value: 30, suffix: "+", pct: 62, label: "Privacy regulations covered by templates", color: "#0088CF" },
-  { value: 4, suffix: "", pct: 45, label: "Continents with Solix teams", color: "#94A3B8" },
+  { value: 4, suffix: "", pct: 45, label: "Continents with Solix teams", color: "#3D6288" },
 ];
 
 const Ring = ({ pct, color, children }) => {
@@ -14,10 +14,10 @@ const Ring = ({ pct, color, children }) => {
   return (
     <div className="relative grid h-28 w-28 place-items-center">
       <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
-        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="rgb(var(--line) / 0.08)" strokeWidth="6" />
         <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (c * pct) / 100} className="transition-[stroke-dashoffset] duration-1000 ease-out" />
       </svg>
-      <span className="relative font-display text-2xl font-medium tracking-tight">{children}</span>
+      <span className="relative font-display text-2xl font-medium tracking-tight text-foreground">{children}</span>
     </div>
   );
 };

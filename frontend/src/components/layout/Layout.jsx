@@ -4,14 +4,12 @@ import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ConciergeWidget } from "@/components/chat/ConciergeWidget";
-import { CustomCursor } from "@/components/shared/CustomCursor";
 import { pageTransitionVariants } from "@/components/shared/Reveal";
 
 export const Layout = () => {
   const location = useLocation();
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      <CustomCursor />
       <ScrollToTop />
       <Navbar />
       <main>

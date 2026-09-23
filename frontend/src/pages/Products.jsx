@@ -15,7 +15,7 @@ export default function Products() {
       <PageHero
         eyebrow="Products"
         crumbs={[{ label: "Products" }]}
-        title="One platform. Every era of your data. Eight ways to put it to work."
+        title="One platform. Every era of your data. Every way to put it to work."
         description="Solix products are not point tools bolted together. They are capabilities on a single governed foundation, so a record archived today is searchable by legal tomorrow and usable by an AI agent next quarter."
         image="/Website/images/prod-cdp.jpg"
       >
@@ -24,22 +24,34 @@ export default function Products() {
         </Button>
       </PageHero>
 
-      <Section>
-        <div className="container">
+      <Section className="dark overflow-hidden bg-background text-foreground">
+        <div className="absolute inset-0 grid-lines grid-fade" />
+        <div className="container relative">
           <SectionHeading eyebrow="Architecture" title="Layered by design." description="Each layer inherits the governance of the one beneath it. Nothing leaves the trust perimeter." />
           <div className="mt-14"><ArchitectureStack /></div>
         </div>
       </Section>
 
       {["Platform", "Enterprise AI (EAI)", "Cloud Archive Products", "EAI Pharma", "Enterprise Foundation"].map((category, i) => (
-        <Section key={category} bordered className={i % 2 === 0 ? "bg-ink-900/40" : undefined}>
+        <Section key={category} bordered className={i % 2 === 0 ? "bg-muted" : undefined}>
           <div className="container">
             <SectionHeading eyebrow="Products" title={category} />
-            <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {PRODUCTS.filter((p) => p.category === category).map((p) => (
-                <Item key={p.slug} className="flex"><ProductCard product={p} className="w-full" /></Item>
-              ))}
-            </Stagger>
+            {(() => {
+              const items = PRODUCTS.filter((p) => p.category === category);
+              // A single-product category gets one wide card with its render
+              // rather than a lone tile beside two empty grid columns.
+              return items.length === 1 ? (
+                <Stagger className="mt-12">
+                  <Item className="flex"><ProductCard product={items[0]} horizontal className="w-full" /></Item>
+                </Stagger>
+              ) : (
+                <Stagger className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {items.map((p) => (
+                    <Item key={p.slug} className="flex"><ProductCard product={p} className="w-full" /></Item>
+                  ))}
+                </Stagger>
+              );
+            })()}
           </div>
         </Section>
       ))}

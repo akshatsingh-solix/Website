@@ -28,7 +28,15 @@
       "governs": "governs",
       "preserves": "preserves",
       "unlocks": "unlocks"
-    }
+    },
+    "archiveJob": "Archive job",
+    "archiveRoute": "SAP ECC → Preservation Zone",
+    "policyChecked": "Policy-checked",
+    "aiAnswer": "Governed AI answer",
+    "answerSample": "14 Q3 contracts with auto-renew clauses, found across 3 retired systems.",
+    "answerSources": "3 sources · lineage attached",
+    "infraCost": "Infra cost",
+    "vsStatusQuo": "vs. status quo"
   },
   "footer": {
     "tagline": "Solix Technologies activates enterprise data across every system and every era, so businesses can put AI to work inside the trust perimeter IT defines.",

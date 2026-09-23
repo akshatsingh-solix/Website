@@ -39,18 +39,18 @@ export const TeamCard = () => {
     setEmail("");
   };
 
-  const cls = "h-10 rounded-lg border-white/15 bg-ink-900 px-3 text-sm focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0";
+  const cls = "h-10 rounded-lg border-line/15 bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0";
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-card p-6" data-testid="admin-team-card">
+    <div className="rounded-2xl border border-line/10 bg-card p-6" data-testid="admin-team-card">
       <div className="flex items-center gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-ink-950 text-primary"><Users className="h-5 w-5" strokeWidth={1.5} /></span>
+        <span className="grid h-10 w-10 place-items-center rounded-xl border border-line/10 bg-accent/50 text-primary-ink"><Users className="h-5 w-5" strokeWidth={1.5} /></span>
         <div>
           <p className="font-display text-lg font-medium">Sales team</p>
           <p className="text-xs text-muted-foreground">People leads can be assigned to</p>
         </div>
       </div>
-      <ul className="mt-5 divide-y divide-white/5" data-testid="admin-team-list">
+      <ul className="mt-5 divide-y divide-line/5" data-testid="admin-team-list">
         {members === null && <li className="py-4 text-center"><Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" /></li>}
         {members?.length === 0 && <li className="py-4 text-center text-sm text-muted-foreground" data-testid="admin-team-empty">No team members yet. Add your first salesperson below.</li>}
         {members?.map((m) => (

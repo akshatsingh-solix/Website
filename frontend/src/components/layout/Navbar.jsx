@@ -31,7 +31,7 @@ const GroupedPanel = ({ item, onNavigate }) => (
   <div className="grid gap-8 p-8 lg:grid-cols-4 lg:p-10" data-testid={`mega-panel-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
     {item.groups.map((group) => (
       <div key={group.heading}>
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">{group.heading}</p>
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary-ink">{group.heading}</p>
         <div className="mt-4 flex flex-col gap-0.5">
           {group.items.map(({ label, desc, to }) => (
             <Link
@@ -39,9 +39,9 @@ const GroupedPanel = ({ item, onNavigate }) => (
               to={to}
               onClick={onNavigate}
               data-testid={`mega-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-              className="group -mx-2 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-white/5"
+              className="group -mx-2 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-muted"
             >
-              <span className="block text-sm font-medium text-slate-200 group-hover:text-foreground">{label}</span>
+              <span className="block text-sm font-medium text-foreground group-hover:text-primary-ink">{label}</span>
               {desc && <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{desc}</span>}
             </Link>
           ))}
@@ -59,7 +59,7 @@ const SimpleLinksPanel = ({ item, onNavigate }) => (
         to={to}
         onClick={onNavigate}
         data-testid={`mega-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-        className="rounded-lg px-2 py-2.5 text-[15px] text-teal transition-colors duration-200 hover:bg-white/5 hover:text-foreground"
+        className="rounded-lg px-2 py-2.5 text-[15px] text-foreground transition-colors duration-200 hover:bg-muted hover:text-teal"
       >
         {label}
       </Link>
@@ -69,19 +69,20 @@ const SimpleLinksPanel = ({ item, onNavigate }) => (
 
 const FlatPanel = ({ item, onNavigate }) => (
   <div className="grid lg:grid-cols-12" data-testid={`mega-panel-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
-    <div className="relative border-b border-white/10 p-8 lg:col-span-4 lg:border-b-0 lg:border-r">
-      <div className="absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
-      <p className="eyebrow mb-3">{item.label}</p>
-      <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{item.blurb}</p>
+    <div className="dark relative overflow-hidden bg-background p-8 text-foreground lg:col-span-4">
+      <div className="absolute -left-16 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.35),transparent)]" />
+      <div className="absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.3),transparent)]" />
+      <p className="eyebrow relative mb-3">{item.label}</p>
+      <p className="relative max-w-xs text-sm leading-relaxed text-muted-foreground">{item.blurb}</p>
       <Link
         to={item.featured.to}
         onClick={onNavigate}
         data-testid={`mega-featured-${item.label.toLowerCase()}`}
-        className="group mt-8 block rounded-xl border border-white/10 bg-ink-900/70 p-5 transition-[border-color,background-color] duration-300 hover:border-primary/50 hover:bg-ink-900"
+        className="group relative mt-8 block rounded-xl border border-line/10 bg-card/70 p-5 transition-[border-color,background-color] duration-300 hover:border-primary/60 hover:bg-card"
       >
         <p className="font-display text-lg font-medium">{item.featured.title}</p>
         <p className="mt-1 text-sm text-muted-foreground">{item.featured.desc}</p>
-        <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-primary">
+        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary-ink">
           Explore <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
         </span>
       </Link>
@@ -93,9 +94,9 @@ const FlatPanel = ({ item, onNavigate }) => (
           to={to}
           onClick={onNavigate}
           data-testid={`mega-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-          className="group flex items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-white/5"
+          className="group flex items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-muted"
         >
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-white/10 bg-ink-900 text-muted-foreground transition-colors duration-200 group-hover:border-primary/50 group-hover:text-primary">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line/10 bg-accent/60 text-teal transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/10 group-hover:text-primary-ink">
             <Icon className="h-5 w-5" strokeWidth={1.5} />
           </span>
           <span>
@@ -108,7 +109,7 @@ const FlatPanel = ({ item, onNavigate }) => (
         to={item.to}
         onClick={onNavigate}
         data-testid={`mega-viewall-${item.label.toLowerCase()}`}
-        className="group mt-2 flex items-center justify-between rounded-xl border border-dashed border-white/15 px-4 py-3 text-sm text-muted-foreground transition-colors duration-200 hover:border-white/40 hover:text-foreground sm:col-span-2"
+        className="group mt-2 flex items-center justify-between rounded-xl border border-dashed border-line/15 px-4 py-3 text-sm text-muted-foreground transition-colors duration-200 hover:border-line/40 hover:text-foreground sm:col-span-2"
       >
         View all {item.label.toLowerCase()}
         <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -126,7 +127,7 @@ const MegaPanel = ({ item, onNavigate }) => (
     className="absolute inset-x-0 top-full pt-3"
   >
     <div className="container">
-      <div className="max-h-[75vh] overflow-y-auto rounded-2xl border border-white/10 bg-ink-950/95 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
+      <div className="max-h-[75vh] overflow-hidden overflow-y-auto rounded-2xl border border-line/10 bg-popover shadow-[0_2px_6px_rgba(13,25,45,0.05),0_40px_80px_-30px_rgba(13,25,45,0.35)]">
         {item.groups ? (
           <GroupedPanel item={item} onNavigate={onNavigate} />
         ) : item.simpleItems ? (
@@ -153,7 +154,7 @@ const MobileNav = ({ onNavigate }) => {
                 key={item.label}
                 to={item.to}
                 onClick={onNavigate}
-                className="flex items-center justify-between border-b border-white/10 py-4 font-display text-lg"
+                className="flex items-center justify-between border-b border-line/10 py-4 font-display text-lg"
                 data-testid={`mobile-nav-${item.label.toLowerCase()}`}
               >
                 {label}
@@ -161,17 +162,17 @@ const MobileNav = ({ onNavigate }) => {
             );
           }
           return (
-            <AccordionItem key={item.label} value={item.label} className="border-white/10">
+            <AccordionItem key={item.label} value={item.label} className="border-line/10">
               <AccordionTrigger className="font-display text-lg hover:no-underline" data-testid={`mobile-nav-${item.label.toLowerCase()}`}>
                 {label}
               </AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col gap-1 pb-2">
-                  <Link to={item.to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-primary hover:bg-white/5">
+                  <Link to={item.to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm font-medium text-primary-ink hover:bg-muted">
                     All {label}
                   </Link>
                   {flatItems.map(({ label, to }) => (
-                    <Link key={label} to={to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
+                    <Link key={label} to={to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
                       {label}
                     </Link>
                   ))}
@@ -221,7 +222,7 @@ export const Navbar = () => {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300",
-        scrolled || open ? "glass border-b border-white/10 bg-ink-950/95" : "border-b border-transparent bg-transparent"
+        scrolled || open ? "border-b border-line/10 bg-background/90 shadow-[0_8px_30px_-18px_rgba(13,25,45,0.25)] backdrop-blur-xl" : "border-b border-transparent bg-transparent"
       )}
       onMouseLeave={() => setOpen(null)}
       data-testid="site-header"
@@ -230,7 +231,7 @@ export const Navbar = () => {
       <div className="container flex h-16 items-center justify-between lg:h-[72px]">
         <Logo />
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
           {NAV.map((item) => {
             const hasDropdown = Boolean(item.items || item.groups || item.simpleItems);
             return (
@@ -240,7 +241,7 @@ export const Navbar = () => {
                   data-testid={`nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                   className={({ isActive }) =>
                     cn(
-                      "inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-sm transition-colors duration-200",
+                      "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-2 text-[13.5px] transition-colors duration-200 2xl:px-3 2xl:text-sm",
                       isActive || open === item.label ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                     )
                   }
@@ -253,10 +254,10 @@ export const Navbar = () => {
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
-          <LanguageSwitcher />
+        <div className="hidden items-center gap-2 xl:flex">
+          <LanguageSwitcher compact />
           <Button asChild variant="ghost" size="sm" data-testid="nav-login">
-            <Link to="/services-support#support-portal"><LogIn className="h-4 w-4" /> {t("nav.login")}</Link>
+            <Link to="/services-support#support-portal" aria-label={t("nav.login")} title={t("nav.login")}><LogIn className="h-4 w-4" /> <span className="hidden 2xl:inline">{t("nav.login")}</span></Link>
           </Button>
           <Magnetic strength={0.2}>
             <Button asChild size="sm" data-testid="nav-try-solix">
@@ -267,11 +268,11 @@ export const Navbar = () => {
 
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <button className="grid h-10 w-10 place-items-center rounded-full border border-white/10 lg:hidden" aria-label="Open menu" data-testid="mobile-menu-button">
+            <button className="grid h-10 w-10 place-items-center rounded-full border border-line/15 bg-background/70 xl:hidden" aria-label="Open menu" data-testid="mobile-menu-button">
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-full max-w-sm border-white/10 bg-ink-950 p-6">
+          <SheetContent side="right" className="w-full max-w-sm overflow-y-auto border-line/10 bg-background p-6">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <Logo />
             <MobileNav onNavigate={() => setMobileOpen(false)} />
