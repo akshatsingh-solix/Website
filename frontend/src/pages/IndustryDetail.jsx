@@ -8,9 +8,13 @@ import { IndustryFlow } from "@/components/shared/IndustryFlow";
 import { CTABand } from "@/components/shared/CTABand";
 import { ProductCard } from "@/components/home/PlatformBento";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+import { midSentence, useTx } from "@/i18n/tx";
 
 export default function IndustryDetail() {
   const { slug } = useParams();
+  const tx = useTx();
+  const { i18n } = useTranslation();
   const ind = INDUSTRIES.find((i) => i.slug === slug);
   if (!ind) return <Navigate to="/404" replace />;
   const products = PRODUCTS.filter((p) => ["enterprise-archiving", "application-retirement", "consumer-data-privacy"].includes(p.slug));
@@ -26,20 +30,20 @@ export default function IndustryDetail() {
         image={ind.image}
       >
         <Button asChild size="lg" data-testid="industry-demo-button">
-          <Link to="/contact">Talk to an industry expert <ArrowRight /></Link>
+          <Link to="/contact">{tx("Talk to an industry expert")} <ArrowRight /></Link>
         </Button>
       </PageHero>
 
       <Section>
         <div className="container">
-          <SectionHeading eyebrow="From challenge to outcome" title={`How ${ind.name.toLowerCase()} leaders get there.`} />
+          <SectionHeading eyebrow="From challenge to outcome" title={tx("How {{name}} leaders get there.", { name: midSentence(ind.name, i18n.language) })} />
           <div className="mt-12"><IndustryFlow industry={ind} /></div>
         </div>
       </Section>
 
       <Section bordered className="bg-muted">
         <div className="container">
-          <SectionHeading eyebrow="Recommended products" title={`What ${ind.name.toLowerCase()} leaders start with.`} />
+          <SectionHeading eyebrow="Recommended products" title={tx("What {{name}} leaders start with.", { name: midSentence(ind.name, i18n.language) })} />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-3">
             {products.map((p) => <Item key={p.slug} className="flex"><ProductCard product={p} className="w-full" /></Item>)}
           </Stagger>
@@ -63,7 +67,7 @@ export default function IndustryDetail() {
         </div>
       </Section>
 
-      <CTABand title={`Let's talk about ${ind.name.toLowerCase()} data.`} />
+      <CTABand title={tx("Let's talk about {{name}} data.", { name: midSentence(ind.name, i18n.language) })} />
     </div>
   );
 }

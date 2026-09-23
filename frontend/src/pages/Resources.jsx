@@ -9,8 +9,10 @@ import { Stagger, Item } from "@/components/shared/Reveal";
 import { ResourceCard } from "@/components/home/InsightsPreview";
 import { CTABand } from "@/components/shared/CTABand";
 import { Input } from "@/components/ui/input";
+import { useTx } from "@/i18n/tx";
 
 export default function Resources() {
+  const tx = useTx();
   const [params, setParams] = useSearchParams();
   const type = params.get("type") ?? "all";
   const [q, setQ] = useState("");
@@ -52,12 +54,12 @@ export default function Resources() {
             </div>
             <div className="relative lg:w-72">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search resources" className="h-11 rounded-full border-line/15 bg-background pl-11 focus-visible:ring-primary" data-testid="resource-search-input" aria-label="Search resources" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tx("Search resources")} className="h-11 rounded-full border-line/15 bg-background pl-11 focus-visible:ring-primary" data-testid="resource-search-input" aria-label={tx("Search resources")} />
             </div>
           </div>
 
           {list.length === 0 ? (
-            <p className="mt-16 text-center text-muted-foreground" data-testid="resources-empty">No resources match your search yet.</p>
+            <p className="mt-16 text-center text-muted-foreground" data-testid="resources-empty">{tx("No resources match your search yet.")}</p>
           ) : (
             <Stagger key={`${type}-${q}`} className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {list.map((r) => <Item key={r.id} className="flex"><ResourceCard r={r} /></Item>)}

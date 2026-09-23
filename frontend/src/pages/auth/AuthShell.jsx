@@ -5,6 +5,7 @@ import { useTx } from "@/i18n/tx";
 import { Logo } from "@/components/shared/Logo";
 import { AuroraField } from "@/components/shared/Reveal";
 
+// i18n: translated at render.
 const FEATURES = [
   { lead: "Talk to Your Enterprise Data:", text: "Ask plain-language questions across hundreds of contracts, reports, or emails simultaneously." },
   { lead: "Auto-Extract Key Data:", text: "Pull structured information from any source — invoices, contracts, emails, ERP reports, etc." },
@@ -12,6 +13,7 @@ const FEATURES = [
   { lead: "Auto-Classify & Govern:", text: "Every uploaded document is automatically classified, tagged with metadata, and routed to the right retention policy." },
 ];
 
+// no-i18n: certification names.
 const BADGES = [
   { icon: Lock, label: "HIPAA" },
   { icon: ShieldCheck, label: "PCI DSS" },

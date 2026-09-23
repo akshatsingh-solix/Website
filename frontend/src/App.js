@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import i18n from "@/i18n";
 import { detectLanguage, getStoredLanguage } from "@/i18n/geoDetect";
@@ -32,6 +33,9 @@ import AdminLeads from "@/pages/admin/AdminLeads";
 import AdminSettings from "@/pages/admin/AdminSettings";
 
 function App() {
+  // Subscribing here re-renders the whole tree on a language change, so
+  // every component reading localized data (see i18n/localize.js) updates.
+  useTranslation();
   useEffect(() => {
     detectLanguage().then(({ lang }) => {
       // Never let a slow geo lookup undo a language the visitor picked

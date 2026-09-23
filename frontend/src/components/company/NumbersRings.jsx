@@ -1,6 +1,8 @@
 import { CountUp } from "@/components/shared/CountUp";
 import { Stagger, Item } from "@/components/shared/Reveal";
+import { useTx } from "@/i18n/tx";
 
+// i18n: labels are translated at render.
 const RINGS = [
   { value: 24, suffix: "", pct: 100, label: "Years of enterprise data stewardship", color: "#EE2424" },
   { value: 150, suffix: "+", pct: 88, label: "Application connectors on the platform", color: "#0088CF" },
@@ -22,15 +24,18 @@ const Ring = ({ pct, color, children }) => {
   );
 };
 
-export const NumbersRings = () => (
+export const NumbersRings = () => {
+  const tx = useTx();
+  return (
   <div data-testid="numbers-rings">
   <Stagger className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
     {RINGS.map((s) => (
       <Item key={s.label} className="flex flex-col items-center text-center">
         <Ring pct={s.pct} color={s.color}><CountUp value={s.value} suffix={s.suffix} /></Ring>
-        <p className="mt-4 max-w-[18ch] text-xs leading-snug text-muted-foreground">{s.label}</p>
+        <p className="mt-4 max-w-[18ch] text-xs leading-snug text-muted-foreground">{tx(s.label)}</p>
       </Item>
     ))}
   </Stagger>
   </div>
 );
+};

@@ -6,8 +6,10 @@ import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
+import { useTx } from "@/i18n/tx";
 
 export default function Platform() {
+  const tx = useTx();
   return (
     <div data-testid="platform-page">
       <PageHero
@@ -18,7 +20,7 @@ export default function Platform() {
         description="SOLIXCloud, your cloud, on-premises or hybrid. Every deployment model runs the same Common Data Platform, the same policy engine and the same audit trail."
       >
         <Button asChild size="lg" data-testid="platform-hero-demo">
-          <Link to="/products/enterprise-edition">Explore Enterprise Edition <ArrowRight /></Link>
+          <Link to="/products/enterprise-edition">{tx("Explore Enterprise Edition")} <ArrowRight /></Link>
         </Button>
       </PageHero>
 

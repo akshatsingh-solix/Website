@@ -10,6 +10,7 @@ import { AuthCard, AuthShell } from "./AuthShell";
 import { CardLanguage, Field, PasswordInput, PrivacyNote, SsoButtons, SubmitButton, inputCls } from "./AuthParts";
 
 const COMPANY_SIZES = ["1–49", "50–249", "250–999", "1,000–4,999", "5,000–19,999", "20,000+"];
+// i18n: options are translated at render; the English value is stored.
 const USE_CASES = [
   "Contract intelligence",
   "Invoice and document processing",
@@ -18,6 +19,7 @@ const USE_CASES = [
   "Knowledge base for AI agents",
   "Something else",
 ];
+// i18n
 const COUNTRIES = [
   "United States", "Canada", "Mexico", "Brazil", "Argentina", "Colombia", "Chile", "United Kingdom", "Ireland", "Germany", "Austria",
   "Switzerland", "France", "Belgium", "Netherlands", "Luxembourg", "Spain", "Portugal", "Italy", "Sweden", "Norway", "Denmark",

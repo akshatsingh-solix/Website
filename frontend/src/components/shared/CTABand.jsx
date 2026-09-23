@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTx } from "@/i18n/tx";
 import { Reveal } from "./Reveal";
 
 /**
@@ -16,7 +17,9 @@ export const CTABand = ({
   primary = { label: "Request a demo", to: "/contact" },
   secondary = { label: "Talk to an expert", to: "/contact?type=contact" },
   image = "/Website/images/prod-cdp.jpg",
-}) => (
+}) => {
+  const tx = useTx();
+  return (
   <section className="relative bg-background pb-20 pt-4 sm:pb-24" data-testid="cta-band">
     <div className="container">
       <Reveal>
@@ -27,16 +30,16 @@ export const CTABand = ({
           <div className="absolute -left-24 -top-24 -z-10 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.35),transparent)]" />
           <div className="grid gap-10 px-6 py-14 sm:px-12 sm:py-16 lg:grid-cols-12 lg:px-16 lg:py-20">
             <div className="lg:col-span-7">
-              <p className="eyebrow mb-4">{eyebrow}</p>
-              <h2 className="text-balance text-4xl font-medium tracking-tight sm:text-5xl">{title}</h2>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">{description}</p>
+              <p className="eyebrow mb-4">{tx(eyebrow)}</p>
+              <h2 className="text-balance text-4xl font-medium tracking-tight sm:text-5xl">{tx(title)}</h2>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">{tx(description)}</p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Button asChild size="lg" data-testid="cta-band-primary">
-                  <Link to={primary.to}>{primary.label} <ArrowRight /></Link>
+                  <Link to={primary.to}>{tx(primary.label)} <ArrowRight /></Link>
                 </Button>
                 {secondary && (
                   <Button asChild size="lg" variant="outline" className="bg-background/40 backdrop-blur" data-testid="cta-band-secondary">
-                    <Link to={secondary.to}>{secondary.label}</Link>
+                    <Link to={secondary.to}>{tx(secondary.label)}</Link>
                   </Button>
                 )}
               </div>
@@ -46,4 +49,5 @@ export const CTABand = ({
       </Reveal>
     </div>
   </section>
-);
+  );
+};

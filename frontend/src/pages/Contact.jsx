@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { OFFICES } from "@/data/site";
 import { Reveal } from "@/components/shared/Reveal";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { useTx } from "@/i18n/tx";
+import { useLocalized } from "@/i18n/localize";
 
 const MODES = [
   { key: "demo", label: "Request a demo", title: "See Solix on your data.", desc: "A 45-minute working session with a solutions architect, tailored to the systems and outcomes you care about." },
@@ -11,8 +13,10 @@ const MODES = [
 ];
 
 export default function Contact() {
+  const tx = useTx();
+  const modes = useLocalized(MODES);
   const [params, setParams] = useSearchParams();
-  const mode = MODES.find((m) => m.key === params.get("type")) ?? MODES[0];
+  const mode = modes.find((m) => m.key === params.get("type")) ?? modes[0];
   const interest = params.get("interest") ?? undefined;
 
   return (
@@ -21,9 +25,9 @@ export default function Contact() {
       <div className="absolute -right-40 top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.1),transparent)]" />
       <div className="container relative grid gap-14 pt-32 pb-24 md:pt-40 lg:grid-cols-12 lg:pt-44">
         <Reveal className="lg:col-span-5">
-          <p className="eyebrow mb-5">Contact</p>
+          <p className="eyebrow mb-5">{tx("Contact")}</p>
           <div className="mb-8 inline-flex rounded-full border border-line/10 bg-card p-1" role="tablist" data-testid="contact-mode-tabs">
-            {MODES.map((m) => (
+            {modes.map((m) => (
               <button
                 key={m.key}
                 role="tab"
@@ -42,25 +46,25 @@ export default function Contact() {
           <dl className="mt-12 space-y-6 text-sm">
             <div className="flex gap-4">
               <Phone className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
-              <div><dt className="text-muted-foreground">Sales & support</dt><dd className="mt-0.5 font-medium"><a href="tel:18884676549" className="hover:text-primary-ink">1.888.GO.SOLIX (467.6549)</a></dd></div>
+              <div><dt className="text-muted-foreground">{tx("Sales & support")}</dt><dd className="mt-0.5 font-medium"><a href="tel:18884676549" className="hover:text-primary-ink">1.888.GO.SOLIX (467.6549)</a></dd></div>
             </div>
             <div className="flex gap-4">
               <Mail className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
-              <div><dt className="text-muted-foreground">Email</dt><dd className="mt-0.5 font-medium"><a href="mailto:info@solix.com" className="hover:text-primary-ink">info@solix.com</a></dd></div>
+              <div><dt className="text-muted-foreground">{tx("Email")}</dt><dd className="mt-0.5 font-medium"><a href="mailto:info@solix.com" className="hover:text-primary-ink">info@solix.com</a></dd></div>
             </div>
             <div className="flex gap-4">
               <MapPin className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
-              <div><dt className="text-muted-foreground">Headquarters</dt><dd className="mt-0.5 font-medium">{OFFICES[0].address}</dd></div>
+              <div><dt className="text-muted-foreground">{tx("Headquarters")}</dt><dd className="mt-0.5 font-medium">{OFFICES[0].address}</dd></div>
             </div>
             <div className="flex gap-4">
               <Clock className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
-              <div><dt className="text-muted-foreground">Response time</dt><dd className="mt-0.5 font-medium">Within one business day</dd></div>
+              <div><dt className="text-muted-foreground">{tx("Response time")}</dt><dd className="mt-0.5 font-medium">{tx("Within one business day")}</dd></div>
             </div>
           </dl>
         </Reveal>
 
         <Reveal delay={0.12} className="lg:col-span-7">
-          <div className="rounded-3xl border border-line/10 bg-card/80 p-6 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] backdrop-blur sm:p-10">
+          <div className="rounded-3xl border border-line/10 bg-card/80 p-6 shadow-[0_2px_6px_rgba(13,25,45,0.05),0_40px_100px_-45px_rgba(13,25,45,0.4)] backdrop-blur sm:p-10">
             <LeadForm
               key={mode.key + (interest ?? "")}
               type={mode.key}

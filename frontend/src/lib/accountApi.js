@@ -31,6 +31,7 @@ export const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 export const isBusinessEmail = (v) => isEmail(v) && !FREE_EMAIL_DOMAINS.has(v.trim().split("@")[1].toLowerCase());
 
 // Same rule the API enforces: 6-30 chars with a letter, a digit and a symbol.
+// i18n: labels are translated at render.
 export const PASSWORD_RULES = [
   { key: "length", label: "6–30 characters", test: (p) => p.length >= 6 && p.length <= 30 },
   { key: "letter", label: "A letter (A–z)", test: (p) => /[A-Za-z]/.test(p) },

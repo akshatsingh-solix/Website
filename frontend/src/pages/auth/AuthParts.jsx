@@ -6,6 +6,7 @@ import { useTx } from "@/i18n/tx";
 import { ECS_PRIVACY_URL } from "@/lib/accountApi";
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 
+// no-i18n
 export const inputCls =
   "h-11 w-full rounded-lg border border-input bg-background px-3.5 text-sm text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/70 focus:border-teal focus:ring-2 focus:ring-teal/20 disabled:opacity-60 aria-[invalid=true]:border-primary aria-[invalid=true]:ring-primary/15";
 

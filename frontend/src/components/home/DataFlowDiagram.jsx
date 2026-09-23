@@ -1,4 +1,8 @@
+import { useTx } from "@/i18n/tx";
+
+// i18n: labels are translated at render.
 const SOURCES = ["SAP ERP", "Oracle EBS", "Salesforce", "Mainframe", "Email & Files", "Retired Apps"];
+// i18n
 const OUTCOMES = ["AI Agents", "Analytics", "Compliance", "Archive"];
 
 // `highlight` ("sources" | "core" | "outcomes") lets a caller narrate the
@@ -17,7 +21,8 @@ const Node = ({ x, y, label, side, lit, dim, color }) => (
       style={{ transition: "stroke 400ms ease" }}
     />
     <text x={side === "left" ? -56 : 56} y="4" textAnchor="middle" fill={lit ? "#fff" : "#B0B0B2"} style={{ fontSize: 10.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.4, transition: "fill 400ms ease" }}>
-      {label}
+      {/* Longer translations are fitted to the 112px node rather than overflowing it. */}
+      <tspan textLength={label.length > 16 ? 102 : undefined} lengthAdjust="spacingAndGlyphs">{label}</tspan>
     </text>
   </g>
 );
@@ -33,6 +38,7 @@ const Flow = ({ d, delay = 0, color = "#0088CF", dur = 3.2, dim }) => (
 );
 
 export const DataFlowDiagram = ({ highlight = null, className = "h-auto w-full" }) => {
+  const tx = useTx();
   const leftX = 150;
   const rightX = 470;
   const cx = 310;
@@ -44,7 +50,7 @@ export const DataFlowDiagram = ({ highlight = null, className = "h-auto w-full" 
   const coreLit = !highlight || highlight === "core";
 
   return (
-    <svg viewBox="0 0 620 380" className={className} role="img" aria-label="Enterprise systems flowing into the Solix Common Data Platform and out to AI, analytics and compliance">
+    <svg viewBox="0 0 620 380" className={className} role="img" aria-label={tx("Enterprise systems flowing into the Solix Common Data Platform and out to AI, analytics and compliance")}>
       <defs>
         <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#EE2424" stopOpacity="0.55" />
@@ -63,8 +69,8 @@ export const DataFlowDiagram = ({ highlight = null, className = "h-auto w-full" 
         <Flow key={`r${i}`} d={`M ${cx + 68} ${cy} C ${cx + 110} ${cy}, ${rightX - 60} ${y}, ${rightX} ${y}`} delay={0.6 + i * 0.5} color="#EE2424" dur={2.8} dim={dimOutcomes && highlight !== "core"} />
       ))}
 
-      {SOURCES.map((s, i) => <Node key={s} x={leftX} y={leftYs[i]} label={s} side="left" lit={highlight === "sources"} dim={dimSources} color="#0088CF" />)}
-      {OUTCOMES.map((s, i) => <Node key={s} x={rightX} y={rightYs[i]} label={s} side="right" lit={highlight === "outcomes"} dim={dimOutcomes} color="#EE2424" />)}
+      {SOURCES.map((s, i) => <Node key={s} x={leftX} y={leftYs[i]} label={tx(s)} side="left" lit={highlight === "sources"} dim={dimSources} color="#0088CF" />)}
+      {OUTCOMES.map((s, i) => <Node key={s} x={rightX} y={rightYs[i]} label={tx(s)} side="right" lit={highlight === "outcomes"} dim={dimOutcomes} color="#EE2424" />)}
 
       <circle cx={cx} cy={cy} r="96" fill="url(#coreGlow)" style={{ opacity: coreLit ? 1 : 0.35, transition: "opacity 400ms ease" }} />
       <g transform={`translate(${cx} ${cy})`}>
@@ -76,8 +82,8 @@ export const DataFlowDiagram = ({ highlight = null, className = "h-auto w-full" 
           <circle r="11" fill="#EE2424" />
           <path d="M1.9 -9.1 -5.2 1.4h4.5l-1.9 8 8.1-11h-4.5l3.3-7.5Z" fill="#fff" />
         </g>
-        <text y="16" textAnchor="middle" className="fill-foreground" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.4 }}>Common Data Platform</text>
-        <text y="32" textAnchor="middle" fill="#B0B0B2" style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.2 }}>GOVERNED · PRESERVED</text>
+        <text y="16" textAnchor="middle" className="fill-foreground" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.4 }}>{tx("Common Data Platform")}</text>
+        <text y="32" textAnchor="middle" fill="#B0B0B2" style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.2 }}>{tx("GOVERNED · PRESERVED")}</text>
       </g>
     </svg>
   );

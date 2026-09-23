@@ -24,3 +24,22 @@ export const useTx = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback((text, vars) => translateText(text, vars, lng), [lng]);
 };
+
+/**
+ * Renders translated copy that keeps inline emphasis: `<em>…</em>` and
+ * `<strong>…</strong>` in the (translated) string become real elements, so
+ * each language can place the emphasis where its grammar puts it.
+ */
+export const Rich = ({ text }) =>
+  String(text)
+    .split(/(<em>.*?<\/em>|<strong>.*?<\/strong>)/g)
+    .map((part, i) => {
+      const em = /^<em>(.*)<\/em>$/.exec(part);
+      if (em) return <em key={i}>{em[1]}</em>;
+      const strong = /^<strong>(.*)<\/strong>$/.exec(part);
+      if (strong) return <strong key={i}>{strong[1]}</strong>;
+      return part;
+    });
+
+/** Lower-cases a name for use mid-sentence, except in German, where nouns stay capitalized. */
+export const midSentence = (name, lng) => (lng === "de" ? name : name.toLowerCase());

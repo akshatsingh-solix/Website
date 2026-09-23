@@ -4,11 +4,16 @@ import { cn } from "@/lib/utils";
 import { RESOURCES, RESOURCE_TYPES } from "@/data/site";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
+import { useTx, translateText } from "@/i18n/tx";
 
 // Singular form of a type's plural label: "Case Studies" -> "Case Study", "Blogs" -> "Blog".
-export const typeLabel = (key) => RESOURCE_TYPES.find((t) => t.key === key)?.label.replace(/ies$/, "y").replace(/s$/, "") ?? key;
+// Singular labels per resource type (the filter tabs use the plural ones).
+// i18n
+const TYPE_SINGULAR = { datasheet: "Datasheet", whitepaper: "White Paper", webinar: "Webinar", podcast: "Podcast", ebook: "eBook", casestudy: "Case Study", leadership: "Leadership Lesson", blog: "Blog", event: "Event" };
+export const typeLabel = (key) => translateText(TYPE_SINGULAR[key] ?? RESOURCE_TYPES.find((t) => t.key === key)?.label ?? key);
 
 export const ResourceCard = ({ r, className }) => {
+  const tx = useTx();
   const Icon = r.icon;
   return (
     <Link
@@ -28,20 +33,22 @@ export const ResourceCard = ({ r, className }) => {
       <div className="mt-auto flex items-center justify-between pt-6 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {r.readTime} · {r.date}</span>
         <span className="inline-flex items-center gap-1 text-muted-foreground transition-colors group-hover:text-primary-ink">
-          {r.gated ? "Get access" : "Read"} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          {r.gated ? tx("Get access") : tx("Read")} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </span>
       </div>
     </Link>
   );
 };
 
-export const InsightsPreview = () => (
+export const InsightsPreview = () => {
+  const tx = useTx();
+  return (
   <Section className="bg-background" id="insights">
     <div className="container">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <SectionHeading chapter="09" eyebrow="Insights" title="Field notes from two decades of enterprise data." />
         <Link to="/resources" className="link-underline shrink-0 text-sm font-medium text-foreground" data-testid="insights-view-all">
-          Browse all resources →
+          {tx("Browse all resources")} →
         </Link>
       </div>
       <Stagger className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -53,4 +60,5 @@ export const InsightsPreview = () => (
       </Stagger>
     </div>
   </Section>
-);
+  );
+};

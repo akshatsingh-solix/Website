@@ -11,15 +11,15 @@ export const fetchChatHistory = (sessionId) => api.get(`/chat/${sessionId}`).the
 
 export const clearChatHistory = (sessionId) => api.delete(`/chat/${sessionId}`);
 
-export async function streamChat({ sessionId, message, onDelta, onEvent, onError, signal }) {
+export async function streamChat({ sessionId, message, language = "en", onDelta, onEvent, onError, signal }) {
   const res = await fetch(`${API}/chat/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ session_id: sessionId, message }),
+    body: JSON.stringify({ session_id: sessionId, message, language }),
     signal,
   });
   if (!res.ok || !res.body) {
-    onError?.("The concierge is unavailable right now.");
+    onError?.("The concierge is unavailable right now. Please try again shortly.");
     return;
   }
   const reader = res.body.getReader();

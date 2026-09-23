@@ -5,8 +5,10 @@ import { PageHero } from "@/components/shared/PageHero";
 import { Section } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
+import { useTx } from "@/i18n/tx";
 
 export default function Industries() {
+  const tx = useTx();
   return (
     <div data-testid="industries-page">
       <PageHero
@@ -37,7 +39,7 @@ export default function Industries() {
                     <h3 className="font-display text-xl font-medium tracking-tight text-foreground">{ind.name}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{ind.desc}</p>
                     <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary-ink">
-                      Explore <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                      {tx("Explore")} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                     </span>
                   </div>
                 </Link>

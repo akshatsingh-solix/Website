@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import i18nInstance from "./index";
 import { translateText } from "./tx";
 
 // Keys whose values are identifiers, routes, assets or filter values - never
@@ -38,4 +39,29 @@ export const localizeData = (data, lng) => {
 export const useLocalized = (data) => {
   const { i18n } = useTranslation("content");
   return localizeData(data, i18n.language);
+};
+
+/**
+ * A data export that always reads in the active language. Wrap a module's
+ * source data once:
+ *
+ *   const PRODUCTS_EN = [...];
+ *   export const PRODUCTS = localizedSource(PRODUCTS_EN);
+ *
+ * and every consumer (`PRODUCTS.find(...)`, `.map`, spread, `Object.keys`)
+ * gets translated copy with no code changes. Components re-render on a
+ * language change because App subscribes to it at the root.
+ */
+export const localizedSource = (source) => {
+  const current = () => localizeData(source, i18nInstance.language);
+  return new Proxy(source, {
+    get(_target, prop) {
+      const view = current();
+      const value = Reflect.get(view, prop);
+      return typeof value === "function" ? value.bind(view) : value;
+    },
+    has: (_target, prop) => prop in current(),
+    ownKeys: () => Reflect.ownKeys(current()),
+    getOwnPropertyDescriptor: (_target, prop) => Reflect.getOwnPropertyDescriptor(current(), prop),
+  });
 };

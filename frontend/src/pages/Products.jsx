@@ -8,8 +8,10 @@ import { ProductCard } from "@/components/home/PlatformBento";
 import { ArchitectureStack } from "@/components/products/ArchitectureStack";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
+import { useTx } from "@/i18n/tx";
 
 export default function Products() {
+  const tx = useTx();
   return (
     <div data-testid="products-page">
       <PageHero
@@ -20,7 +22,7 @@ export default function Products() {
         image="/Website/images/prod-cdp.jpg"
       >
         <Button asChild size="lg" data-testid="products-hero-demo">
-          <Link to="/contact">Request a demo <ArrowRight /></Link>
+          <Link to="/contact">{tx("Request a demo")} <ArrowRight /></Link>
         </Button>
       </PageHero>
 

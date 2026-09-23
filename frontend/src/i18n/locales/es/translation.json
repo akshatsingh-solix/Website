@@ -36,7 +36,8 @@
     "answerSample": "14 contratos del T3 con renovación automática, encontrados en 3 sistemas retirados.",
     "answerSources": "3 fuentes · linaje adjunto",
     "infraCost": "Costo de infraestructura",
-    "vsStatusQuo": "vs. situación actual"
+    "vsStatusQuo": "vs. situación actual",
+    "imageAlt": "Plataforma de datos de Solix por capas, representada como una arquitectura luminosa y gobernada"
   },
   "footer": {
     "tagline": "Solix Technologies activa los datos empresariales en todos los sistemas y épocas, para que las empresas puedan poner la IA a trabajar dentro del perímetro de confianza que define TI.",
@@ -53,6 +54,7 @@
   "language": {
     "label": "Idioma",
     "detectedNotice": "Mostrando esta página en {{language}} según tu ubicación.",
-    "revertToEnglish": "Ver en inglés"
+    "revertToEnglish": "Ver en inglés",
+    "dismiss": "Cerrar"
   }
 }

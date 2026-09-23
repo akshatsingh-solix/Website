@@ -7,8 +7,10 @@ import { Stagger, Item } from "@/components/shared/Reveal";
 import { SolutionCard } from "@/components/home/SolutionsGrid";
 import { ApproachTimeline } from "@/components/shared/ApproachTimeline";
 import { CTABand } from "@/components/shared/CTABand";
+import { useTx } from "@/i18n/tx";
 
 export default function Solutions() {
+  const tx = useTx();
   return (
     <div data-testid="solutions-page">
       <PageHero
@@ -42,7 +44,7 @@ export default function Solutions() {
                   <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-teal"><ind.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                   <h3 className="mt-5 font-display text-lg font-medium">{ind.name}</h3>
                   <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-muted-foreground transition-colors group-hover:text-primary-ink">
-                    Explore <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    {tx("Explore")} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
                 </Link>
               </Item>

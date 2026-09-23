@@ -1,3 +1,6 @@
+import { useTx } from "@/i18n/tx";
+
+// i18n: city and region labels are translated at render.
 const NODES = [
   { city: "Santa Clara", region: "Headquarters", x: 130, y: 118 },
   { city: "London", region: "EMEA", x: 300, y: 70 },
@@ -23,17 +26,20 @@ const Arc = ({ x, y, delay, dur }) => {
   );
 };
 
-const OfficeNode = ({ city, region, x, y, delay }) => (
+const OfficeNode = ({ city, region, x, y, delay }) => {
+  const tx = useTx();
+  return (
   <g transform={`translate(${x} ${y})`}>
     <circle r="14" fill="none" stroke="#EE2424" strokeWidth="1" opacity="0.5">
       <animate attributeName="r" values="8;18;8" dur="3.2s" begin={`${delay}s`} repeatCount="indefinite" />
       <animate attributeName="opacity" values="0.6;0;0.6" dur="3.2s" begin={`${delay}s`} repeatCount="indefinite" />
     </circle>
     <circle r="4.5" fill="#EE2424" />
-    <text y="-22" textAnchor="middle" className="fill-foreground" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600 }}>{city}</text>
-    <text y="-9" textAnchor="middle" className="fill-[#B0B0B2]" style={{ fontSize: 8.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.8, textTransform: "uppercase" }}>{region}</text>
+    <text y="-22" textAnchor="middle" className="fill-foreground" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600 }}>{tx(city)}</text>
+    <text y="-9" textAnchor="middle" className="fill-[#B0B0B2]" style={{ fontSize: 8.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.8, textTransform: "uppercase" }}>{tx(region)}</text>
   </g>
-);
+  );
+};
 
 /**
  * Deliberately abstract rather than a literal (and inevitably imprecise
@@ -43,8 +49,10 @@ const OfficeNode = ({ city, region, x, y, delay }) => (
  * hub. Communicates "global, connected" honestly instead of borrowing
  * stock-map imagery this environment has no way to source or verify.
  */
-export const GlobalNetworkMap = () => (
-  <svg viewBox="0 0 680 340" className="h-auto w-full" role="img" aria-label="Solix's four global offices - Santa Clara, London, Hyderabad and Singapore - connected to one governed platform">
+export const GlobalNetworkMap = () => {
+  const tx = useTx();
+  return (
+  <svg viewBox="0 0 680 340" className="h-auto w-full" role="img" aria-label={tx("Solix's four global offices - Santa Clara, London, Hyderabad and Singapore - connected to one governed platform")}>
     <defs>
       <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="#EE2424" stopOpacity="0.5" />
@@ -65,9 +73,10 @@ export const GlobalNetworkMap = () => (
     <g transform={`translate(${cx} ${cy})`}>
       <circle r="20" className="fill-background" stroke="#EE2424" strokeWidth="1.25" />
       <path d="M2.4 -11.4 -6.5 1.8h5.6l-2.4 10 10.1-13.8h-5.6l4.1-9.4Z" fill="#EE2424" />
-      <text y="34" textAnchor="middle" className="fill-foreground" style={{ fontSize: 11, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.3 }}>One governed platform</text>
+      <text y="34" textAnchor="middle" className="fill-foreground" style={{ fontSize: 11, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.3 }}>{tx("One governed platform")}</text>
     </g>
 
     {NODES.map((n, i) => <OfficeNode key={n.city} {...n} delay={i * 0.5} />)}
   </svg>
-);
+  );
+};

@@ -8,8 +8,18 @@ import { CTABand } from "@/components/shared/CTABand";
 import { NumbersRings } from "@/components/company/NumbersRings";
 import { GlobalNetworkMap } from "@/components/company/GlobalNetworkMap";
 import { Button } from "@/components/ui/button";
+import { Rich, useTx } from "@/i18n/tx";
+import { useLocalized } from "@/i18n/localize";
+
+const MORE = [
+  { id: "analyst-views", icon: BarChart3, eyebrow: "Analyst Views", title: "Independent perspective on where we fit.", body: "Solix briefs industry analysts regularly on our platform strategy, from archiving and application retirement to governed Enterprise AI. If you're evaluating Solix as part of an analyst-led shortlist, your account team can share the relevant reports and briefing notes for your industry and use case." },
+  { id: "investor-relations", icon: TrendingUp, eyebrow: "Investor Relations", title: "Independent and growing since 2002.", body: "Solix has grown as an independent, privately held company for over two decades. For investment or partnership inquiries, reach our corporate development team through the contact form." },
+  { id: "csr", icon: HeartHandshake, eyebrow: "Corporate Social Responsibility", title: "Stewardship, on and off the platform.", body: "The same stewardship we apply to customer data guides how we operate as a company: annual volunteer days for every employee, data-minimization built into our own internal systems, and a hiring practice that reflects the global, regulated industries we serve." },
+];
 
 export default function Company() {
+  const tx = useTx();
+  const more = useLocalized(MORE);
   return (
     <div data-testid="company-page">
       <PageHero
@@ -20,7 +30,7 @@ export default function Company() {
         image="/Website/images/company-office.jpg"
       >
         <Button asChild size="lg" variant="outline" data-testid="company-careers-button">
-          <Link to="/careers">We're hiring <ArrowRight /></Link>
+          <Link to="/careers">{tx("We're hiring")} <ArrowRight /></Link>
         </Button>
       </PageHero>
 
@@ -30,9 +40,9 @@ export default function Company() {
             <SectionHeading eyebrow="Mission" title="Activate every era of enterprise data, inside a perimeter of trust." />
           </div>
           <Reveal delay={0.1} className="prose-solix text-base leading-relaxed text-muted-foreground md:text-lg lg:col-span-7">
-            <p>Enterprises don't have a data problem. They have a data <em>history</em> problem: decades of systems, formats and regulations, each holding records the business still needs and regulators still expect.</p>
-            <p>Solix built the Common Data Platform to give that history a home: governed, searchable, preserved. Then we built the products that put it to work, from archiving and application retirement to privacy automation and, now, governed Enterprise AI.</p>
-            <p>Headquartered in Santa Clara, California with engineering in Hyderabad and teams across EMEA and APAC, we serve some of the most regulated organizations in the world.</p>
+            <p><Rich text={tx("Enterprises don't have a data problem. They have a data <em>history</em> problem: decades of systems, formats and regulations, each holding records the business still needs and regulators still expect.")} /></p>
+            <p>{tx("Solix built the Common Data Platform to give that history a home: governed, searchable, preserved. Then we built the products that put it to work, from archiving and application retirement to privacy automation and, now, governed Enterprise AI.")}</p>
+            <p>{tx("Headquartered in Santa Clara, California with engineering in Hyderabad and teams across EMEA and APAC, we serve some of the most regulated organizations in the world.")}</p>
           </Reveal>
         </div>
       </Section>
@@ -120,11 +130,7 @@ export default function Company() {
         <div className="container">
           <SectionHeading eyebrow="Beyond the platform" title="How we engage with the market, investors and the world." />
           <Stagger className="mt-12 grid gap-4 lg:grid-cols-3">
-            {[
-              { id: "analyst-views", icon: BarChart3, eyebrow: "Analyst Views", title: "Independent perspective on where we fit.", body: "Solix briefs industry analysts regularly on our platform strategy, from archiving and application retirement to governed Enterprise AI. If you're evaluating Solix as part of an analyst-led shortlist, your account team can share the relevant reports and briefing notes for your industry and use case." },
-              { id: "investor-relations", icon: TrendingUp, eyebrow: "Investor Relations", title: "Independent and growing since 2002.", body: "Solix has grown as an independent, privately held company for over two decades. For investment or partnership inquiries, reach our corporate development team through the contact form." },
-              { id: "csr", icon: HeartHandshake, eyebrow: "Corporate Social Responsibility", title: "Stewardship, on and off the platform.", body: "The same stewardship we apply to customer data guides how we operate as a company: annual volunteer days for every employee, data-minimization built into our own internal systems, and a hiring practice that reflects the global, regulated industries we serve." },
-            ].map((c) => (
+            {more.map((c) => (
               <Item key={c.id} id={c.id} className="flex scroll-mt-28">
                 <div className="surface-elevated flex w-full flex-col p-7">
                   <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal/10 text-teal"><c.icon className="h-5 w-5" strokeWidth={1.5} /></span>

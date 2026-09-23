@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, ArrowUpRight, ChevronDown, LogIn, Menu, Phone, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAV } from "@/data/site";
+import { SOURCE } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -19,6 +19,10 @@ import { useTx } from "@/i18n/tx";
 // mega-menu content (product/solution/industry names) is still English
 // and is being translated page by page. Keyed off the English label so
 // data/site.js doesn't need restructuring for this first pass.
+// English source: this component translates its own copy via tx() and
+// keeps ids/test ids on the English labels.
+const NAV = SOURCE.NAV;
+
 export const NAV_LABEL_KEYS = {
   Platform: "nav.platform",
   Products: "nav.products",
@@ -280,7 +284,7 @@ export const Navbar = () => {
       <div className="container flex h-16 items-center justify-between gap-4 lg:h-[72px]">
         <Logo />
 
-        <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-0.5 xl:flex" aria-label={tx("Primary")}>
           {NAV.map((item) => {
             const hasDropdown = Boolean(item.items || item.groups || item.simpleItems);
             return (

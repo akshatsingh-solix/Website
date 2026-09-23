@@ -8,9 +8,11 @@ import { CTABand } from "@/components/shared/CTABand";
 import { ProductCard } from "@/components/home/PlatformBento";
 import { OutcomeChart } from "@/components/shared/OutcomeChart";
 import { Button } from "@/components/ui/button";
+import { useTx } from "@/i18n/tx";
 
 export default function ProductDetail() {
   const { slug } = useParams();
+  const tx = useTx();
   const product = PRODUCTS.find((p) => p.slug === slug);
   if (!product) return <Navigate to="/404" replace />;
 
@@ -21,7 +23,7 @@ export default function ProductDetail() {
   return (
     <div data-testid={`product-detail-${slug}`}>
       <PageHero
-        eyebrow={product.category}
+        eyebrow={tx(product.category)}
         crumbs={[{ label: "Products", to: "/products" }, { label: product.name }]}
         title={product.tagline}
         description={product.description}
@@ -29,10 +31,10 @@ export default function ProductDetail() {
       >
         <div className="flex flex-wrap gap-3">
           <Button asChild size="lg" data-testid="product-demo-button">
-            <Link to={`/contact?interest=${product.slug}`}>Request a demo <ArrowRight /></Link>
+            <Link to={`/contact?interest=${product.slug}`}>{tx("Request a demo")} <ArrowRight /></Link>
           </Button>
           <Button asChild size="lg" variant="outline" data-testid="product-whitepaper-button">
-            <Link to="/resources?type=whitepaper">Download white paper</Link>
+            <Link to="/resources?type=whitepaper">{tx("Download white paper")}</Link>
           </Button>
         </div>
       </PageHero>
@@ -40,7 +42,7 @@ export default function ProductDetail() {
       <Section>
         <div className="container grid gap-12 lg:grid-cols-12 lg:items-center">
           <div className="lg:col-span-5">
-            <SectionHeading eyebrow="Measured impact" title={`What changes with ${product.name}.`} description="Indexed comparison of typical customer programs before and after deployment. Your assessment produces your own numbers." />
+            <SectionHeading eyebrow="Measured impact" title={tx("What changes with {{name}}.", { name: product.name })} description="Indexed comparison of typical customer programs before and after deployment. Your assessment produces your own numbers." />
             <Reveal delay={0.1} className="mt-8 grid grid-cols-3 gap-3">
               {product.outcomes.map((o) => (
                 <div key={o.label} className="rounded-xl border border-line/10 bg-card p-4">
@@ -51,7 +53,7 @@ export default function ProductDetail() {
             </Reveal>
           </div>
           <Reveal delay={0.12} className="rounded-3xl border border-line/10 bg-card p-5 sm:p-8 lg:col-span-7">
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Before = 100 · lower is better unless noted as coverage</p>
+            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{tx("Before = 100 · lower is better unless noted as coverage")}</p>
             <OutcomeChart data={product.chart} accent={product.accent === "teal" ? "#0088CF" : "#EE2424"} />
           </Reveal>
         </div>
@@ -59,7 +61,7 @@ export default function ProductDetail() {
 
       <Section bordered className="bg-muted">
         <div className="container">
-          <SectionHeading eyebrow="Capabilities" title={`What ${product.name} does for you.`} />
+          <SectionHeading eyebrow="Capabilities" title={tx("What {{name}} does for you.", { name: product.name })} />
           <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {product.features.map((f) => (
               <Item key={f.title} className="rounded-2xl border border-line/10 bg-card p-6 card-hover">
@@ -78,7 +80,7 @@ export default function ProductDetail() {
             <SectionHeading eyebrow="How it works" title="Three moves. One governed path." />
             <Reveal delay={0.1} className="mt-8 flex items-center gap-4">
               <span className={`grid h-14 w-14 place-items-center rounded-2xl border border-line/10 bg-card ${product.accent === "teal" ? "text-teal" : "text-primary-ink"}`}><Icon className="h-7 w-7" strokeWidth={1.25} /></span>
-              <p className="text-sm text-muted-foreground">Runs on the Common Data Platform. Deploy in SOLIXCloud, your cloud, or on-premises.</p>
+              <p className="text-sm text-muted-foreground">{tx("Runs on the Common Data Platform. Deploy in SOLIXCloud, your cloud, or on-premises.")}</p>
             </Reveal>
           </div>
           <Stagger className="grid gap-4 lg:col-span-8 sm:grid-cols-3">
@@ -119,7 +121,7 @@ export default function ProductDetail() {
         </div>
       </Section>
 
-      <CTABand title={`See ${product.name} on your data.`} primary={{ label: "Request a demo", to: `/contact?interest=${product.slug}` }} />
+      <CTABand title={tx("See {{name}} on your data.", { name: product.name })} primary={{ label: "Request a demo", to: `/contact?interest=${product.slug}` }} />
     </div>
   );
 }

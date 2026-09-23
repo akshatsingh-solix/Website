@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTx } from "@/i18n/tx";
 
+// i18n: layer labels and product names are translated at render.
 const LAYERS = [
   { key: "activate", label: "Activate", items: [{ n: "Enterprise AI", to: "/products/enterprise-ai" }, { n: "Enterprise Edition workspace", to: "/products/enterprise-edition" }], fill: "#EE2424", text: "#fff" },
   { key: "comply", label: "Comply", items: [{ n: "eDiscovery", to: "/products/ediscovery" }, { n: "Consumer Data Privacy", to: "/products/consumer-data-privacy" }], fill: "#1C2F43", text: "#F5F5F5" },
@@ -24,14 +26,16 @@ const Slab = ({ i, fill }) => {
   );
 };
 
-export const ArchitectureStack = () => (
+export const ArchitectureStack = () => {
+  const tx = useTx();
+  return (
   <div className="grid items-center gap-10 lg:grid-cols-12" data-testid="architecture-stack">
     <div className="relative lg:col-span-5">
       <div className="absolute -inset-10 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.22),transparent)]" />
-      <svg viewBox={`-10 -10 ${W + 20} ${H + DY * (LAYERS.length - 1) + 40}`} className="relative w-full" role="img" aria-label="Isometric diagram of the Solix platform layers">
+      <svg viewBox={`-10 -10 ${W + 20} ${H + DY * (LAYERS.length - 1) + 40}`} className="relative w-full" role="img" aria-label={tx("Isometric diagram of the Solix platform layers")}>
         {[...LAYERS].reverse().map((l, idx) => <Slab key={l.key} i={LAYERS.length - 1 - idx} fill={l.fill} />)}
         {LAYERS.map((l, i) => (
-          <text key={l.key} x={160} y={i * DY + 60} textAnchor="middle" fill={l.text} style={{ fontFamily: "Outfit, sans-serif", fontSize: 13, fontWeight: 600, letterSpacing: 0.5 }}>{l.label}</text>
+          <text key={l.key} x={160} y={i * DY + 60} textAnchor="middle" fill={l.text} style={{ fontFamily: "Outfit, sans-serif", fontSize: 13, fontWeight: 600, letterSpacing: 0.5 }}>{tx(l.label)}</text>
         ))}
         {[0, 1, 2].map((i) => (
           <circle key={i} r="3" fill="#fff">
@@ -45,13 +49,14 @@ export const ArchitectureStack = () => (
         <motion.div key={l.key} initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.08 * i }} className="grid gap-3 rounded-2xl border border-line/10 bg-card px-6 py-5 sm:grid-cols-12 sm:items-center" data-testid={`layer-${l.key}`}>
           <div className="flex items-center gap-3 sm:col-span-4">
             <span className="h-3 w-3 rounded-sm" style={{ background: l.fill }} />
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground">{l.label}</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground">{tx(l.label)}</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:col-span-8">
-            {l.items.map((it) => <Link key={it.n} to={it.to} className="rounded-full border border-line/10 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground">{it.n}</Link>)}
+            {l.items.map((it) => <Link key={it.n} to={it.to} className="rounded-full border border-line/10 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground">{tx(it.n)}</Link>)}
           </div>
         </motion.div>
       ))}
     </div>
   </div>
-);
+  );
+};

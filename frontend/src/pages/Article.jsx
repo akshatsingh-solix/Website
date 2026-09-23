@@ -12,28 +12,33 @@ import { ResourceCard, typeLabel } from "@/components/home/InsightsPreview";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+import { useTx } from "@/i18n/tx";
 
 const UNLOCK_KEY = "solix_unlocked";
 const readUnlocked = () => JSON.parse(sessionStorage.getItem(UNLOCK_KEY) || "[]");
 
 const Share = ({ title }) => {
+  const tx = useTx();
   const url = window.location.href;
   const copy = async () => {
     await navigator.clipboard?.writeText(url);
-    toast.success("Link copied");
+    toast.success(tx("Link copied"));
   };
   const cls = "grid h-9 w-9 place-items-center rounded-full border border-line/10 text-muted-foreground transition-[color,border-color] hover:border-line/40 hover:text-foreground";
   return (
     <div className="flex gap-2" data-testid="article-share">
-      <a className={cls} aria-label="Share on LinkedIn" target="_blank" rel="noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}><Linkedin className="h-4 w-4" /></a>
-      <a className={cls} aria-label="Share on X" target="_blank" rel="noreferrer" href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}><Twitter className="h-4 w-4" /></a>
-      <button className={cls} aria-label="Copy link" onClick={copy} data-testid="article-copy-link"><Link2 className="h-4 w-4" /></button>
+      <a className={cls} aria-label={tx("Share on LinkedIn")} target="_blank" rel="noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}><Linkedin className="h-4 w-4" /></a>
+      <a className={cls} aria-label={tx("Share on X")} target="_blank" rel="noreferrer" href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}><Twitter className="h-4 w-4" /></a>
+      <button className={cls} aria-label={tx("Copy link")} onClick={copy} data-testid="article-copy-link"><Link2 className="h-4 w-4" /></button>
     </div>
   );
 };
 
 export default function Article() {
   const { slug } = useParams();
+  const tx = useTx();
+  const { i18n } = useTranslation();
   const r = RESOURCES.find((x) => x.slug === slug);
   const article = ARTICLES[slug];
   const [unlocked, setUnlocked] = useState(() => readUnlocked().includes(slug));
@@ -69,7 +74,7 @@ export default function Article() {
           <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {r.date}</span>
             <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {r.readTime}</span>
-            {r.gated && <span className="inline-flex items-center gap-1.5 text-primary-ink">{unlocked ? <Check className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />} {unlocked ? "Unlocked" : "Gated"}</span>}
+            {r.gated && <span className="inline-flex items-center gap-1.5 text-primary-ink">{unlocked ? <Check className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />} {unlocked ? tx("Unlocked") : tx("Gated")}</span>}
           </div>
           <Share title={r.title} />
         </div>
@@ -81,10 +86,10 @@ export default function Article() {
             <div className="lg:sticky lg:top-28 space-y-10">
               <ArticleTOC blocks={article.body} />
               <div className="rounded-2xl border border-line/10 bg-card p-5">
-                <p className="eyebrow mb-2">Talk to an expert</p>
-                <p className="text-sm text-muted-foreground">See how this applies to your systems and data volumes.</p>
+                <p className="eyebrow mb-2">{tx("Talk to an expert")}</p>
+                <p className="text-sm text-muted-foreground">{tx("See how this applies to your systems and data volumes.")}</p>
                 <Button asChild size="sm" className="mt-4" data-testid="article-sidebar-demo">
-                  <Link to="/contact">Request a demo <ArrowRight /></Link>
+                  <Link to="/contact">{tx("Request a demo")} <ArrowRight /></Link>
                 </Button>
               </div>
             </div>
@@ -96,9 +101,9 @@ export default function Article() {
               <Reveal className="relative mt-4">
                 <div className="pointer-events-none absolute -top-40 inset-x-0 h-40 bg-gradient-to-t from-background to-transparent" />
                 <div className="rounded-3xl border border-primary/30 bg-card p-6 glow-ember sm:p-8" data-testid="article-gate">
-                  <p className="eyebrow mb-2 flex items-center gap-2"><Lock className="h-3.5 w-3.5" /> Continue reading</p>
-                  <h3 className="font-display text-2xl font-medium tracking-tight">Unlock the full {typeLabel(r.type).toLowerCase()}.</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">Tell us a little about yourself. We'll unlock the complete content instantly and send a copy to your inbox.</p>
+                  <p className="eyebrow mb-2 flex items-center gap-2"><Lock className="h-3.5 w-3.5" /> {tx("Continue reading")}</p>
+                  <h3 className="font-display text-2xl font-medium tracking-tight">{tx("Unlock the full {{type}}.", { type: i18n.language === "de" ? typeLabel(r.type) : typeLabel(r.type).toLowerCase() })}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{tx("Tell us a little about yourself. We'll unlock the complete content instantly and send a copy to your inbox.")}</p>
                   <div className="mt-6">
                     <LeadForm type="download" extra={{ resource: r.title }} submitLabel="Unlock full content" successTitle="Unlocked." successDesc="The full content is now visible below and a copy is on its way to your inbox." showInterest={false} showMessage={false} compact onSuccess={unlock} />
                   </div>

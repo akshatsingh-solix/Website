@@ -6,8 +6,10 @@ import { cn } from "@/lib/utils";
 import { INDUSTRIES } from "@/data/site";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal } from "@/components/shared/Reveal";
+import { useTx } from "@/i18n/tx";
 
 export const IndustriesStrip = () => {
+  const tx = useTx();
   const [active, setActive] = useState(INDUSTRIES[0].slug);
   const current = INDUSTRIES.find((i) => i.slug === active);
   const Icon = current.icon;
@@ -79,20 +81,20 @@ export const IndustriesStrip = () => {
                   <p className="max-w-xl text-muted-foreground">{current.desc}</p>
                   <div className="mt-6 grid gap-6 sm:grid-cols-2">
                     <div>
-                      <p className="eyebrow mb-3">Challenges</p>
+                      <p className="eyebrow mb-3">{tx("Challenges")}</p>
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         {current.challenges.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />{c}</li>)}
                       </ul>
                     </div>
                     <div>
-                      <p className="eyebrow mb-3 !text-teal">Results</p>
+                      <p className="eyebrow mb-3 !text-teal">{tx("Results")}</p>
                       <ul className="space-y-2 text-sm text-foreground">
                         {current.results.map((c) => <li key={c} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-teal" />{c}</li>)}
                       </ul>
                     </div>
                   </div>
                   <Link to={`/industries/${current.slug}`} className="mt-auto inline-flex items-center gap-1.5 self-start pt-6 text-sm font-medium text-primary-ink link-underline" data-testid="industry-detail-link">
-                    Explore {current.name} <ArrowUpRight className="h-4 w-4" />
+                    {tx("Explore")} {current.name} <ArrowUpRight className="h-4 w-4" />
                   </Link>
                 </div>
               </motion.div>

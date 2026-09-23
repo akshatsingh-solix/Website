@@ -44,7 +44,7 @@ export const LanguageDetectionNotice = () => {
           <button onClick={revert} className="underline-offset-2 hover:text-foreground hover:underline" data-testid="language-notice-revert">
             {t("language.revertToEnglish")}
           </button>
-          <button onClick={() => setVisible(false)} aria-label="Dismiss" className="text-muted-foreground hover:text-foreground">
+          <button onClick={() => setVisible(false)} aria-label={t("language.dismiss")} className="text-muted-foreground hover:text-foreground">
             <X className="h-3.5 w-3.5" />
           </button>
         </div>

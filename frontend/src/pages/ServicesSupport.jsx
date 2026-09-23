@@ -6,8 +6,10 @@ import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
+import { useTx } from "@/i18n/tx";
 
 export default function ServicesSupport() {
+  const tx = useTx();
   return (
     <div data-testid="services-support-page">
       <PageHero
@@ -17,7 +19,7 @@ export default function ServicesSupport() {
         description="Every Solix program is backed by the same team that builds the platform, an outcomes-based methodology, and a support portal that doesn't leave you guessing."
       >
         <Button asChild size="lg" data-testid="services-hero-contact">
-          <Link to="/contact?type=contact">Talk to services <ArrowRight /></Link>
+          <Link to="/contact?type=contact">{tx("Talk to services")} <ArrowRight /></Link>
         </Button>
       </PageHero>
 
