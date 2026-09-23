@@ -38,8 +38,9 @@ export default function Platform() {
             <Reveal className={i % 2 === 1 ? "lg:col-span-5 lg:col-start-1 lg:row-start-1" : "lg:col-span-5"}>
               <div className="relative rounded-3xl border border-white/10 bg-card p-8">
                 <span className="grid h-14 w-14 place-items-center rounded-2xl border border-white/10 bg-ink-950 text-primary"><s.icon className="h-7 w-7" strokeWidth={1.25} /></span>
-                <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Runs on the Common Data Platform</p>
-                <p className="mt-2 text-sm text-muted-foreground">Deploy in SOLIXCloud, your cloud, or on-premises with the same controls everywhere.</p>
+                <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{s.highlight.eyebrow}</p>
+                <p className="mt-2 font-display text-2xl font-medium tracking-tight text-foreground">{s.highlight.value}</p>
+                <p className="mt-3 text-sm text-muted-foreground">{s.highlight.caption}</p>
               </div>
             </Reveal>
           </div>

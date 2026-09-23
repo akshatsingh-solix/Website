@@ -6,6 +6,7 @@ import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { NumbersRings } from "@/components/company/NumbersRings";
+import { GlobalNetworkMap } from "@/components/company/GlobalNetworkMap";
 import { Button } from "@/components/ui/button";
 
 export default function Company() {
@@ -96,7 +97,10 @@ export default function Company() {
       <Section bordered>
         <div className="container">
           <SectionHeading eyebrow="Global presence" title="Where we work." />
-          <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Reveal delay={0.1} className="mt-12 rounded-2xl border border-white/10 bg-card p-6 sm:p-10">
+            <GlobalNetworkMap />
+          </Reveal>
+          <Stagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {OFFICES.map((o) => (
               <Item key={o.city} className="flex gap-4 rounded-2xl border border-white/10 bg-card p-6">
                 <MapPin className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />

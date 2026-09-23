@@ -4,7 +4,7 @@ const OUTCOMES = ["AI Agents", "Analytics", "Compliance", "Archive"];
 const Node = ({ x, y, label, side }) => (
   <g transform={`translate(${x} ${y})`}>
     <rect x={side === "left" ? -112 : 0} y="-14" width="112" height="28" rx="6" className="fill-ink-900 stroke-white/15" strokeWidth="1" />
-    <text x={side === "left" ? -56 : 56} y="4" textAnchor="middle" className="fill-slate-300" style={{ fontSize: 10.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.4 }}>
+    <text x={side === "left" ? -56 : 56} y="4" textAnchor="middle" className="fill-[#B0B0B2]" style={{ fontSize: 10.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.4 }}>
       {label}
     </text>
   </g>
@@ -62,7 +62,7 @@ export const DataFlowDiagram = () => {
           <path d="M1.9 -9.1 -5.2 1.4h4.5l-1.9 8 8.1-11h-4.5l3.3-7.5Z" fill="#fff" />
         </g>
         <text y="16" textAnchor="middle" className="fill-white" style={{ fontSize: 12, fontFamily: "Outfit, sans-serif", fontWeight: 600, letterSpacing: 0.4 }}>Common Data Platform</text>
-        <text y="32" textAnchor="middle" className="fill-slate-400" style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.2 }}>GOVERNED · PRESERVED</text>
+        <text y="32" textAnchor="middle" className="fill-[#B0B0B2]" style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.2 }}>GOVERNED · PRESERVED</text>
       </g>
     </svg>
   );
