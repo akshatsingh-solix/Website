@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "platform": "Plattform",
+    "products": "Produkte",
+    "solutions": "Lösungen",
+    "servicesSupport": "Services & Support",
+    "resources": "Ressourcen",
+    "partners": "Partner",
+    "company": "Unternehmen",
+    "login": "Anmelden",
+    "trySolix": "Solix testen"
+  },
+  "hero": {
+    "eyebrow": "Wir stärken das datengetriebene Unternehmen",
+    "headlineStart": "Legen Sie KI in die Hände",
+    "headlineAccent": "Ihres Unternehmens.",
+    "body": "Ihre Unternehmensdaten. Jedes System. Jede Ära. Damit die Menschen, die Ihr Geschäft kennen, die Lösungen entwickeln können, die sie brauchen – innerhalb des von der IT definierten Vertrauensbereichs.",
+    "requestDemo": "Demo anfordern",
+    "exploreEnterpriseEdition": "Enterprise Edition entdecken",
+    "trustBadge": "SOC 2 · HIPAA · DSGVO-konform",
+    "connectors": "150+ KONNEKTOREN",
+    "scale": "PETABYTE-SKALA",
+    "since": "SEIT 2002",
+    "liveDataFabric": "Live-Datengewebe",
+    "streaming": "Streaming",
+    "words": {
+      "activates": "aktiviert",
+      "governs": "verwaltet",
+      "preserves": "bewahrt",
+      "unlocks": "erschließt"
+    }
+  },
+  "footer": {
+    "tagline": "Solix Technologies aktiviert Unternehmensdaten über alle Systeme und Epochen hinweg, damit Unternehmen KI innerhalb des von der IT definierten Vertrauensbereichs einsetzen können.",
+    "stayCurrent": "Bleiben Sie informiert",
+    "workEmail": "Geschäftliche E-Mail",
+    "subscribe": "Abonnieren",
+    "subscribed": "Sie sind angemeldet. Willkommen in der Solix-Community.",
+    "subscribeError": "Anmeldung derzeit nicht möglich. Bitte erneut versuchen.",
+    "invalidEmail": "Bitte geben Sie eine gültige geschäftliche E-Mail-Adresse ein.",
+    "copyright": "Solix Technologies, Inc. Alle Rechte vorbehalten.",
+    "privacy": "Datenschutz",
+    "terms": "Nutzungsbedingungen"
+  },
+  "language": {
+    "label": "Sprache",
+    "detectedNotice": "Diese Seite wird basierend auf Ihrem Standort auf {{language}} angezeigt.",
+    "revertToEnglish": "Auf Englisch anzeigen"
+  }
+}

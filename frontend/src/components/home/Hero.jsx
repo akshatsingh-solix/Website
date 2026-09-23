@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, Play, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataFlowDiagram } from "./DataFlowDiagram";
 import { Magnetic, AuroraField } from "@/components/shared/Reveal";
 
-const WORDS = ["activates", "governs", "preserves", "unlocks"];
+const WORD_KEYS = ["activates", "governs", "preserves", "unlocks"];
 const ease = [0.22, 1, 0.36, 1];
 
 export const Hero = () => {
+  const { t } = useTranslation();
   const [i, setI] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setI((n) => (n + 1) % WORDS.length), 2600);
-    return () => clearInterval(t);
+    const interval = setInterval(() => setI((n) => (n + 1) % WORD_KEYS.length), 2600);
+    return () => clearInterval(interval);
   }, []);
 
   const { scrollY } = useScroll();
@@ -37,7 +39,7 @@ export const Hero = () => {
       <div className="container relative grid min-h-[92vh] items-center gap-12 pt-32 pb-20 lg:grid-cols-12 lg:pt-36">
         <div className="lg:col-span-7">
           <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="eyebrow mb-6 flex items-center gap-3">
-            <span className="h-px w-8 bg-primary" /> Empowering the Data-driven Enterprise
+            <span className="h-px w-8 bg-primary" /> {t("hero.eyebrow")}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
@@ -45,14 +47,14 @@ export const Hero = () => {
             transition={{ duration: 0.8, ease, delay: 0.08 }}
             className="text-balance text-fluid-h1 font-medium"
           >
-            Put AI in the hands of <span className="text-gradient-accent">your business.</span>
+            {t("hero.headlineStart")} <span className="text-gradient-accent">{t("hero.headlineAccent")}</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.18 }} className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
             Solix{" "}
-            <span className="relative inline-block h-[1.625em] w-[9.5ch] overflow-hidden align-top text-teal">
+            <span className="relative inline-block h-[1.625em] w-[12ch] overflow-hidden align-top text-teal">
               <AnimatePresence mode="wait">
                 <motion.span
-                  key={WORDS[i]}
+                  key={WORD_KEYS[i]}
                   initial={{ y: "100%", opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: "-100%", opacity: 0 }}
@@ -60,29 +62,29 @@ export const Hero = () => {
                   className="absolute left-0 top-0 leading-[1.625]"
                   data-testid="hero-rotating-word"
                 >
-                  {WORDS[i]}
+                  {t(`hero.words.${WORD_KEYS[i]}`)}
                 </motion.span>
               </AnimatePresence>
             </span>{" "}
-            your enterprise data. Every system. Every era. So the people who know your business can build the solutions they need, inside the trust perimeter IT defines.
+            {t("hero.body")}
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease, delay: 0.3 }} className="mt-10 flex flex-wrap items-center gap-3">
             <Magnetic strength={0.25}>
               <Button asChild size="lg" data-testid="hero-demo-button">
-                <Link to="/contact">Request a demo <ArrowRight /></Link>
+                <Link to="/contact">{t("hero.requestDemo")} <ArrowRight /></Link>
               </Button>
             </Magnetic>
             <Magnetic strength={0.25}>
               <Button asChild size="lg" variant="outline" data-testid="hero-explore-button">
-                <Link to="/products/enterprise-edition"><Play className="fill-current" /> Explore Enterprise Edition</Link>
+                <Link to="/products/enterprise-edition"><Play className="fill-current" /> {t("hero.exploreEnterpriseEdition")}</Link>
               </Button>
             </Magnetic>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.5 }} className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-teal" strokeWidth={1.5} /> SOC 2 · HIPAA · GDPR ready</span>
-            <span className="font-mono tracking-wider">150+ CONNECTORS</span>
-            <span className="font-mono tracking-wider">PETABYTE SCALE</span>
-            <span className="font-mono tracking-wider">SINCE 2002</span>
+            <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-teal" strokeWidth={1.5} /> {t("hero.trustBadge")}</span>
+            <span className="font-mono tracking-wider">{t("hero.connectors")}</span>
+            <span className="font-mono tracking-wider">{t("hero.scale")}</span>
+            <span className="font-mono tracking-wider">{t("hero.since")}</span>
           </motion.div>
         </div>
 
@@ -95,9 +97,9 @@ export const Hero = () => {
           <div className="absolute -inset-6 rounded-3xl bg-teal/5 blur-2xl" />
           <div className="glass relative rounded-2xl p-4 shadow-[0_40px_120px_-40px_rgba(0,212,255,0.35)]">
             <div className="mb-3 flex items-center justify-between px-2 pt-1">
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Live data fabric</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{t("hero.liveDataFabric")}</span>
               <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-teal">
-                <span className="h-1.5 w-1.5 rounded-full bg-teal animate-pulse" /> streaming
+                <span className="h-1.5 w-1.5 rounded-full bg-teal animate-pulse" /> {t("hero.streaming")}
               </span>
             </div>
             <DataFlowDiagram />

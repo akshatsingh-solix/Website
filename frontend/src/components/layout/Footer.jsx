@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, Linkedin, Twitter, Youtube, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { NAV, OFFICES } from "@/data/site";
@@ -7,25 +8,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/shared/Logo";
 import { submitLead } from "@/lib/api";
+import { NAV_LABEL_KEYS } from "./Navbar";
 
 const NewsletterForm = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [state, setState] = useState("idle");
 
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Please enter a valid work email.");
+      toast.error(t("footer.invalidEmail"));
       return;
     }
     setState("loading");
     try {
       await submitLead({ type: "newsletter", email, source_page: window.location.pathname });
       setState("done");
-      toast.success("You're subscribed. Welcome to the Solix community.");
+      toast.success(t("footer.subscribed"));
     } catch {
       setState("idle");
-      toast.error("Could not subscribe right now. Please try again.");
+      toast.error(t("footer.subscribeError"));
     }
   };
 
@@ -35,20 +38,22 @@ const NewsletterForm = () => {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="Work email"
+        placeholder={t("footer.workEmail")}
         disabled={state !== "idle"}
         className="h-11 rounded-full border-white/15 bg-ink-900 px-5 focus-visible:ring-primary"
         data-testid="newsletter-email-input"
-        aria-label="Work email"
+        aria-label={t("footer.workEmail")}
       />
       <Button type="submit" size="default" className="h-11 shrink-0" disabled={state !== "idle"} data-testid="newsletter-submit-button">
-        {state === "loading" ? <Loader2 className="animate-spin" /> : state === "done" ? <Check /> : <>Subscribe <ArrowRight /></>}
+        {state === "loading" ? <Loader2 className="animate-spin" /> : state === "done" ? <Check /> : <>{t("footer.subscribe")} <ArrowRight /></>}
       </Button>
     </form>
   );
 };
 
-export const Footer = () => (
+export const Footer = () => {
+  const { t } = useTranslation();
+  return (
   <footer className="relative overflow-hidden border-t border-white/10 bg-ink-950" data-testid="site-footer">
     <div className="absolute inset-0 grid-lines opacity-40" />
     <div className="container relative pt-20 pb-10 sm:pt-24">
@@ -56,9 +61,9 @@ export const Footer = () => (
         <div className="lg:col-span-4">
           <Logo tagline />
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted-foreground">
-            Solix Technologies activates enterprise data across every system and every era, so businesses can put AI to work inside the trust perimeter IT defines.
+            {t("footer.tagline")}
           </p>
-          <p className="mt-8 eyebrow">Stay current</p>
+          <p className="mt-8 eyebrow">{t("footer.stayCurrent")}</p>
           <NewsletterForm />
           <div className="mt-8 flex gap-2">
             {[
@@ -88,7 +93,7 @@ export const Footer = () => (
               : (col.items || col.simpleItems)?.slice(0, 6);
             return (
               <div key={col.label}>
-                <Link to={col.to} className="font-display text-sm font-semibold text-foreground">{col.label}</Link>
+                <Link to={col.to} className="font-display text-sm font-semibold text-foreground">{NAV_LABEL_KEYS[col.label] ? t(NAV_LABEL_KEYS[col.label]) : col.label}</Link>
                 {subLinks && (
                   <ul className="mt-4 space-y-2.5">
                     {subLinks.map((it) => (
@@ -121,13 +126,14 @@ export const Footer = () => (
       </div>
 
       <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-        <p>© {new Date().getFullYear()} Solix Technologies, Inc. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} {t("footer.copyright")}</p>
         <div className="flex gap-6">
-          <Link to="/company#privacy" className="hover:text-foreground">Privacy</Link>
-          <Link to="/company#terms" className="hover:text-foreground">Terms</Link>
+          <Link to="/company#privacy" className="hover:text-foreground">{t("footer.privacy")}</Link>
+          <Link to="/company#terms" className="hover:text-foreground">{t("footer.terms")}</Link>
           <a href="tel:18884676549" className="hover:text-foreground">1.888.GO.SOLIX</a>
         </div>
       </div>
     </div>
   </footer>
-);
+  );
+};

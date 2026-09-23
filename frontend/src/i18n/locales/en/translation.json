@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "platform": "Platform",
+    "products": "Products",
+    "solutions": "Solutions",
+    "servicesSupport": "Services & Support",
+    "resources": "Resources",
+    "partners": "Partners",
+    "company": "Company",
+    "login": "Login",
+    "trySolix": "Try Solix"
+  },
+  "hero": {
+    "eyebrow": "Empowering the Data-driven Enterprise",
+    "headlineStart": "Put AI in the hands of",
+    "headlineAccent": "your business.",
+    "body": "your enterprise data. Every system. Every era. So the people who know your business can build the solutions they need, inside the trust perimeter IT defines.",
+    "requestDemo": "Request a demo",
+    "exploreEnterpriseEdition": "Explore Enterprise Edition",
+    "trustBadge": "SOC 2 · HIPAA · GDPR ready",
+    "connectors": "150+ CONNECTORS",
+    "scale": "PETABYTE SCALE",
+    "since": "SINCE 2002",
+    "liveDataFabric": "Live data fabric",
+    "streaming": "streaming",
+    "words": {
+      "activates": "activates",
+      "governs": "governs",
+      "preserves": "preserves",
+      "unlocks": "unlocks"
+    }
+  },
+  "footer": {
+    "tagline": "Solix Technologies activates enterprise data across every system and every era, so businesses can put AI to work inside the trust perimeter IT defines.",
+    "stayCurrent": "Stay current",
+    "workEmail": "Work email",
+    "subscribe": "Subscribe",
+    "subscribed": "You're subscribed. Welcome to the Solix community.",
+    "subscribeError": "Could not subscribe right now. Please try again.",
+    "invalidEmail": "Please enter a valid work email.",
+    "copyright": "Solix Technologies, Inc. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "language": {
+    "label": "Language",
+    "detectedNotice": "Showing this page in {{language}} based on your location.",
+    "revertToEnglish": "View in English instead"
+  }
+}
