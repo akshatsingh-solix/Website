@@ -28,7 +28,15 @@
       "governs": "verwaltet",
       "preserves": "bewahrt",
       "unlocks": "erschließt"
-    }
+    },
+    "archiveJob": "Archivierungsjob",
+    "archiveRoute": "SAP ECC → Preservation Zone",
+    "policyChecked": "Richtlinien geprüft",
+    "aiAnswer": "Geprüfte KI-Antwort",
+    "answerSample": "14 Q3-Verträge mit automatischer Verlängerung, gefunden in 3 stillgelegten Systemen.",
+    "answerSources": "3 Quellen · Herkunft angehängt",
+    "infraCost": "Infrastrukturkosten",
+    "vsStatusQuo": "ggü. Status quo"
   },
   "footer": {
     "tagline": "Solix Technologies aktiviert Unternehmensdaten über alle Systeme und Epochen hinweg, damit Unternehmen KI innerhalb des von der IT definierten Vertrauensbereichs einsetzen können.",

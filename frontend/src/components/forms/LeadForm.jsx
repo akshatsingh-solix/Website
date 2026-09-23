@@ -23,7 +23,7 @@ const schema = z.object({
   message: z.string().max(2000).optional(),
 });
 
-const inputCls = "h-11 rounded-lg border-white/15 bg-ink-900 px-4 focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:ring-offset-0";
+const inputCls = "h-11 rounded-lg border-line/15 bg-background px-4 focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:ring-offset-0";
 
 const Field = ({ label, error, htmlFor, children, optional }) => (
   <div className="space-y-2">
@@ -102,7 +102,7 @@ export const LeadForm = ({
                   <SelectTrigger id="interest" className={cn(inputCls, "text-left")} data-testid="lead-interest-select">
                     <SelectValue placeholder="Select a product or solution" />
                   </SelectTrigger>
-                  <SelectContent className="border-white/10 bg-ink-900">
+                  <SelectContent className="border-line/10 bg-popover">
                     {INTERESTS.map((i) => (
                       <SelectItem key={i.value} value={i.value} data-testid={`lead-interest-option-${i.value}`}>{i.label}</SelectItem>
                     ))}
@@ -115,7 +115,7 @@ export const LeadForm = ({
       </div>
       {showMessage && (
         <Field label="What are you trying to solve?" htmlFor="message" optional>
-          <Textarea id="message" rows={4} placeholder="Tell us about the systems, data volumes or deadlines involved." className="rounded-lg border-white/15 bg-ink-900 px-4 py-3 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0" data-testid="lead-message-input" {...register("message")} />
+          <Textarea id="message" rows={4} placeholder="Tell us about the systems, data volumes or deadlines involved." className="rounded-lg border-line/15 bg-background px-4 py-3 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0" data-testid="lead-message-input" {...register("message")} />
         </Field>
       )}
       <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">

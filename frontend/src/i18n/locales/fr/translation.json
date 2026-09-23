@@ -28,7 +28,15 @@
       "governs": "gouverne",
       "preserves": "préserve",
       "unlocks": "libère"
-    }
+    },
+    "archiveJob": "Tâche d'archivage",
+    "archiveRoute": "SAP ECC → Zone de préservation",
+    "policyChecked": "Conforme aux règles",
+    "aiAnswer": "Réponse IA gouvernée",
+    "answerSample": "14 contrats T3 à renouvellement automatique, trouvés dans 3 systèmes retirés.",
+    "answerSources": "3 sources · lignage joint",
+    "infraCost": "Coût d'infrastructure",
+    "vsStatusQuo": "vs. statu quo"
   },
   "footer": {
     "tagline": "Solix Technologies active les données d'entreprise sur tous les systèmes et toutes les époques, afin que les entreprises puissent mettre l'IA au travail dans le périmètre de confiance défini par la DSI.",

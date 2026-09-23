@@ -21,7 +21,7 @@ export const BrandMark = ({ name, className = "" }) => {
 
   return (
     <div
-      className={`group flex h-20 items-center justify-center rounded-xl border border-white/10 bg-ink-950/60 px-5 transition-colors duration-300 hover:border-white/25 ${className}`}
+      className={`group flex h-20 items-center justify-center rounded-xl border border-line/10 bg-card px-5 transition-colors duration-300 hover:border-line/25 ${className}`}
       style={icon ? { "--brand": `#${icon.hex}` } : undefined}
       title={icon ? icon.title : name}
     >

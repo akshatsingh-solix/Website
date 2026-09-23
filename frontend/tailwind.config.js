@@ -21,23 +21,30 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
-        popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
-        primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
-        secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
-        muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
-        accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
-        destructive: { DEFAULT: "hsl(var(--destructive))", foreground: "hsl(var(--destructive-foreground))" },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        // Brand blue, replacing the earlier generic cyan - matches the Solix
-        // brand guide's button/hyperlink blue (#0088CF) instead of an
-        // off-the-shelf "AI startup" teal. Class name kept as `teal` to avoid
-        // a mechanical rename across every consumer; the color itself is blue.
-        teal: { DEFAULT: "#0088CF", dim: "#00669E" },
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
+        card: { DEFAULT: "hsl(var(--card) / <alpha-value>)", foreground: "hsl(var(--card-foreground) / <alpha-value>)" },
+        popover: { DEFAULT: "hsl(var(--popover) / <alpha-value>)", foreground: "hsl(var(--popover-foreground) / <alpha-value>)" },
+        primary: {
+          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
+          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
+          // Same red hue, deepened for small type on light grounds (see index.css).
+          ink: "hsl(var(--primary-ink) / <alpha-value>)",
+        },
+        secondary: { DEFAULT: "hsl(var(--secondary) / <alpha-value>)", foreground: "hsl(var(--secondary-foreground) / <alpha-value>)" },
+        muted: { DEFAULT: "hsl(var(--muted) / <alpha-value>)", foreground: "hsl(var(--muted-foreground) / <alpha-value>)" },
+        accent: { DEFAULT: "hsl(var(--accent) / <alpha-value>)", foreground: "hsl(var(--accent-foreground) / <alpha-value>)" },
+        destructive: { DEFAULT: "hsl(var(--destructive) / <alpha-value>)", foreground: "hsl(var(--destructive-foreground) / <alpha-value>)" },
+        border: "hsl(var(--border) / <alpha-value>)",
+        input: "hsl(var(--input) / <alpha-value>)",
+        ring: "hsl(var(--ring) / <alpha-value>)",
+        // Theme-aware hairline/overlay color: navy on light, white on dark.
+        // `border-line/10`, `bg-line/5` read correctly in either scope.
+        line: "rgb(var(--line) / <alpha-value>)",
+        // Solix Blue. Class name kept as `teal` to avoid a mechanical rename
+        // across every consumer; resolves per scope so small blue type stays
+        // AA on light (#0072AD) and on navy (#0088CF-range).
+        teal: { DEFAULT: "hsl(var(--brand-blue) / <alpha-value>)", dim: "#00669E" },
         ember: { DEFAULT: "#EE2424", deep: "#B91C1C" },
         // Real Solix navy scale, from the SOLIX Brand Design System (Navy
         // 950/900/800/700/600) - not a generic slate.
@@ -47,11 +54,11 @@ module.exports = {
         grey: { 50: "#F5F5F5", 400: "#B0B0B2", 700: "#424242", 900: "#1D1D1D" },
         "tint-blue": "#DDE9F2",
         chart: {
-          1: "hsl(var(--chart-1))",
-          2: "hsl(var(--chart-2))",
-          3: "hsl(var(--chart-3))",
-          4: "hsl(var(--chart-4))",
-          5: "hsl(var(--chart-5))",
+          1: "hsl(var(--chart-1) / <alpha-value>)",
+          2: "hsl(var(--chart-2) / <alpha-value>)",
+          3: "hsl(var(--chart-3) / <alpha-value>)",
+          4: "hsl(var(--chart-4) / <alpha-value>)",
+          5: "hsl(var(--chart-5) / <alpha-value>)",
         },
       },
       fontSize: {
@@ -82,6 +89,7 @@ module.exports = {
           "70%": { transform: "translate(3%, -5%) scale(0.94)" },
         },
         "spin-slow": { to: { transform: "rotate(360deg)" } },
+        "era-pulse": { "0%": { transform: "translateX(-100%)" }, "100%": { transform: "translateX(0)" } },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",

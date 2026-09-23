@@ -13,8 +13,8 @@ const links = [
 export default function AdminLayout() {
   const { user, logout } = useAdmin();
   return (
-    <div className="min-h-screen bg-background text-foreground" data-testid="admin-layout">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink-950/85 backdrop-blur-xl">
+    <div className="dark min-h-screen bg-background text-foreground" data-testid="admin-layout">
+      <header className="sticky top-0 z-40 border-b border-line/10 bg-background/85 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between gap-6">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-3">
@@ -23,7 +23,7 @@ export default function AdminLayout() {
             </div>
             <nav className="hidden items-center gap-1 sm:flex">
               {links.map((l) => (
-                <NavLink key={l.to} to={l.to} end={l.end} data-testid={`admin-nav-${l.label.toLowerCase().split(" ")[0]}`} className={({ isActive }) => cn("inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm transition-colors", isActive ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground")}>
+                <NavLink key={l.to} to={l.to} end={l.end} data-testid={`admin-nav-${l.label.toLowerCase().split(" ")[0]}`} className={({ isActive }) => cn("inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm transition-colors", isActive ? "bg-line/10 text-foreground" : "text-muted-foreground hover:text-foreground")}>
                   <l.icon className="h-4 w-4" strokeWidth={1.5} /> {l.label}
                 </NavLink>
               ))}

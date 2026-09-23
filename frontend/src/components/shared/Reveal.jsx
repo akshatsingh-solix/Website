@@ -29,10 +29,11 @@ export const Stagger = ({ children, className, stagger = 0.08, ...rest }) => (
   </motion.div>
 );
 
-export const Item = ({ children, className, y = 24 }) => (
+export const Item = ({ children, className, y = 24, ...rest }) => (
   <motion.div
     variants={{ hidden: { opacity: 0, y }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } }}
     className={className}
+    {...rest}
   >
     {children}
   </motion.div>
@@ -122,9 +123,11 @@ export const Parallax = ({ children, className, range = 60 }) => {
 /** Slow-drifting dual-tone gradient field — replaces a flat single blur-circle with layered ambient depth. */
 export const AuroraField = ({ className }) => <div className={`aurora-field ${className || ""}`} aria-hidden="true" />;
 
-/** Route-change transition: brief blur+fade+rise on the outgoing/incoming page. */
+/** Route-change transition. */
+// Opacity + a small rise only: a full-page `filter: blur()` forces the whole
+// route to re-rasterise every frame of the transition.
 export const pageTransitionVariants = {
-  initial: { opacity: 0, y: 14, filter: "blur(6px)" },
-  animate: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease } },
-  exit: { opacity: 0, y: -10, filter: "blur(6px)", transition: { duration: 0.32, ease } },
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.25, ease } },
 };

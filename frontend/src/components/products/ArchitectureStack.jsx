@@ -27,7 +27,7 @@ const Slab = ({ i, fill }) => {
 export const ArchitectureStack = () => (
   <div className="grid items-center gap-10 lg:grid-cols-12" data-testid="architecture-stack">
     <div className="relative lg:col-span-5">
-      <div className="absolute -inset-10 rounded-full bg-teal/10 blur-3xl" />
+      <div className="absolute -inset-10 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.22),transparent)]" />
       <svg viewBox={`-10 -10 ${W + 20} ${H + DY * (LAYERS.length - 1) + 40}`} className="relative w-full" role="img" aria-label="Isometric diagram of the Solix platform layers">
         {[...LAYERS].reverse().map((l, idx) => <Slab key={l.key} i={LAYERS.length - 1 - idx} fill={l.fill} />)}
         {LAYERS.map((l, i) => (
@@ -42,13 +42,13 @@ export const ArchitectureStack = () => (
     </div>
     <div className="space-y-3 lg:col-span-7">
       {LAYERS.map((l, i) => (
-        <motion.div key={l.key} initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.08 * i }} className="grid gap-3 rounded-2xl border border-white/10 bg-card px-6 py-5 sm:grid-cols-12 sm:items-center" data-testid={`layer-${l.key}`}>
+        <motion.div key={l.key} initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.08 * i }} className="grid gap-3 rounded-2xl border border-line/10 bg-card px-6 py-5 sm:grid-cols-12 sm:items-center" data-testid={`layer-${l.key}`}>
           <div className="flex items-center gap-3 sm:col-span-4">
             <span className="h-3 w-3 rounded-sm" style={{ background: l.fill }} />
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-200">{l.label}</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground">{l.label}</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:col-span-8">
-            {l.items.map((it) => <Link key={it.n} to={it.to} className="rounded-full border border-white/10 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground">{it.n}</Link>)}
+            {l.items.map((it) => <Link key={it.n} to={it.to} className="rounded-full border border-line/10 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground">{it.n}</Link>)}
           </div>
         </motion.div>
       ))}

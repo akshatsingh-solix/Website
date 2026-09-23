@@ -45,7 +45,7 @@ export const RequireAdmin = ({ children }) => {
   if (user === null) {
     return (
       <div className="grid min-h-screen place-items-center bg-background" data-testid="admin-loading">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <Loader2 className="h-6 w-6 animate-spin text-primary-ink" />
       </div>
     );
   }

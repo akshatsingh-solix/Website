@@ -28,7 +28,15 @@
       "governs": "gobierna",
       "preserves": "preserva",
       "unlocks": "desbloquea"
-    }
+    },
+    "archiveJob": "Trabajo de archivo",
+    "archiveRoute": "SAP ECC → Zona de preservación",
+    "policyChecked": "Verificado por políticas",
+    "aiAnswer": "Respuesta de IA gobernada",
+    "answerSample": "14 contratos del T3 con renovación automática, encontrados en 3 sistemas retirados.",
+    "answerSources": "3 fuentes · linaje adjunto",
+    "infraCost": "Costo de infraestructura",
+    "vsStatusQuo": "vs. situación actual"
   },
   "footer": {
     "tagline": "Solix Technologies activa los datos empresariales en todos los sistemas y épocas, para que las empresas puedan poner la IA a trabajar dentro del perímetro de confianza que define TI.",

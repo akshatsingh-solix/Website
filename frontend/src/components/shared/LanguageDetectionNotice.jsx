@@ -37,8 +37,8 @@ export const LanguageDetectionNotice = () => {
   };
 
   return (
-    <div className="relative border-b border-white/10 bg-ink-900" data-testid="language-detection-notice">
-      <div className="container flex items-center justify-between gap-4 py-2.5 text-xs text-muted-foreground">
+    <div className="relative border-b border-teal/15 bg-accent" data-testid="language-detection-notice">
+      <div className="container flex items-center justify-between gap-4 py-2.5 text-xs text-accent-foreground">
         <p>{t("language.detectedNotice", { language: LANGUAGE_NAMES[i18n.language] })}</p>
         <div className="flex shrink-0 items-center gap-3">
           <button onClick={revert} className="underline-offset-2 hover:text-foreground hover:underline" data-testid="language-notice-revert">

@@ -31,10 +31,10 @@ export default function Careers() {
                 <button
                   onClick={() => setJob(j)}
                   data-testid={`job-card-${j.id}`}
-                  className="group grid w-full gap-4 rounded-2xl border border-white/10 bg-card p-6 text-left card-hover sm:grid-cols-12 sm:items-center"
+                  className="group grid w-full gap-4 rounded-2xl border border-line/10 bg-card p-6 text-left card-hover sm:grid-cols-12 sm:items-center"
                 >
                   <div className="sm:col-span-7">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">{j.team}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary-ink">{j.team}</p>
                     <h3 className="mt-1.5 font-display text-xl font-medium">{j.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{j.desc}</p>
                   </div>
@@ -42,7 +42,7 @@ export default function Careers() {
                     <span className="inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {j.location}</span>
                     <span className="inline-flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> {j.type}</span>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-primary sm:col-span-1 sm:justify-end">
+                  <span className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-primary-ink sm:col-span-1 sm:justify-end">
                     Apply <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </button>
@@ -52,14 +52,14 @@ export default function Careers() {
         </div>
       </Section>
 
-      <Section bordered className="bg-ink-900/40">
+      <Section bordered className="bg-muted">
         <div className="container grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading eyebrow="Benefits" title="Taken care of, so you can take care of the work." />
           </div>
           <Reveal delay={0.1} className="grid gap-3 sm:grid-cols-2 lg:col-span-7">
             {PERKS.map((p) => (
-              <div key={p} className="flex items-center gap-3 rounded-xl border border-white/10 bg-card px-4 py-3 text-sm">
+              <div key={p} className="flex items-center gap-3 rounded-xl border border-line/10 bg-card px-4 py-3 text-sm">
                 <Check className="h-4 w-4 shrink-0 text-teal" /> {p}
               </div>
             ))}
@@ -68,7 +68,7 @@ export default function Careers() {
       </Section>
 
       <Dialog open={!!job} onOpenChange={(o) => !o && setJob(null)}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto border-white/10 bg-ink-950 sm:max-w-2xl" data-testid="job-apply-dialog">
+        <DialogContent className="max-h-[90vh] overflow-y-auto border-line/10 bg-background sm:max-w-2xl" data-testid="job-apply-dialog">
           {job && (
             <>
               <DialogHeader>
@@ -76,7 +76,7 @@ export default function Careers() {
                 <DialogTitle className="font-display text-2xl font-medium tracking-tight sm:text-3xl">{job.title}</DialogTitle>
                 <DialogDescription className="text-base text-muted-foreground">{job.desc}</DialogDescription>
               </DialogHeader>
-              <div className="mt-2 rounded-2xl border border-white/10 bg-card p-6">
+              <div className="mt-2 rounded-2xl border border-line/10 bg-card p-6">
                 <LeadForm
                   type="career"
                   extra={{ role: job.title }}

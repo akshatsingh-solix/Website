@@ -18,11 +18,11 @@ export default function Contact() {
   return (
     <div className="relative overflow-hidden" data-testid="contact-page">
       <div className="absolute inset-0 grid-lines opacity-50" />
-      <div className="absolute -right-40 top-40 h-[520px] w-[520px] rounded-full bg-primary/10 blur-3xl" />
+      <div className="absolute -right-40 top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.1),transparent)]" />
       <div className="container relative grid gap-14 pt-32 pb-24 lg:grid-cols-12 lg:pt-40">
         <Reveal className="lg:col-span-5">
           <p className="eyebrow mb-5">Contact</p>
-          <div className="mb-8 inline-flex rounded-full border border-white/10 bg-card p-1" role="tablist" data-testid="contact-mode-tabs">
+          <div className="mb-8 inline-flex rounded-full border border-line/10 bg-card p-1" role="tablist" data-testid="contact-mode-tabs">
             {MODES.map((m) => (
               <button
                 key={m.key}
@@ -42,11 +42,11 @@ export default function Contact() {
           <dl className="mt-12 space-y-6 text-sm">
             <div className="flex gap-4">
               <Phone className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
-              <div><dt className="text-muted-foreground">Sales & support</dt><dd className="mt-0.5 font-medium"><a href="tel:18884676549" className="hover:text-primary">1.888.GO.SOLIX (467.6549)</a></dd></div>
+              <div><dt className="text-muted-foreground">Sales & support</dt><dd className="mt-0.5 font-medium"><a href="tel:18884676549" className="hover:text-primary-ink">1.888.GO.SOLIX (467.6549)</a></dd></div>
             </div>
             <div className="flex gap-4">
               <Mail className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
-              <div><dt className="text-muted-foreground">Email</dt><dd className="mt-0.5 font-medium"><a href="mailto:info@solix.com" className="hover:text-primary">info@solix.com</a></dd></div>
+              <div><dt className="text-muted-foreground">Email</dt><dd className="mt-0.5 font-medium"><a href="mailto:info@solix.com" className="hover:text-primary-ink">info@solix.com</a></dd></div>
             </div>
             <div className="flex gap-4">
               <MapPin className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
@@ -60,7 +60,7 @@ export default function Contact() {
         </Reveal>
 
         <Reveal delay={0.12} className="lg:col-span-7">
-          <div className="rounded-3xl border border-white/10 bg-card/80 p-6 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] backdrop-blur sm:p-10">
+          <div className="rounded-3xl border border-line/10 bg-card/80 p-6 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] backdrop-blur sm:p-10">
             <LeadForm
               key={mode.key + (interest ?? "")}
               type={mode.key}

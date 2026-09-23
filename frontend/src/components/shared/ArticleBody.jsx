@@ -21,9 +21,9 @@ const Block = ({ b }) => {
       );
     case "quote":
       return (
-        <blockquote className="relative rounded-2xl border border-white/10 bg-card p-8">
+        <blockquote className="relative rounded-2xl border border-line/10 bg-card p-8">
           <Quote className="absolute right-6 top-6 h-8 w-8 text-primary/30" strokeWidth={1} />
-          <p className="font-display text-xl font-light leading-snug text-slate-100 sm:text-2xl">“{b.text}”</p>
+          <p className="font-display text-xl font-light leading-snug text-foreground sm:text-2xl">“{b.text}”</p>
           {b.cite && <cite className="mt-4 block font-mono text-[11px] not-italic uppercase tracking-[0.18em] text-muted-foreground">{b.cite}</cite>}
         </blockquote>
       );
@@ -39,10 +39,10 @@ const Block = ({ b }) => {
       );
     case "stats":
       return (
-        <div className="grid grid-cols-1 divide-y divide-white/10 rounded-2xl border border-white/10 bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="grid grid-cols-1 divide-y divide-line/10 rounded-2xl border border-line/10 bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {b.items.map((s) => (
             <div key={s.label} className="p-6">
-              <p className="font-display text-4xl font-medium tracking-tighter text-primary">{s.value}</p>
+              <p className="font-display text-4xl font-medium tracking-tighter text-primary-ink">{s.value}</p>
               <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{s.label}</p>
             </div>
           ))}
@@ -52,8 +52,8 @@ const Block = ({ b }) => {
       return (
         <ol className="grid gap-3 sm:grid-cols-2">
           {b.items.map((s, i) => (
-            <li key={s.title} className="rounded-2xl border border-white/10 bg-card p-5">
-              <span className="font-mono text-xs text-primary">0{i + 1}</span>
+            <li key={s.title} className="rounded-2xl border border-line/10 bg-card p-5">
+              <span className="font-mono text-xs text-primary-ink">0{i + 1}</span>
               <p className="mt-2 font-display text-lg font-medium">{s.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{s.desc}</p>
             </li>
@@ -79,7 +79,7 @@ export const ArticleTOC = ({ blocks }) => {
   return (
     <nav aria-label="On this page" data-testid="article-toc">
       <p className="eyebrow mb-4">On this page</p>
-      <ul className="space-y-2 border-l border-white/10">
+      <ul className="space-y-2 border-l border-line/10">
         {heads.map((h) => (
           <li key={h.text}>
             <a href={`#${slugify(h.text)}`} className="group -ml-px flex items-center gap-2 border-l border-transparent pl-4 text-sm text-muted-foreground transition-colors hover:border-primary hover:text-foreground">
