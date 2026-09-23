@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, ArrowUpRight, ChevronDown, LogIn, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV } from "@/data/site";
@@ -9,6 +10,22 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Logo } from "@/components/shared/Logo";
 import { Magnetic } from "@/components/shared/Reveal";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
+import { LanguageDetectionNotice } from "@/components/shared/LanguageDetectionNotice";
+
+// Only the site's top-level nav chrome is translated so far - the deep
+// mega-menu content (product/solution/industry names) is still English
+// and is being translated page by page. Keyed off the English label so
+// data/site.js doesn't need restructuring for this first pass.
+export const NAV_LABEL_KEYS = {
+  Platform: "nav.platform",
+  Products: "nav.products",
+  Solutions: "nav.solutions",
+  "Services & Support": "nav.servicesSupport",
+  Resources: "nav.resources",
+  Partners: "nav.partners",
+  Company: "nav.company",
+};
 
 const GroupedPanel = ({ item, onNavigate }) => (
   <div className="grid gap-8 p-8 lg:grid-cols-4 lg:p-10" data-testid={`mega-panel-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
@@ -122,57 +139,65 @@ const MegaPanel = ({ item, onNavigate }) => (
   </motion.div>
 );
 
-const MobileNav = ({ onNavigate }) => (
-  <div className="flex h-full flex-col">
-    <Accordion type="single" collapsible className="mt-6 w-full">
-      {NAV.map((item) => {
-        const flatItems = item.groups ? item.groups.flatMap((g) => g.items) : item.items || item.simpleItems;
-        if (!flatItems) {
+const MobileNav = ({ onNavigate }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex h-full flex-col">
+      <Accordion type="single" collapsible className="mt-6 w-full">
+        {NAV.map((item) => {
+          const flatItems = item.groups ? item.groups.flatMap((g) => g.items) : item.items || item.simpleItems;
+          const label = NAV_LABEL_KEYS[item.label] ? t(NAV_LABEL_KEYS[item.label]) : item.label;
+          if (!flatItems) {
+            return (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={onNavigate}
+                className="flex items-center justify-between border-b border-white/10 py-4 font-display text-lg"
+                data-testid={`mobile-nav-${item.label.toLowerCase()}`}
+              >
+                {label}
+              </Link>
+            );
+          }
           return (
-            <Link
-              key={item.label}
-              to={item.to}
-              onClick={onNavigate}
-              className="flex items-center justify-between border-b border-white/10 py-4 font-display text-lg"
-              data-testid={`mobile-nav-${item.label.toLowerCase()}`}
-            >
-              {item.label}
-            </Link>
-          );
-        }
-        return (
-          <AccordionItem key={item.label} value={item.label} className="border-white/10">
-            <AccordionTrigger className="font-display text-lg hover:no-underline" data-testid={`mobile-nav-${item.label.toLowerCase()}`}>
-              {item.label}
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="flex flex-col gap-1 pb-2">
-                <Link to={item.to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-primary hover:bg-white/5">
-                  All {item.label}
-                </Link>
-                {flatItems.map(({ label, to }) => (
-                  <Link key={label} to={to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
-                    {label}
+            <AccordionItem key={item.label} value={item.label} className="border-white/10">
+              <AccordionTrigger className="font-display text-lg hover:no-underline" data-testid={`mobile-nav-${item.label.toLowerCase()}`}>
+                {label}
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="flex flex-col gap-1 pb-2">
+                  <Link to={item.to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-primary hover:bg-white/5">
+                    All {label}
                   </Link>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        );
-      })}
-    </Accordion>
-    <div className="mt-auto flex flex-col gap-3 pt-8">
-      <Button asChild size="lg" data-testid="mobile-nav-demo">
-        <Link to="/contact?type=demo" onClick={onNavigate}>Try Solix</Link>
-      </Button>
-      <Button asChild size="lg" variant="outline">
-        <Link to="/services-support#support-portal" onClick={onNavigate}><LogIn /> Login</Link>
-      </Button>
+                  {flatItems.map(({ label, to }) => (
+                    <Link key={label} to={to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
+      <div className="mt-4">
+        <LanguageSwitcher />
+      </div>
+      <div className="mt-6 flex flex-col gap-3 pt-4">
+        <Button asChild size="lg" data-testid="mobile-nav-demo">
+          <Link to="/contact?type=demo" onClick={onNavigate}>{t("nav.trySolix")}</Link>
+        </Button>
+        <Button asChild size="lg" variant="outline">
+          <Link to="/services-support#support-portal" onClick={onNavigate}><LogIn /> {t("nav.login")}</Link>
+        </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const Navbar = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -201,6 +226,7 @@ export const Navbar = () => {
       onMouseLeave={() => setOpen(null)}
       data-testid="site-header"
     >
+      <LanguageDetectionNotice />
       <div className="container flex h-16 items-center justify-between lg:h-[72px]">
         <Logo />
 
@@ -219,7 +245,7 @@ export const Navbar = () => {
                     )
                   }
                 >
-                  {item.label}
+                  {NAV_LABEL_KEYS[item.label] ? t(NAV_LABEL_KEYS[item.label]) : item.label}
                   {hasDropdown && <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", open === item.label && "rotate-180")} />}
                 </NavLink>
               </div>
@@ -227,13 +253,14 @@ export const Navbar = () => {
           })}
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden items-center gap-3 lg:flex">
+          <LanguageSwitcher />
           <Button asChild variant="ghost" size="sm" data-testid="nav-login">
-            <Link to="/services-support#support-portal"><LogIn className="h-4 w-4" /> Login</Link>
+            <Link to="/services-support#support-portal"><LogIn className="h-4 w-4" /> {t("nav.login")}</Link>
           </Button>
           <Magnetic strength={0.2}>
             <Button asChild size="sm" data-testid="nav-try-solix">
-              <Link to="/contact?type=demo">Try Solix <ArrowRight /></Link>
+              <Link to="/contact?type=demo">{t("nav.trySolix")} <ArrowRight /></Link>
             </Button>
           </Magnetic>
         </div>

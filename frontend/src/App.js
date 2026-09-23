@@ -1,4 +1,7 @@
+import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import i18n from "@/i18n";
+import { detectLanguage } from "@/i18n/geoDetect";
 import { Toaster } from "@/components/ui/sonner";
 import { Layout } from "@/components/layout/Layout";
 import { AdminAuthProvider, RequireAdmin } from "@/components/admin/AdminAuth";
@@ -25,6 +28,12 @@ import AdminLeads from "@/pages/admin/AdminLeads";
 import AdminSettings from "@/pages/admin/AdminSettings";
 
 function App() {
+  useEffect(() => {
+    detectLanguage().then(({ lang }) => {
+      if (lang !== i18n.language) i18n.changeLanguage(lang);
+    });
+  }, []);
+
   return (
     <BrowserRouter basename="/Website">
       <AdminAuthProvider>

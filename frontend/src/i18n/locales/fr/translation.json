@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "platform": "Plateforme",
+    "products": "Produits",
+    "solutions": "Solutions",
+    "servicesSupport": "Services et assistance",
+    "resources": "Ressources",
+    "partners": "Partenaires",
+    "company": "Entreprise",
+    "login": "Connexion",
+    "trySolix": "Essayer Solix"
+  },
+  "hero": {
+    "eyebrow": "Au service de l'entreprise pilotée par les données",
+    "headlineStart": "Mettez l'IA entre les mains de",
+    "headlineAccent": "votre entreprise.",
+    "body": "les données de votre entreprise. Chaque système. Chaque époque. Pour que ceux qui connaissent votre activité puissent créer les solutions dont ils ont besoin, dans le périmètre de confiance défini par la DSI.",
+    "requestDemo": "Demander une démo",
+    "exploreEnterpriseEdition": "Découvrir Enterprise Edition",
+    "trustBadge": "SOC 2 · HIPAA · conforme RGPD",
+    "connectors": "PLUS DE 150 CONNECTEURS",
+    "scale": "ÉCHELLE PÉTAOCTET",
+    "since": "DEPUIS 2002",
+    "liveDataFabric": "Tissu de données en direct",
+    "streaming": "en flux",
+    "words": {
+      "activates": "active",
+      "governs": "gouverne",
+      "preserves": "préserve",
+      "unlocks": "libère"
+    }
+  },
+  "footer": {
+    "tagline": "Solix Technologies active les données d'entreprise sur tous les systèmes et toutes les époques, afin que les entreprises puissent mettre l'IA au travail dans le périmètre de confiance défini par la DSI.",
+    "stayCurrent": "Restez informé",
+    "workEmail": "E-mail professionnel",
+    "subscribe": "S'abonner",
+    "subscribed": "Vous êtes abonné. Bienvenue dans la communauté Solix.",
+    "subscribeError": "Impossible de s'abonner pour le moment. Veuillez réessayer.",
+    "invalidEmail": "Veuillez saisir un e-mail professionnel valide.",
+    "copyright": "Solix Technologies, Inc. Tous droits réservés.",
+    "privacy": "Confidentialité",
+    "terms": "Conditions"
+  },
+  "language": {
+    "label": "Langue",
+    "detectedNotice": "Cette page s'affiche en {{language}} en fonction de votre localisation.",
+    "revertToEnglish": "Afficher en anglais"
+  }
+}

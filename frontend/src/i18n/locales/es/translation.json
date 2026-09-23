@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "platform": "Plataforma",
+    "products": "Productos",
+    "solutions": "Soluciones",
+    "servicesSupport": "Servicios y Soporte",
+    "resources": "Recursos",
+    "partners": "Socios",
+    "company": "Empresa",
+    "login": "Iniciar sesión",
+    "trySolix": "Probar Solix"
+  },
+  "hero": {
+    "eyebrow": "Impulsando la empresa basada en datos",
+    "headlineStart": "Pon la IA en manos de",
+    "headlineAccent": "tu negocio.",
+    "body": "los datos de tu empresa. Cada sistema. Cada época. Para que quienes conocen tu negocio puedan crear las soluciones que necesitan, dentro del perímetro de confianza que define TI.",
+    "requestDemo": "Solicitar una demo",
+    "exploreEnterpriseEdition": "Explorar Enterprise Edition",
+    "trustBadge": "SOC 2 · HIPAA · listo para GDPR",
+    "connectors": "MÁS DE 150 CONECTORES",
+    "scale": "ESCALA DE PETABYTES",
+    "since": "DESDE 2002",
+    "liveDataFabric": "Tejido de datos en vivo",
+    "streaming": "en streaming",
+    "words": {
+      "activates": "activa",
+      "governs": "gobierna",
+      "preserves": "preserva",
+      "unlocks": "desbloquea"
+    }
+  },
+  "footer": {
+    "tagline": "Solix Technologies activa los datos empresariales en todos los sistemas y épocas, para que las empresas puedan poner la IA a trabajar dentro del perímetro de confianza que define TI.",
+    "stayCurrent": "Mantente al día",
+    "workEmail": "Correo de trabajo",
+    "subscribe": "Suscribirse",
+    "subscribed": "Te has suscrito. Bienvenido a la comunidad Solix.",
+    "subscribeError": "No se pudo completar la suscripción. Inténtalo de nuevo.",
+    "invalidEmail": "Introduce un correo de trabajo válido.",
+    "copyright": "Solix Technologies, Inc. Todos los derechos reservados.",
+    "privacy": "Privacidad",
+    "terms": "Términos"
+  },
+  "language": {
+    "label": "Idioma",
+    "detectedNotice": "Mostrando esta página en {{language}} según tu ubicación.",
+    "revertToEnglish": "Ver en inglés"
+  }
+}
