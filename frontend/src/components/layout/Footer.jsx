@@ -134,8 +134,8 @@ export const Footer = () => {
       <div className="mt-6 flex flex-col gap-3 border-t border-line/10 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <p>© {new Date().getFullYear()} {t("footer.copyright")}</p>
         <div className="flex gap-6">
-          <Link to="/company#privacy" className="hover:text-foreground">{t("footer.privacy")}</Link>
-          <Link to="/company#terms" className="hover:text-foreground">{t("footer.terms")}</Link>
+          <a href="https://www.solix.com/privacy-policy/" target="_blank" rel="noreferrer" className="hover:text-foreground">{t("footer.privacy")}</a>
+          <a href="https://www.solix.com/terms-and-conditions/" target="_blank" rel="noreferrer" className="hover:text-foreground">{t("footer.terms")}</a>
           <a href="tel:18884676549" className="hover:text-foreground">1.888.GO.SOLIX</a>
         </div>
       </div>

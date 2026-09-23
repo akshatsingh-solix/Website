@@ -18,7 +18,7 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
     <section className={cn("relative overflow-hidden border-b border-line/10 bg-background", className)}>
       <div className="absolute inset-0 grid-lines grid-fade" />
       <AuroraField />
-      <div className={cn("container relative", compact ? "pb-14 pt-28 sm:pb-16 sm:pt-32" : "pb-16 pt-28 sm:pb-20 sm:pt-36")}>
+      <div className={cn("container relative", compact ? "pb-14 pt-28 sm:pb-16 sm:pt-32 md:pt-40" : "pb-16 pt-28 sm:pb-20 sm:pt-36 md:pt-44")}>
         {crumbs.length > 0 && (
           <Reveal className="mb-8 flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground" y={10}>
             <Link to="/" className="hover:text-foreground" data-testid="crumb-home">Home</Link>

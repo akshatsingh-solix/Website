@@ -19,7 +19,7 @@ export default function Contact() {
     <div className="relative overflow-hidden" data-testid="contact-page">
       <div className="absolute inset-0 grid-lines opacity-50" />
       <div className="absolute -right-40 top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.1),transparent)]" />
-      <div className="container relative grid gap-14 pt-32 pb-24 lg:grid-cols-12 lg:pt-40">
+      <div className="container relative grid gap-14 pt-32 pb-24 md:pt-40 lg:grid-cols-12 lg:pt-44">
         <Reveal className="lg:col-span-5">
           <p className="eyebrow mb-5">Contact</p>
           <div className="mb-8 inline-flex rounded-full border border-line/10 bg-card p-1" role="tablist" data-testid="contact-mode-tabs">

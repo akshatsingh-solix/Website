@@ -12,7 +12,7 @@ export const NAV = [
     label: "Platform",
     to: "/platform",
     blurb: "One governed platform, deployed however your enterprise runs.",
-    featured: { title: "Start your 30-day free trial", desc: "See Enterprise Edition on your own data.", to: "/contact?type=demo" },
+    featured: { title: "Start your 30-day free trial", desc: "See Enterprise Edition on your own data.", to: "/signup" },
     items: [
       { label: "Enterprise Edition", desc: "Put AI in the hands of your business", to: "/products/enterprise-edition", icon: Sparkles },
       { label: "SOLIXCloud", desc: "Fully managed, on the cloud you trust", to: "/platform#solixcloud", icon: Cloud },

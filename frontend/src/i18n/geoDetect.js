@@ -69,6 +69,10 @@ export async function detectLanguage({ timeoutMs = 2500 } = {}) {
     const data = await res.json();
     const country = data?.country_code || data?.country || null;
     const lang = (country && COUNTRY_LANGUAGE[country]) || "en";
+    // The visitor may have picked a language while the lookup was in
+    // flight - their choice always wins over the geo guess.
+    const now = getStoredLanguage();
+    if (now.source === "manual" && SUPPORTED_LANGUAGES.includes(now.lang)) return { lang: now.lang, source: "manual" };
     rememberGeoLanguage(lang);
     return { lang, source: "geo", country };
   } catch {

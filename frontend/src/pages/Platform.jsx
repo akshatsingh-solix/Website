@@ -50,7 +50,7 @@ export default function Platform() {
         </Section>
       ))}
 
-      <CTABand eyebrow="Start your 30-day free trial" title="See Enterprise Edition on your own data." primary={{ label: "Try Solix", to: "/contact?type=demo" }} />
+      <CTABand eyebrow="Start your 30-day free trial" title="See Enterprise Edition on your own data." primary={{ label: "Try Solix", to: "/signup" }} />
     </div>
   );
 }

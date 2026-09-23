@@ -131,7 +131,7 @@ export const Hero = () => {
       {/* Hairline horizon that ties the hero into the proof strip below. */}
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-line/15 to-transparent" />
 
-      <div className="container relative grid items-center gap-12 pb-16 pt-28 sm:pt-32 lg:min-h-[86vh] lg:grid-cols-12 lg:gap-8 lg:pb-20 lg:pt-32">
+      <div className="container relative grid items-center gap-12 pb-16 pt-28 sm:pt-32 md:pt-40 lg:min-h-[86vh] lg:grid-cols-12 lg:gap-8 lg:pb-20 lg:pt-44">
         <div className="lg:col-span-6">
           <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="eyebrow mb-6 inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 py-1.5 pl-1.5 pr-4">
             <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] tracking-[0.14em] text-primary-foreground">AI</span> {t("hero.eyebrow")}
