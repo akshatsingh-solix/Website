@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { CHAT_SUGGESTIONS } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { clearChatHistory, fetchChatHistory, streamChat } from "@/lib/api";
+import { useTranslation } from "react-i18next";
+import { useTx } from "@/i18n/tx";
 
 const SESSION_KEY = "solix_chat_session";
 
@@ -44,19 +46,22 @@ const Markdown = ({ text }) => {
   return <>{out}</>;
 };
 
-const BookingCard = ({ name, email, company }) => (
+const BookingCard = ({ name, email, company }) => {
+  const tx = useTx();
+  return (
   <div className="flex justify-start" data-testid="chat-booking-card">
     <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-teal/30 bg-teal/5 px-4 py-3 text-sm">
-      <p className="flex items-center gap-2 font-display font-medium text-teal"><CalendarCheck className="h-4 w-4" /> Demo request saved</p>
+      <p className="flex items-center gap-2 font-display font-medium text-teal"><CalendarCheck className="h-4 w-4" /> {tx("Demo request saved")}</p>
       <dl className="mt-2 space-y-0.5 text-xs text-muted-foreground">
-        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Name</dt><dd>{name}</dd></div>
-        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Email</dt><dd>{email}</dd></div>
-        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">Company</dt><dd>{company}</dd></div>
+        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">{tx("Name")}</dt><dd>{name}</dd></div>
+        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">{tx("Email")}</dt><dd>{email}</dd></div>
+        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">{tx("Company")}</dt><dd>{company}</dd></div>
       </dl>
-      <p className="mt-2 text-[11px] text-muted-foreground">A Solix expert will reach out within one business day.</p>
+      <p className="mt-2 text-[11px] text-muted-foreground">{tx("A Solix expert will reach out within one business day.")}</p>
     </div>
   </div>
-);
+  );
+};
 
 const Bubble = ({ role, content, streaming }) => (
   <div className={cn("flex", role === "user" ? "justify-end" : "justify-start")} data-testid={`chat-message-${role}`}>
@@ -73,6 +78,8 @@ const Bubble = ({ role, content, streaming }) => (
 );
 
 export const ConciergeWidget = () => {
+  const tx = useTx();
+  const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -115,6 +122,7 @@ export const ConciergeWidget = () => {
       await streamChat({
         sessionId,
         message,
+        language: i18n.language,
         onDelta: append,
         onEvent: (evt) => {
           if (evt.event === "demo_booked") {
@@ -125,10 +133,10 @@ export const ConciergeWidget = () => {
             });
           }
         },
-        onError: (err) => append(err),
+        onError: (err) => append(tx(err)),
       });
     } catch {
-      append("The concierge is unavailable right now. Please try again shortly.");
+      append(tx("The concierge is unavailable right now. Please try again shortly."));
     } finally {
       setMessages((m) => m.map((x, i) => (i === m.length - 1 ? { ...x, streaming: false } : x)));
       setBusy(false);
@@ -155,7 +163,7 @@ export const ConciergeWidget = () => {
             className="fixed bottom-24 right-4 z-[60] flex h-[min(620px,calc(100vh-7rem))] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-line/10 bg-background shadow-[0_2px_8px_rgba(13,25,45,0.06),0_40px_100px_-30px_rgba(13,25,45,0.45)] sm:right-6"
             data-testid="chat-panel"
             role="dialog"
-            aria-label="Solix AI concierge"
+            aria-label={tx("Solix AI concierge")}
           >
             <div className="dark relative flex items-center gap-3 bg-background px-4 py-3 text-foreground">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
@@ -164,13 +172,13 @@ export const ConciergeWidget = () => {
                 <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-teal" />
               </span>
               <div className="flex-1">
-                <p className="font-display text-sm font-semibold">Sol · Solix AI Concierge</p>
-                <p className="text-[11px] text-muted-foreground">Answers about products, solutions and next steps</p>
+                <p className="font-display text-sm font-semibold">{tx("Sol · Solix AI Concierge")}</p>
+                <p className="text-[11px] text-muted-foreground">{tx("Answers about products, solutions and next steps")}</p>
               </div>
-              <button onClick={reset} aria-label="New conversation" data-testid="chat-reset-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-line/5 hover:text-foreground">
+              <button onClick={reset} aria-label={tx("New conversation")} data-testid="chat-reset-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-line/5 hover:text-foreground">
                 <RotateCcw className="h-4 w-4" />
               </button>
-              <button onClick={() => setOpen(false)} aria-label="Close chat" data-testid="chat-close-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-line/5 hover:text-foreground">
+              <button onClick={() => setOpen(false)} aria-label={tx("Close chat")} data-testid="chat-close-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-line/5 hover:text-foreground">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -179,7 +187,7 @@ export const ConciergeWidget = () => {
               {messages.length === 0 && (
                 <div className="space-y-4">
                   <div className="rounded-2xl rounded-bl-md border border-line/10 bg-muted px-4 py-3 text-sm text-foreground">
-                    Hi, I'm Sol. Ask me anything about Solix — archiving, application retirement, governed AI, pricing conversations, or how to get a demo.
+                    {tx("Hi, I'm Sol. Ask me anything about Solix — archiving, application retirement, governed AI, pricing conversations, or how to get a demo.")}
                   </div>
                   <div className="grid gap-2">
                     {CHAT_SUGGESTIONS.map((s) => (
@@ -210,12 +218,12 @@ export const ConciergeWidget = () => {
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about Solix…"
+                placeholder={tx("Ask about Solix…")}
                 disabled={busy}
                 data-testid="chat-input"
                 className="h-11 flex-1 rounded-full border border-line/15 bg-muted/60 px-4 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
               />
-              <Button type="submit" size="icon" disabled={busy || !input.trim()} aria-label="Send" data-testid="chat-send-button" className="h-11 w-11 rounded-full">
+              <Button type="submit" size="icon" disabled={busy || !input.trim()} aria-label={tx("Send")} data-testid="chat-send-button" className="h-11 w-11 rounded-full">
                 <Send className="h-4 w-4" />
               </Button>
             </form>
@@ -225,13 +233,13 @@ export const ConciergeWidget = () => {
 
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label={open ? "Close AI concierge" : "Open AI concierge"}
+        aria-label={open ? tx("Close AI concierge") : tx("Open AI concierge")}
         data-testid="chat-toggle-button"
         className="group fixed bottom-5 right-4 z-[60] flex h-14 items-center gap-2 rounded-full bg-primary pl-4 pr-5 text-white shadow-[0_18px_40px_-12px_rgba(237,36,35,0.7)] transition-[transform,background-color] duration-300 hover:-translate-y-1 hover:bg-ember-deep sm:right-6"
       >
         {!open && <span className="absolute inset-0 -z-10 rounded-full bg-primary/60 animate-pulse-ring" />}
         {open ? <X className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" strokeWidth={1.75} />}
-        <span className="font-display text-sm font-semibold">{open ? "Close" : "Ask Sol"}</span>
+        <span className="font-display text-sm font-semibold">{open ? tx("Close") : tx("Ask Sol")}</span>
       </button>
     </>
   );

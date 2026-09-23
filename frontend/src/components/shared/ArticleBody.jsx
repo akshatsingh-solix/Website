@@ -1,5 +1,6 @@
 import { ArrowRight, Quote, Lightbulb } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
+import { useTx } from "@/i18n/tx";
 
 export const slugify = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
@@ -74,11 +75,12 @@ export const ArticleBody = ({ blocks }) => (
 );
 
 export const ArticleTOC = ({ blocks }) => {
+  const tx = useTx();
   const heads = blocks.filter((b) => b.type === "h2");
   if (!heads.length) return null;
   return (
-    <nav aria-label="On this page" data-testid="article-toc">
-      <p className="eyebrow mb-4">On this page</p>
+    <nav aria-label={tx("On this page")} data-testid="article-toc">
+      <p className="eyebrow mb-4">{tx("On this page")}</p>
       <ul className="space-y-2 border-l border-line/10">
         {heads.map((h) => (
           <li key={h.text}>

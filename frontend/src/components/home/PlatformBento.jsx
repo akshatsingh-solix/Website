@@ -4,7 +4,9 @@ import { cn } from "@/lib/utils";
 import { PRODUCTS } from "@/data/site";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Stagger, Item, Tilt } from "@/components/shared/Reveal";
+import { useTx } from "@/i18n/tx";
 
+// no-i18n
 const spans = ["lg:col-span-7 lg:row-span-2", "lg:col-span-5", "lg:col-span-5", "lg:col-span-4", "lg:col-span-4", "lg:col-span-4", "lg:col-span-6", "lg:col-span-6"];
 
 // Curated highlight reel for the homepage bento - the full 26-product catalog
@@ -27,6 +29,7 @@ const FEATURED_SLUGS = [
 // puts it alongside the copy, for a category that has a single product.
 export const ProductCard = ({ product, className, large = false, horizontal = false, image }) => {
   const showImage = large || horizontal;
+  const tx = useTx();
   const Icon = product.icon;
   const blue = product.accent === "teal";
   return (
@@ -42,7 +45,7 @@ export const ProductCard = ({ product, className, large = false, horizontal = fa
           <div className={cn("dark relative min-h-[240px] flex-1 overflow-hidden bg-background", horizontal && "md:min-h-[300px] md:w-1/2 md:flex-none")}>
             <img src={image || product.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/70 to-transparent" />
-            {large && <span className="absolute bottom-4 left-5 rounded-full border border-line/20 bg-background/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground backdrop-blur">Flagship</span>}
+            {large && <span className="absolute bottom-4 left-5 rounded-full border border-line/20 bg-background/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground backdrop-blur">{tx("Flagship")}</span>}
           </div>
         )}
         <div className={cn("relative flex flex-1 flex-col p-6 sm:p-7", large && "flex-none", horizontal && "md:justify-center md:p-10")}>
@@ -50,12 +53,12 @@ export const ProductCard = ({ product, className, large = false, horizontal = fa
             <span className={cn("grid h-11 w-11 shrink-0 place-items-center rounded-xl transition-colors duration-300", blue ? "bg-teal/10 text-teal group-hover:bg-teal group-hover:text-white" : "bg-primary/10 text-primary-ink group-hover:bg-primary group-hover:text-primary-foreground")}>
               <Icon className="h-5 w-5" strokeWidth={1.75} />
             </span>
-            <span className="pt-1 text-right font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{product.category}</span>
+            <span className="pt-1 text-right font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{tx(product.category)}</span>
           </div>
           <h3 className={cn("mt-5 font-display font-medium tracking-tight text-foreground", showImage ? "text-2xl sm:text-3xl" : "text-xl")}>{product.name}</h3>
           <p className={cn("mt-2 leading-relaxed text-muted-foreground", showImage ? "max-w-lg text-base" : "text-sm")}>{product.tagline}</p>
           <span className={cn("mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary-ink", horizontal && "md:mt-0")}>
-            Learn more <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            {tx("Learn more")} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </span>
         </div>
       </Link>
@@ -63,7 +66,9 @@ export const ProductCard = ({ product, className, large = false, horizontal = fa
   );
 };
 
-export const PlatformBento = () => (
+export const PlatformBento = () => {
+  const tx = useTx();
+  return (
   <Section className="bg-background" id="the-products">
     <div className="container">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
@@ -74,7 +79,7 @@ export const PlatformBento = () => (
           description="Every Solix product runs on one governed foundation, so archiving, retirement, privacy and AI share the same catalog, policies and Preservation Zone."
         />
         <Link to="/products" className="link-underline shrink-0 text-sm font-medium text-foreground" data-testid="platform-view-all">
-          View all products →
+          {tx("View all products")} →
         </Link>
       </div>
       <Stagger className="mt-12 grid gap-4 lg:grid-cols-12">
@@ -90,4 +95,5 @@ export const PlatformBento = () => (
       </Stagger>
     </div>
   </Section>
-);
+  );
+};

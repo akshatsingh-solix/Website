@@ -6,8 +6,10 @@ import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { useTx } from "@/i18n/tx";
 
 export default function Careers() {
+  const tx = useTx();
   const [job, setJob] = useState(null);
 
   return (
@@ -23,7 +25,7 @@ export default function Careers() {
       <Section>
         <div className="container grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <SectionHeading eyebrow="Open roles" title={`${JOBS.length} positions across four continents.`} description="Hybrid by default. Remote where the role allows." />
+            <SectionHeading eyebrow="Open roles" title={tx("{{count}} positions across four continents.", { count: JOBS.length })} description="Hybrid by default. Remote where the role allows." />
           </div>
           <Stagger className="space-y-3 lg:col-span-8" data-testid="jobs-list">
             {JOBS.map((j) => (
@@ -43,7 +45,7 @@ export default function Careers() {
                     <span className="inline-flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> {j.type}</span>
                   </div>
                   <span className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-primary-ink sm:col-span-1 sm:justify-end">
-                    Apply <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    {tx("Apply")} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </button>
               </Item>

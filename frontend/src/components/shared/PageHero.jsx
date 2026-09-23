@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useTx } from "@/i18n/tx";
 import { Reveal, AuroraField } from "./Reveal";
 
 /**
@@ -11,6 +12,7 @@ import { Reveal, AuroraField } from "./Reveal";
  * CTAs - sit under the copy. Without one, `children` take the right column.
  */
 export const PageHero = ({ eyebrow, title, description, crumbs = [], children, image, className, compact = false }) => {
+  const tx = useTx();
   const { scrollY } = useScroll();
   const imgY = useTransform(scrollY, [0, 600], [0, 40]);
 
@@ -18,14 +20,14 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
     <section className={cn("relative overflow-hidden border-b border-line/10 bg-background", className)}>
       <div className="absolute inset-0 grid-lines grid-fade" />
       <AuroraField />
-      <div className={cn("container relative", compact ? "pb-14 pt-28 sm:pb-16 sm:pt-32" : "pb-16 pt-28 sm:pb-20 sm:pt-36")}>
+      <div className={cn("container relative", compact ? "pb-14 pt-28 sm:pb-16 sm:pt-32 md:pt-40" : "pb-16 pt-28 sm:pb-20 sm:pt-36 md:pt-44")}>
         {crumbs.length > 0 && (
           <Reveal className="mb-8 flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground" y={10}>
-            <Link to="/" className="hover:text-foreground" data-testid="crumb-home">Home</Link>
+            <Link to="/" className="hover:text-foreground" data-testid="crumb-home">{tx("Home")}</Link>
             {crumbs.map((c) => (
               <span key={c.label} className="flex items-center gap-2">
                 <ChevronRight className="h-3 w-3" />
-                {c.to ? <Link to={c.to} className="hover:text-foreground">{c.label}</Link> : <span className="line-clamp-1 max-w-[40ch] text-foreground">{c.label}</span>}
+                {c.to ? <Link to={c.to} className="hover:text-foreground">{tx(c.label)}</Link> : <span className="line-clamp-1 max-w-[40ch] text-foreground">{tx(c.label)}</span>}
               </span>
             ))}
           </Reveal>
@@ -34,9 +36,9 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
         {image ? (
           <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
             <Reveal blur className="lg:col-span-7">
-              {eyebrow && <p className="eyebrow mb-5">{eyebrow}</p>}
-              <h1 className="text-balance text-fluid-h2 font-medium text-foreground">{title}</h1>
-              {description && <p className="mt-6 max-w-2xl text-fluid-lead text-muted-foreground">{description}</p>}
+              {eyebrow && <p className="eyebrow mb-5">{tx(eyebrow)}</p>}
+              <h1 className="text-balance text-fluid-h2 font-medium text-foreground">{tx(title)}</h1>
+              {description && <p className="mt-6 max-w-2xl text-fluid-lead text-muted-foreground">{tx(description)}</p>}
               {children && <div className="mt-8">{children}</div>}
             </Reveal>
             <Reveal delay={0.1} className="relative lg:col-span-5">
@@ -50,9 +52,9 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
         ) : (
           <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
             <Reveal blur className="lg:col-span-8">
-              {eyebrow && <p className="eyebrow mb-5">{eyebrow}</p>}
-              <h1 className="text-balance text-fluid-h2 font-medium text-foreground">{title}</h1>
-              {description && <p className="mt-6 max-w-2xl text-fluid-lead text-muted-foreground">{description}</p>}
+              {eyebrow && <p className="eyebrow mb-5">{tx(eyebrow)}</p>}
+              <h1 className="text-balance text-fluid-h2 font-medium text-foreground">{tx(title)}</h1>
+              {description && <p className="mt-6 max-w-2xl text-fluid-lead text-muted-foreground">{tx(description)}</p>}
             </Reveal>
             {children && <Reveal delay={0.1} className="lg:col-span-4 lg:justify-self-end">{children}</Reveal>}
           </div>

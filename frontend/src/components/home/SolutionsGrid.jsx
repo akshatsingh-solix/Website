@@ -4,8 +4,10 @@ import { cn } from "@/lib/utils";
 import { SOLUTIONS, PRODUCTS } from "@/data/site";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
+import { useTx } from "@/i18n/tx";
 
 export const SolutionCard = ({ s, detailed = false }) => {
+  const tx = useTx();
   const Icon = s.icon;
   const related = PRODUCTS.filter((p) => s.products.includes(p.slug));
   return (
@@ -28,7 +30,7 @@ export const SolutionCard = ({ s, detailed = false }) => {
       </div>
       {!detailed && (
         <Link to={`/solutions#${s.id}`} className="relative mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary-ink">
-          Explore solution <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          {tx("Explore solution")} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       )}
     </div>

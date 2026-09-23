@@ -1,5 +1,6 @@
+import { localizedSource } from "@/i18n/localize";
 // Long-form article bodies keyed by resource slug. Block types: h2, p, ul, quote, callout, stats, steps.
-export const ARTICLES = {
+const ARTICLES_EN = {
   "build-enterprise-archive-in-the-cloud": {
     summary: "Most cloud migrations move everything and pay for it twice. This reference architecture shows how to land inactive data in a governed, low-cost archive first, then migrate only what production really needs.",
     body: [
@@ -209,3 +210,8 @@ export const ARTICLES = {
     ],
   },
 };
+
+// Display copy follows the active language (see i18n/localize.js); the
+// *_EN sources stay the single place to edit content.
+export const ARTICLES = localizedSource(ARTICLES_EN);
+export const SOURCE = { ARTICLES: ARTICLES_EN };

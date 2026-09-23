@@ -1,3 +1,4 @@
+import { useTx } from "@/i18n/tx";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const TooltipBox = ({ active, payload, label }) => {
@@ -14,7 +15,9 @@ const TooltipBox = ({ active, payload, label }) => {
   );
 };
 
-export const OutcomeChart = ({ data, accent = "#EE2424" }) => (
+export const OutcomeChart = ({ data, accent = "#EE2424" }) => {
+  const tx = useTx();
+  return (
   <div className="h-[300px] w-full" data-testid="outcome-chart">
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} layout="vertical" margin={{ top: 4, right: 24, bottom: 4, left: 8 }} barCategoryGap={22} barGap={6}>
@@ -23,9 +26,10 @@ export const OutcomeChart = ({ data, accent = "#EE2424" }) => (
         <YAxis type="category" dataKey="metric" width={190} tick={{ fill: "#0D192D", fontSize: 12 }} axisLine={false} tickLine={false} />
         <Tooltip content={<TooltipBox />} cursor={{ fill: "rgba(13,25,45,0.04)" }} />
         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: "#3D6288", paddingTop: 8 }} />
-        <Bar dataKey="before" name="Before Solix" fill="rgba(61,98,136,0.28)" radius={[0, 4, 4, 0]} isAnimationActive />
-        <Bar dataKey="after" name="With Solix" fill={accent} radius={[0, 4, 4, 0]} isAnimationActive />
+        <Bar dataKey="before" name={tx("Before Solix")} fill="rgba(61,98,136,0.28)" radius={[0, 4, 4, 0]} isAnimationActive />
+        <Bar dataKey="after" name={tx("With Solix")} fill={accent} radius={[0, 4, 4, 0]} isAnimationActive />
       </BarChart>
     </ResponsiveContainer>
   </div>
-);
+  );
+};

@@ -67,7 +67,9 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test"
+    "test": "craco test",
+    "i18n": "node scripts/i18n-extract.js",
+    "i18n:lint": "node scripts/i18n-extract.js --lint"
   },
   "browserslist": {
     "production": [

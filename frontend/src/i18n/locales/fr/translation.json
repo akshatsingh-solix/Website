@@ -36,7 +36,8 @@
     "answerSample": "14 contrats T3 à renouvellement automatique, trouvés dans 3 systèmes retirés.",
     "answerSources": "3 sources · lignage joint",
     "infraCost": "Coût d'infrastructure",
-    "vsStatusQuo": "vs. statu quo"
+    "vsStatusQuo": "vs. statu quo",
+    "imageAlt": "Plateforme de données Solix en couches, représentée comme une architecture lumineuse et gouvernée"
   },
   "footer": {
     "tagline": "Solix Technologies active les données d'entreprise sur tous les systèmes et toutes les époques, afin que les entreprises puissent mettre l'IA au travail dans le périmètre de confiance défini par la DSI.",
@@ -53,6 +54,7 @@
   "language": {
     "label": "Langue",
     "detectedNotice": "Cette page s'affiche en {{language}} en fonction de votre localisation.",
-    "revertToEnglish": "Afficher en anglais"
+    "revertToEnglish": "Afficher en anglais",
+    "dismiss": "Fermer"
   }
 }

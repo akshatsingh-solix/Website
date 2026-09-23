@@ -1,4 +1,5 @@
-export const PRESS_RELEASES = [
+import { localizedSource } from "@/i18n/localize";
+const PRESS_RELEASES_EN = [
   {
     id: "enterprise-edition-launch", date: "2026-06-02", year: "2026", category: "Product", featured: true, image: "/Website/images/hero-architecture.jpg",
     title: "Solix Launches Enterprise Edition to Put AI in the Hands of the Business",
@@ -83,7 +84,7 @@ export const PRESS_RELEASES = [
   },
 ];
 
-export const COVERAGE = [
+const COVERAGE_EN = [
   { outlet: "Enterprise Data Review", title: "Archive-first is quietly becoming the default S/4HANA playbook", quote: "Solix has turned a decades-old discipline into the shortest path to a modern ERP.", date: "May 2026" },
   { outlet: "CIO Frontier", title: "The trust perimeter: a saner model for business-led AI", quote: "A rare AI architecture story that starts with governance and still ends with speed.", date: "Apr 2026" },
   { outlet: "Data Governance Weekly", title: "Why retired applications are the most valuable AI data you're ignoring", quote: "Solix's Preservation Zone makes legacy history queryable, governed and finally useful.", date: "Mar 2026" },
@@ -91,7 +92,7 @@ export const COVERAGE = [
   { outlet: "Privacy Ops Journal", title: "DSARs in two hours: automation across live and archived data", quote: "The first privacy platform we've seen that treats the archive as in-scope by design.", date: "Feb 2026" },
 ];
 
-export const MEDIA_KIT = [
+const MEDIA_KIT_EN = [
   { label: "Primary logo (dark backgrounds)", file: "/Website/brand/solix-logo-dark.svg", meta: "SVG" },
   { label: "Primary logo (light backgrounds)", file: "/Website/brand/solix-logo-light.svg", meta: "SVG" },
   { label: "Brand mark", file: "/Website/brand/solix-mark.svg", meta: "SVG" },
@@ -99,10 +100,19 @@ export const MEDIA_KIT = [
   { label: "Brand guidelines", file: "/Website/brand/solix-brand-guidelines.txt", meta: "TXT" },
 ];
 
-export const BRAND_COLORS = [
+const BRAND_COLORS_EN = [
   { name: "Navy", hex: "#0D192D" }, { name: "Solix Red", hex: "#EE2424" }, { name: "Solix Blue", hex: "#0088CF" }, { name: "Grey", hex: "#B0B0B2" },
 ];
 
 export const BOILERPLATE = "Solix Technologies, Inc. is an enterprise data management and AI company headquartered in Santa Clara, California. Founded in 2002, Solix helps regulated, data-intensive organizations activate data from every system and every era through the Solix Common Data Platform, Enterprise Archiving, Application Retirement, Enterprise Data Lake, eDiscovery, Consumer Data Privacy and Enterprise AI. Solix Enterprise Edition puts AI in the hands of the business, inside the trust perimeter IT defines. Learn more at solix.com.";
 
-export const PRESS_CONTACT = { name: "Solix Media Relations", email: "press@solix.com", phone: "1.888.GO.SOLIX" };
+const PRESS_CONTACT_EN = { name: "Solix Media Relations", email: "press@solix.com", phone: "1.888.GO.SOLIX" };
+
+// Display copy follows the active language (see i18n/localize.js); the
+// *_EN sources stay the single place to edit content.
+export const PRESS_RELEASES = localizedSource(PRESS_RELEASES_EN);
+export const COVERAGE = localizedSource(COVERAGE_EN);
+export const MEDIA_KIT = localizedSource(MEDIA_KIT_EN);
+export const BRAND_COLORS = localizedSource(BRAND_COLORS_EN);
+export const PRESS_CONTACT = localizedSource(PRESS_CONTACT_EN);
+export const SOURCE = { PRESS_RELEASES: PRESS_RELEASES_EN, COVERAGE: COVERAGE_EN, MEDIA_KIT: MEDIA_KIT_EN, BRAND_COLORS: BRAND_COLORS_EN, PRESS_CONTACT: PRESS_CONTACT_EN };

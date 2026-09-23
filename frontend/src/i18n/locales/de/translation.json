@@ -36,7 +36,8 @@
     "answerSample": "14 Q3-Verträge mit automatischer Verlängerung, gefunden in 3 stillgelegten Systemen.",
     "answerSources": "3 Quellen · Herkunft angehängt",
     "infraCost": "Infrastrukturkosten",
-    "vsStatusQuo": "ggü. Status quo"
+    "vsStatusQuo": "ggü. Status quo",
+    "imageAlt": "Mehrschichtige Solix-Datenplattform als leuchtende, geregelte Architektur dargestellt"
   },
   "footer": {
     "tagline": "Solix Technologies aktiviert Unternehmensdaten über alle Systeme und Epochen hinweg, damit Unternehmen KI innerhalb des von der IT definierten Vertrauensbereichs einsetzen können.",
@@ -53,6 +54,7 @@
   "language": {
     "label": "Sprache",
     "detectedNotice": "Diese Seite wird basierend auf Ihrem Standort auf {{language}} angezeigt.",
-    "revertToEnglish": "Auf Englisch anzeigen"
+    "revertToEnglish": "Auf Englisch anzeigen",
+    "dismiss": "Schließen"
   }
 }

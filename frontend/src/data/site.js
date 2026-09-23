@@ -1,3 +1,4 @@
+import { localizedSource } from "@/i18n/localize";
 import {
   Archive, Database, Layers, PowerOff, Scale, ShieldCheck, Sparkles, Landmark, HeartPulse, Factory,
   Building2, ShoppingBag, Zap, RadioTower, Umbrella, Server, Gauge, Cloud, Vault, RefreshCw, BrainCircuit,
@@ -7,12 +8,12 @@ import {
   Rows3, Download, Boxes, Compass,
 } from "lucide-react";
 
-export const NAV = [
+const NAV_EN = [
   {
     label: "Platform",
     to: "/platform",
     blurb: "One governed platform, deployed however your enterprise runs.",
-    featured: { title: "Start your 30-day free trial", desc: "See Enterprise Edition on your own data.", to: "/contact?type=demo" },
+    featured: { title: "Start your 30-day free trial", desc: "See Enterprise Edition on your own data.", to: "/signup" },
     items: [
       { label: "Enterprise Edition", desc: "Put AI in the hands of your business", to: "/products/enterprise-edition", icon: Sparkles },
       { label: "SOLIXCloud", desc: "Fully managed, on the cloud you trust", to: "/platform#solixcloud", icon: Cloud },
@@ -180,14 +181,14 @@ export const NAV = [
   },
 ];
 
-export const STATS = [
+const STATS_EN = [
   { value: 150, suffix: "+", label: "Enterprise application connectors" },
   { value: 80, suffix: "%", label: "Infrastructure cost reduction, typical" },
   { value: 20, suffix: "+", label: "Years engineering data at scale" },
   { value: 12, suffix: " PB", label: "Preserved for a single customer" },
 ];
 
-export const PRODUCTS = [
+const PRODUCTS_EN = [
   {
     slug: "enterprise-edition",
     category: "Platform",
@@ -916,7 +917,7 @@ export const PRODUCTS = [
   },
 ];
 
-export const SOLUTIONS = [
+const SOLUTIONS_EN = [
   { id: "infrastructure-optimization", group: "Preservation & Archive", icon: Gauge, title: "Infrastructure Optimization", desc: "Shrink production databases, retire redundant applications and reclaim storage, licenses and compute, without losing access to a single record.", products: ["enterprise-archiving", "application-retirement"], metric: "80% lower TCO", span: "lg:col-span-7" },
   { id: "compliance-governance", group: "Preservation & Archive", icon: ShieldCheck, title: "Compliance & Governance", desc: "Retention, legal hold, defensible deletion and audit trails that satisfy SEC, FINRA, HIPAA, GDPR and sector regulators.", products: ["ediscovery", "consumer-data-privacy"], metric: "30+ regulations", span: "lg:col-span-5" },
   { id: "ai-readiness", group: "AI Solutions", icon: BrainCircuit, title: "AI & Analytics Readiness", desc: "Make every dataset discoverable, trustworthy and usable by analysts and AI agents through a governed lake and semantic catalog.", products: ["enterprise-data-lake", "enterprise-ai"], metric: "10x faster to first use case", span: "lg:col-span-5" },
@@ -934,7 +935,7 @@ export const SOLUTIONS = [
   { id: "agentic-operations", group: "AI Solutions", icon: Workflow, title: "Agentic Operations", desc: "Agents that plan, retrieve and act across governed data products, with every step logged and policy-checked.", products: ["agentic"], metric: "100% of agent actions audited", span: "lg:col-span-6" },
 ];
 
-export const INDUSTRIES = [
+const INDUSTRIES_EN = [
   { slug: "financial-services", image: "/Website/images/ind-financial-services.jpg", icon: Landmark, name: "Financial Services", headline: "Compliance-grade archives and AI for banks, brokers and asset managers.", desc: "Meet SEC 17a-4, FINRA and Basel retention while shrinking core banking and trading system footprints.", challenges: ["Books-and-records retention across email, chat and trades", "Legacy core systems too costly to run and too risky to retire", "AI initiatives blocked by data lineage and privacy concerns"], results: ["WORM-compliant preservation with supervisory search", "Retired 40+ legacy applications at a top-20 US bank", "Governed RAG for advisor copilots on trusted client data"] },
   { slug: "healthcare", image: "/Website/images/ind-healthcare.jpg", icon: HeartPulse, name: "Healthcare & Life Sciences", headline: "Protect patient data. Preserve clinical history. Accelerate research.", desc: "Archive legacy EHRs, retire acquired systems and enable HIPAA-compliant analytics and AI.", challenges: ["Dozens of legacy EHR/EMR systems after M&A", "HIPAA retention and breach exposure", "Research data locked in silos"], results: ["Legacy EHR retirement with clinician-friendly access", "Automated PHI discovery and minimization", "Governed research lake for clinical analytics"] },
   { slug: "manufacturing", image: "/Website/images/ind-manufacturing.jpg", icon: Factory, name: "Manufacturing", headline: "Leaner ERP. Longer product memory. Smarter operations.", desc: "Archive SAP and Oracle history, retire plant-level systems and unify OT/IT data for predictive AI.", challenges: ["ERP growth slowing month-end and upgrades", "Decades of product and quality records to preserve", "OT and IT data never meet"], results: ["S/4HANA migration 50% smaller via archive-first", "Preserved 25 years of quality records for audits", "Predictive maintenance on unified plant data"] },
@@ -946,17 +947,17 @@ export const INDUSTRIES = [
   { slug: "insurance", image: "/Website/images/ind-insurance.jpg", icon: Umbrella, name: "Insurance", headline: "Policies and claims preserved for the life of the promise.", desc: "Retire legacy policy administration systems, meet retention rules and enable underwriting AI.", challenges: ["Long-tail policy and claims retention", "Multiple PAS platforms after acquisitions", "Underwriting AI needs historical claims"], results: ["Retired legacy PAS with full claim history access", "Retention by product line and jurisdiction", "Claims history lake for pricing models"] },
 ];
 
-export const LOGOS = [
+const LOGOS_EN = [
   "Meridian Bank", "Northwind Health", "Atlas Energy", "Helios Retail", "Vantage Insurance", "Orion Telecom", "Summit Manufacturing", "Civic Cloud", "Aurora Pharma", "Keystone Capital",
 ];
 
-export const TESTIMONIALS = [
+const TESTIMONIALS_EN = [
   { quote: "We retired forty legacy applications in eighteen months and every record is still one search away. Solix turned a compliance liability into a governed asset our AI teams can finally use.", role: "Chief Data Officer", org: "Top-20 US Bank" },
   { quote: "Our S/4HANA migration was half the size it would have been. Archive-first with Solix paid for itself before we even cut over.", role: "VP, Enterprise Applications", org: "Global Manufacturer" },
   { quote: "DSAR fulfilment went from a two-week scramble across thirty systems to a two-hour automated workflow. Legal and IT finally share one source of truth.", role: "Head of Privacy", org: "Multinational Retailer" },
 ];
 
-export const RESOURCES = [
+const RESOURCES_EN = [
   { id: 1, slug: "build-enterprise-archive-in-the-cloud", type: "whitepaper", title: "How to Build an Enterprise Archive in the Cloud", desc: "A reference architecture for compliant, low-cost archiving with SOLIXCloud and the Common Data Platform.", tag: "Architecture", readTime: "24 min", date: "May 2026", gated: true, icon: FileText, author: "Solix Field Engineering", authorRole: "Reference architectures & delivery" },
   { id: 2, slug: "archive-first-fastest-path-to-s4hana", type: "blog", title: "Why Archive-First Is the Fastest Path to S/4HANA", desc: "Migrate less, cut risk and land on time by moving inactive ERP history before you move the system.", tag: "SAP", readTime: "7 min", date: "Jun 2026", icon: Newspaper, author: "Solix SAP Practice", authorRole: "ERP archiving & migration" },
   { id: 3, slug: "governed-rag-enterprise-ai-without-shadow-copies", type: "webinar", title: "Governed RAG: Enterprise AI Without the Shadow Copies", desc: "Live walkthrough of building a policy-aware copilot on curated data products.", tag: "Enterprise AI", readTime: "45 min", date: "Jun 2026", icon: Video, author: "Solix Enterprise AI Team", authorRole: "Product & platform engineering" },
@@ -972,7 +973,7 @@ export const RESOURCES = [
   { id: 13, slug: "twenty-years-of-enterprise-data-five-lessons", type: "leadership", title: "Twenty Years of Enterprise Data: Five Lessons", desc: "Our founder on what changed, what didn't, and what he'd tell a CDO starting today.", tag: "Leadership", readTime: "11 min", date: "Jun 2026", icon: GraduationCap, author: "Sai Gundavelli", authorRole: "Founder & CEO, Solix" },
 ];
 
-export const RESOURCE_TYPES = [
+const RESOURCE_TYPES_EN = [
   { key: "all", label: "All" },
   { key: "datasheet", label: "Datasheets" },
   { key: "whitepaper", label: "White Papers" },
@@ -985,7 +986,7 @@ export const RESOURCE_TYPES = [
   { key: "event", label: "Events" },
 ];
 
-export const TIMELINE = [
+const TIMELINE_EN = [
   { year: "2002", title: "Founded in Silicon Valley", desc: "Solix begins with a simple idea: enterprise data should be managed for its whole life, not just its first year." },
   { year: "2008", title: "Enterprise Data Management Suite", desc: "Archiving, test data management and application retirement ship as a unified suite for ERP-heavy enterprises." },
   { year: "2014", title: "Big Data Suite", desc: "Hadoop-native archiving and data lake capabilities bring petabyte scale to regulated industries." },
@@ -995,28 +996,28 @@ export const TIMELINE = [
   { year: "2026", title: "Enterprise Edition", desc: "Put AI in the hands of your business: every system, every era, inside the trust perimeter." },
 ];
 
-export const VALUES = [
+const VALUES_EN = [
   { icon: Vault, title: "Preserve the record", desc: "Data of every era is a first-class asset. We never trade integrity for convenience." },
   { icon: ShieldCheck, title: "Trust is the product", desc: "Governance is not a feature we bolt on. It is the reason customers choose us." },
   { icon: Server, title: "Engineer for scale", desc: "Petabytes and decades are our normal operating conditions." },
   { icon: Sparkles, title: "Activate, don't accumulate", desc: "Data that is not usable by the business is a cost. We make it a capability." },
 ];
 
-export const LEADERSHIP = [
+const LEADERSHIP_EN = [
   { name: "Sai Gundavelli", role: "Founder & Chief Executive Officer", initials: "SG", bio: "Founded Solix in 2002 with the conviction that enterprise data deserves lifecycle-long stewardship." },
   { name: "Chief Technology Officer", role: "Platform & Engineering", initials: "CT", bio: "Leads the Common Data Platform, SOLIXCloud and Enterprise AI engineering organizations." },
   { name: "Chief Customer Officer", role: "Customer Success & Services", initials: "CC", bio: "Owns outcomes for hundreds of enterprise programs across regulated industries." },
   { name: "Chief Revenue Officer", role: "Sales & Partnerships", initials: "CR", bio: "Drives global go-to-market with hyperscaler, SI and technology partners." },
 ];
 
-export const OFFICES = [
+const OFFICES_EN = [
   { city: "Santa Clara, CA", label: "Headquarters", address: "4701 Patrick Henry Drive, Bldg 20, Santa Clara, CA 95054, USA" },
   { city: "Hyderabad, India", label: "Engineering Center", address: "HITEC City, Hyderabad, Telangana" },
   { city: "London, UK", label: "EMEA", address: "City of London" },
   { city: "Singapore", label: "APAC", address: "Marina Bay" },
 ];
 
-export const JOBS = [
+const JOBS_EN = [
   { id: "sr-platform-eng", title: "Senior Platform Engineer", team: "Engineering", location: "Santa Clara, CA / Hybrid", type: "Full-time", desc: "Own ingestion and storage services on the Common Data Platform. Kubernetes, Go/Java, Iceberg, object storage at petabyte scale." },
   { id: "ai-solutions-arch", title: "AI Solutions Architect", team: "Field Engineering", location: "Remote, US", type: "Full-time", desc: "Design governed RAG and agent architectures for Fortune 500 customers on Enterprise AI." },
   { id: "product-mgr-privacy", title: "Product Manager, Consumer Data Privacy", team: "Product", location: "Santa Clara, CA", type: "Full-time", desc: "Shape DSAR automation, consent and retention capabilities against a fast-moving regulatory landscape." },
@@ -1025,11 +1026,11 @@ export const JOBS = [
   { id: "ux-designer", title: "Senior Product Designer", team: "Design", location: "Remote, US", type: "Full-time", desc: "Design the builder workspace and console experiences for Enterprise Edition." },
 ];
 
-export const PERKS = [
+const PERKS_EN = [
   "Competitive salary and equity", "Health, dental and vision", "401(k) with company match", "Flexible hybrid work", "Learning budget and certifications", "Parental leave", "Annual Empower summit", "Volunteer days",
 ];
 
-export const PARTNER_TIERS = [
+const PARTNER_TIERS_EN = [
   { id: "cloud-partners-hyperscalers", icon: Cloud, title: "Cloud Partners / Hyperscalers", desc: "Deploy SOLIXCloud and the Common Data Platform natively on the hyperscalers your enterprise already trusts.", partners: ["Amazon Web Services", "Microsoft Azure", "Google Cloud", "Oracle Cloud"] },
   { id: "big-data-partners", icon: Database, title: "Big Data Partners", desc: "Certified integrations with the data platforms your analysts and models already run on.", partners: ["Snowflake", "Databricks"] },
   { id: "oem-partners", icon: Layers, title: "OEM Partners", desc: "Embedded and certified integrations with the enterprise platforms that run your business.", partners: ["SAP", "Oracle", "Salesforce", "Workday", "ServiceNow"] },
@@ -1037,7 +1038,7 @@ export const PARTNER_TIERS = [
   { id: "distribution-partners", icon: Building2, title: "Distribution Partners", desc: "Regional integrators, resellers and managed service providers who bring Solix to mid-market customers.", partners: ["Infosys", "TCS", "Wipro", "Regional VARs", "Managed service providers"] },
 ];
 
-export const PLATFORM_SECTIONS = [
+const PLATFORM_SECTIONS_EN = [
   { id: "solixcloud", icon: Cloud, title: "SOLIXCloud", desc: "Fully managed archiving, retirement, privacy and Enterprise AI, run by Solix on the cloud you already trust.", points: ["Deployed and operated by Solix, patched and monitored 24/7", "Runs natively on AWS, Microsoft Azure, Google Cloud or Oracle Cloud", "Same governance and controls as an on-premises deployment", "Elastic scale from a single archive to petabyte-scale programs"], highlight: { eyebrow: "Runs natively on", value: "4 hyperscalers", caption: "AWS · Microsoft Azure · Google Cloud · Oracle Cloud, same controls on every one." } },
   { id: "it-leaders", icon: ShieldCheck, title: "For IT Leaders", desc: "A platform built so IT can say yes to the business without losing control of access, retention or audit.", points: ["Policy defined once, enforced everywhere the platform touches", "Full audit trail for every access, query and model call", "Cost and adoption telemetry in a single console", "Deploy in your cloud, on-premises or hybrid, same control plane"], highlight: { eyebrow: "Compliance-ready", value: "SOC 2 · HIPAA · GDPR", caption: "Audited controls IT can stand behind, not a checkbox exercise." } },
   { id: "why-solix", icon: Compass, title: "Why Solix", desc: "Two decades of enterprise data stewardship, built by a team that has never treated an old record as disposable.", points: ["Founded in 2002, profitable and independent", "Petabyte-scale production deployments in regulated industries", "One platform for every era of data, not a portfolio of acquisitions", "Named support team from onboarding through renewal"], highlight: { eyebrow: "Operating since", value: "2002", caption: "20+ years of enterprise data stewardship, profitable and independent." } },
@@ -1045,7 +1046,7 @@ export const PLATFORM_SECTIONS = [
   { id: "roadmap", icon: Map, title: "Roadmap", desc: "What's shipping next, and the direction the platform is heading over the next few releases.", points: ["Deeper Agentic tooling for multi-step, governed automation", "Expanded pre-built Application Knowledge Graphs by industry", "Broader model support in AI Governance and AI Warehouse", "Talk to your account team for the detailed, dated roadmap"], highlight: { eyebrow: "Roadmap access", value: "Your account team", caption: "Ask for the detailed, dated view for your industry and use case." } },
 ];
 
-export const SERVICES = [
+const SERVICES_EN = [
   { id: "why-solix-services", icon: Compass, title: "Why Solix Services", desc: "The same team that builds the platform stands behind every program we deliver, from first workshop to steady-state run.", points: ["Engineers and architects who work the platform, not a reseller layer", "Fixed-scope assessments before any open-ended engagement", "Outcomes measured in dollars, systems and hours, not hours billed"] },
   { id: "application-retirement-services", icon: PowerOff, title: "Application Retirement Services", desc: "A factory model for decommissioning portfolios of legacy applications, not one-off projects that never quite finish.", points: ["Reusable templates by application type (ERP, CRM, custom, mainframe)", "Chain-of-custody validation and reconciliation on every retirement", "Parallel-track delivery to retire a portfolio, not just one app"] },
   { id: "implementation-services", icon: Wrench, title: "Implementation Services", desc: "Design, build and go-live support for Enterprise Edition and every product on the Common Data Platform.", points: ["Solution design workshops scoped to your first use case", "Hands-on build alongside your team, not a handoff document", "Go-live support and a defined path to internal ownership"] },
@@ -1056,14 +1057,14 @@ export const SERVICES = [
   { id: "support-portal", icon: LifeBuoy, title: "Support Portal", desc: "Cases, documentation and release notes for customers and partners with an active Solix relationship.", points: ["Existing customers and partners: your onboarding team provided portal access", "Need access or have lost it? Our team can help", "Not yet a customer? Talk to sales about what's included at your tier"] },
 ];
 
-export const PARTNER_BENEFITS = [
+const PARTNER_BENEFITS_EN = [
   { title: "Deal registration & margins", desc: "Protected opportunities with tiered incentives." },
   { title: "Technical enablement", desc: "Certification paths, sandboxes and architecture support." },
   { title: "Co-marketing", desc: "Joint campaigns, events and customer stories." },
   { title: "Dedicated partner team", desc: "Named managers from onboarding to renewal." },
 ];
 
-export const INTERESTS = [
+const INTERESTS_EN = [
   { value: "enterprise-edition", label: "Solix Enterprise Edition" },
   { value: "common-data-platform", label: "Common Data Platform" },
   { value: "enterprise-archiving", label: "Enterprise Archiving" },
@@ -1084,9 +1085,34 @@ export const INTERESTS = [
   { value: "other", label: "Something else" },
 ];
 
-export const CHAT_SUGGESTIONS = [
+const CHAT_SUGGESTIONS_EN = [
   "What is Solix Enterprise Edition?",
   "How does archiving cut infrastructure cost?",
   "Can you retire SAP ECC and keep the data?",
   "Book a demo for me",
 ];
+
+// Display copy follows the active language (see i18n/localize.js); the
+// *_EN sources stay the single place to edit content.
+export const NAV = localizedSource(NAV_EN);
+export const STATS = localizedSource(STATS_EN);
+export const PRODUCTS = localizedSource(PRODUCTS_EN);
+export const SOLUTIONS = localizedSource(SOLUTIONS_EN);
+export const INDUSTRIES = localizedSource(INDUSTRIES_EN);
+export const LOGOS = localizedSource(LOGOS_EN);
+export const TESTIMONIALS = localizedSource(TESTIMONIALS_EN);
+export const RESOURCES = localizedSource(RESOURCES_EN);
+export const RESOURCE_TYPES = localizedSource(RESOURCE_TYPES_EN);
+export const TIMELINE = localizedSource(TIMELINE_EN);
+export const VALUES = localizedSource(VALUES_EN);
+export const LEADERSHIP = localizedSource(LEADERSHIP_EN);
+export const OFFICES = localizedSource(OFFICES_EN);
+export const JOBS = localizedSource(JOBS_EN);
+export const PERKS = localizedSource(PERKS_EN);
+export const PARTNER_TIERS = localizedSource(PARTNER_TIERS_EN);
+export const PLATFORM_SECTIONS = localizedSource(PLATFORM_SECTIONS_EN);
+export const SERVICES = localizedSource(SERVICES_EN);
+export const PARTNER_BENEFITS = localizedSource(PARTNER_BENEFITS_EN);
+export const INTERESTS = localizedSource(INTERESTS_EN);
+export const CHAT_SUGGESTIONS = localizedSource(CHAT_SUGGESTIONS_EN);
+export const SOURCE = { NAV: NAV_EN, STATS: STATS_EN, PRODUCTS: PRODUCTS_EN, SOLUTIONS: SOLUTIONS_EN, INDUSTRIES: INDUSTRIES_EN, LOGOS: LOGOS_EN, TESTIMONIALS: TESTIMONIALS_EN, RESOURCES: RESOURCES_EN, RESOURCE_TYPES: RESOURCE_TYPES_EN, TIMELINE: TIMELINE_EN, VALUES: VALUES_EN, LEADERSHIP: LEADERSHIP_EN, OFFICES: OFFICES_EN, JOBS: JOBS_EN, PERKS: PERKS_EN, PARTNER_TIERS: PARTNER_TIERS_EN, PLATFORM_SECTIONS: PLATFORM_SECTIONS_EN, SERVICES: SERVICES_EN, PARTNER_BENEFITS: PARTNER_BENEFITS_EN, INTERESTS: INTERESTS_EN, CHAT_SUGGESTIONS: CHAT_SUGGESTIONS_EN };

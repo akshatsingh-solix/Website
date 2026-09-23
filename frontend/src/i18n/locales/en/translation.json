@@ -36,7 +36,8 @@
     "answerSample": "14 Q3 contracts with auto-renew clauses, found across 3 retired systems.",
     "answerSources": "3 sources · lineage attached",
     "infraCost": "Infra cost",
-    "vsStatusQuo": "vs. status quo"
+    "vsStatusQuo": "vs. status quo",
+    "imageAlt": "Layered Solix data platform rendered as a glowing, governed architecture"
   },
   "footer": {
     "tagline": "Solix Technologies activates enterprise data across every system and every era, so businesses can put AI to work inside the trust perimeter IT defines.",
@@ -53,6 +54,7 @@
   "language": {
     "label": "Language",
     "detectedNotice": "Showing this page in {{language}} based on your location.",
-    "revertToEnglish": "View in English instead"
+    "revertToEnglish": "View in English instead",
+    "dismiss": "Dismiss"
   }
 }

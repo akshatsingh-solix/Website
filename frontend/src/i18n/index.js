@@ -4,16 +4,29 @@ import en from "./locales/en/translation.json";
 import es from "./locales/es/translation.json";
 import fr from "./locales/fr/translation.json";
 import de from "./locales/de/translation.json";
+import esContent from "./locales/es/content.json";
+import frContent from "./locales/fr/content.json";
+import deContent from "./locales/de/content.json";
+import { SUPPORTED_LANGUAGES, getStoredLanguage } from "./geoDetect";
 
+// Two namespaces:
+// - `translation`: keyed UI strings (nav, hero, footer, language notice).
+// - `content`: every other piece of site copy, keyed by a hash of its
+//   English source (see tx.js / hash.js). English needs no content file -
+//   the source text is the fallback.
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
-    es: { translation: es },
-    fr: { translation: fr },
-    de: { translation: de },
+    es: { translation: es, content: esContent },
+    fr: { translation: fr, content: frContent },
+    de: { translation: de, content: deContent },
   },
-  lng: "en",
+  // Start in the remembered language so a returning visitor never sees an
+  // English flash before detection runs.
+  lng: SUPPORTED_LANGUAGES.includes(getStoredLanguage().lang) ? getStoredLanguage().lang : "en",
   fallbackLng: "en",
+  ns: ["translation", "content"],
+  defaultNS: "translation",
   interpolation: { escapeValue: false },
   returnEmptyString: false,
 });

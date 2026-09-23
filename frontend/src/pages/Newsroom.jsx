@@ -8,19 +8,25 @@ import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
+import { useTranslation } from "react-i18next";
+import { useTx } from "@/i18n/tx";
 import { Button } from "@/components/ui/button";
 
-const fmt = (d) => new Date(d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
+// i18n: filter labels are translated at render; values stay English.
 const CATS = ["All", "Product", "Customer", "Partner", "Event", "Company"];
 
 export default function Newsroom() {
+  const tx = useTx();
+  const { i18n } = useTranslation();
+  const lng = i18n.language;
   const [cat, setCat] = useState("All");
   const featured = PRESS_RELEASES.find((p) => p.featured);
-  const list = useMemo(() => PRESS_RELEASES.filter((p) => !p.featured && (cat === "All" || p.category === cat)), [cat]);
+  const list = useMemo(() => PRESS_RELEASES.filter((p) => !p.featured && (cat === "All" || p.category === cat)), [cat, lng]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const copyBoilerplate = async () => {
-    await navigator.clipboard?.writeText(BOILERPLATE);
-    toast.success("Boilerplate copied");
+    await navigator.clipboard?.writeText(tx(BOILERPLATE));
+    toast.success(tx("Boilerplate copied"));
   };
 
   return (
@@ -33,7 +39,7 @@ export default function Newsroom() {
         compact
       >
         <div className="rounded-2xl border border-line/10 bg-card/80 p-5 text-sm backdrop-blur lg:min-w-[260px]" data-testid="press-contact-card">
-          <p className="eyebrow mb-3">Media inquiries</p>
+          <p className="eyebrow mb-3">{tx("Media inquiries")}</p>
           <p className="font-medium">{PRESS_CONTACT.name}</p>
           <a href={`mailto:${PRESS_CONTACT.email}`} className="mt-2 flex items-center gap-2 text-muted-foreground hover:text-primary-ink" data-testid="press-email-link"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
           <a href="tel:18884676549" className="mt-1.5 flex items-center gap-2 text-muted-foreground hover:text-primary-ink"><Phone className="h-4 w-4" /> {PRESS_CONTACT.phone}</a>
@@ -52,12 +58,12 @@ export default function Newsroom() {
                 </div>
                 <div className="p-8 sm:p-12 lg:col-span-7">
                   <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em]">
-                    <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-primary-ink">Featured · {featured.category}</span>
-                    <span className="text-muted-foreground">{fmt(featured.date)}</span>
+                    <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-primary-ink">{tx("Featured")} · {tx(featured.category)}</span>
+                    <span className="text-muted-foreground">{fmt(featured.date, lng)}</span>
                   </div>
                   <h2 className="mt-6 text-balance font-display text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">{featured.title}</h2>
                   <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">{featured.summary}</p>
-                  <Button asChild className="mt-8" data-testid="featured-release-cta"><Link to={`/newsroom/${featured.id}`}>Read the announcement <ArrowUpRight /></Link></Button>
+                  <Button asChild className="mt-8" data-testid="featured-release-cta"><Link to={`/newsroom/${featured.id}`}>{tx("Read the announcement")} <ArrowUpRight /></Link></Button>
                 </div>
               </div>
             </Reveal>
@@ -71,23 +77,23 @@ export default function Newsroom() {
             <SectionHeading eyebrow="Press releases" title="Latest announcements." />
             <div className="flex flex-wrap gap-2" role="tablist" data-testid="release-filters">
               {CATS.map((c) => (
-                <button key={c} role="tab" aria-selected={cat === c} onClick={() => setCat(c)} data-testid={`release-filter-${c.toLowerCase()}`} className={cn("rounded-full border px-4 py-1.5 text-sm transition-colors", cat === c ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:border-line/40 hover:text-foreground")}>{c}</button>
+                <button key={c} role="tab" aria-selected={cat === c} onClick={() => setCat(c)} data-testid={`release-filter-${c.toLowerCase()}`} className={cn("rounded-full border px-4 py-1.5 text-sm transition-colors", cat === c ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:border-line/40 hover:text-foreground")}>{tx(c)}</button>
               ))}
             </div>
           </div>
           <Stagger key={cat} className="mt-10 divide-y divide-line/10 border-y border-line/10" data-testid="release-list">
-            {list.length === 0 && <p className="py-12 text-center text-muted-foreground" data-testid="release-empty">No releases in this category yet.</p>}
+            {list.length === 0 && <p className="py-12 text-center text-muted-foreground" data-testid="release-empty">{tx("No releases in this category yet.")}</p>}
             {list.map((p) => (
               <Item key={p.id}>
                 <Link to={`/newsroom/${p.id}`} className="group grid gap-3 py-6 sm:grid-cols-12 sm:items-start" data-testid={`release-${p.id}`}>
-                  <div className="font-mono text-xs text-muted-foreground sm:col-span-2">{fmt(p.date)}</div>
+                  <div className="font-mono text-xs text-muted-foreground sm:col-span-2">{fmt(p.date, lng)}</div>
                   <div className="sm:col-span-8">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{p.category}</span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{tx(p.category)}</span>
                     <h3 className="mt-1.5 font-display text-xl font-medium tracking-tight transition-colors group-hover:text-primary-ink sm:text-2xl">{p.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{p.summary}</p>
                   </div>
                   <div className="sm:col-span-2 sm:text-right">
-                    <span className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-primary-ink">Read release <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></span>
+                    <span className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-primary-ink">{tx("Read release")} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></span>
                   </div>
                 </Link>
               </Item>
@@ -142,10 +148,10 @@ export default function Newsroom() {
             </div>
             <div className="rounded-2xl border border-line/10 bg-card p-6" data-testid="boilerplate-card">
               <div className="flex items-center justify-between">
-                <p className="eyebrow">Company boilerplate</p>
-                <Button variant="ghost" size="sm" onClick={copyBoilerplate} data-testid="copy-boilerplate"><Copy /> Copy</Button>
+                <p className="eyebrow">{tx("Company boilerplate")}</p>
+                <Button variant="ghost" size="sm" onClick={copyBoilerplate} data-testid="copy-boilerplate"><Copy /> {tx("Copy")}</Button>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{BOILERPLATE}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{tx(BOILERPLATE)}</p>
             </div>
           </div>
         </div>

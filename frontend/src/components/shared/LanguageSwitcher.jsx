@@ -12,7 +12,7 @@ const LANGUAGE_NAMES = { en: "English", es: "Español", fr: "Français", de: "De
  * accessible label.
  */
 export const LanguageSwitcher = ({ className = "", compact = false }) => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   const onChange = (e) => {
     const lang = e.target.value;
@@ -26,7 +26,7 @@ export const LanguageSwitcher = ({ className = "", compact = false }) => {
       <select
         value={i18n.language}
         onChange={onChange}
-        aria-label="Language"
+        aria-label={t("language.label")}
         data-testid="language-switcher"
         className="cursor-pointer appearance-none bg-transparent pr-1 text-sm font-medium text-muted-foreground outline-none transition-colors group-hover:text-foreground [&>option]:bg-popover [&>option]:text-popover-foreground"
       >

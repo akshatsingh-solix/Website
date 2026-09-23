@@ -1,5 +1,6 @@
 import { Landmark, HeartPulse, Zap, ShoppingBag, Umbrella, RadioTower, Factory, Cloud, FlaskConical, Briefcase } from "lucide-react";
 import { LOGOS } from "@/data/site";
+import { useTx } from "@/i18n/tx";
 
 // LOGOS holds illustrative example-industry names, not real customers — no
 // claim of an actual relationship is made or implied. Each gets a generic
@@ -14,11 +15,13 @@ const Wordmark = ({ name, Icon }) => (
   </span>
 );
 
-export const LogoMarquee = () => (
+export const LogoMarquee = () => {
+  const tx = useTx();
+  return (
   <section className="relative bg-background py-10 sm:py-12" data-testid="logo-marquee">
     <div className="container mb-6">
       <p className="text-center font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-        Representative industries Solix serves <span className="opacity-70">· illustrative examples</span>
+        {tx("Representative industries Solix serves")} <span className="opacity-70">· {tx("illustrative examples")}</span>
       </p>
     </div>
     <div className="mask-fade-x overflow-hidden">
@@ -29,4 +32,5 @@ export const LogoMarquee = () => (
       </div>
     </div>
   </section>
-);
+  );
+};

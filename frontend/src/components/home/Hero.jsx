@@ -14,7 +14,7 @@ const ease = [0.22, 1, 0.36, 1];
 // leaving the visual as a mute picture.
 const ArchiveCard = ({ t }) => (
   <div className="w-[240px] rounded-2xl border border-line/10 bg-background/95 p-4 shadow-lift backdrop-blur-md">
-    <div className="flex items-center justify-between">
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
       <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal">
         <Database className="h-3.5 w-3.5" strokeWidth={1.75} /> {t("hero.archiveJob")}
       </span>
@@ -73,7 +73,7 @@ const HeroVisual = () => {
       <div className="dark relative overflow-hidden rounded-[28px] border border-line/10 bg-background shadow-[0_2px_6px_rgba(13,25,45,0.08),0_60px_120px_-50px_rgba(13,25,45,0.6)]">
         <motion.img
           src="/Website/images/hero-architecture.jpg"
-          alt="Layered Solix data platform rendered as a glowing, governed architecture"
+          alt={t("hero.imageAlt")}
           style={{ y: imgY, scale: 1.1 }}
           className="aspect-[5/4] w-full object-cover"
           fetchpriority="high"
@@ -131,7 +131,7 @@ export const Hero = () => {
       {/* Hairline horizon that ties the hero into the proof strip below. */}
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-line/15 to-transparent" />
 
-      <div className="container relative grid items-center gap-12 pb-16 pt-28 sm:pt-32 lg:min-h-[86vh] lg:grid-cols-12 lg:gap-8 lg:pb-20 lg:pt-32">
+      <div className="container relative grid items-center gap-12 pb-16 pt-28 sm:pt-32 md:pt-40 lg:min-h-[86vh] lg:grid-cols-12 lg:gap-8 lg:pb-20 lg:pt-44">
         <div className="lg:col-span-6">
           <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="eyebrow mb-6 inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 py-1.5 pl-1.5 pr-4">
             <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] tracking-[0.14em] text-primary-foreground">AI</span> {t("hero.eyebrow")}
@@ -146,7 +146,11 @@ export const Hero = () => {
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.18 }} className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
             Solix{" "}
-            <span className="relative inline-block h-[1.625em] w-[12ch] overflow-hidden align-top font-medium text-teal">
+            <span className="relative inline-grid h-[1.625em] overflow-hidden align-top font-medium text-teal">
+              {/* Invisible copies of every word reserve exactly the longest one's width in the current language. */}
+              {WORD_KEYS.map((k) => (
+                <span key={k} aria-hidden="true" className="invisible col-start-1 row-start-1 whitespace-nowrap">{t(`hero.words.${k}`)}</span>
+              ))}
               <AnimatePresence mode="wait">
                 <motion.span
                   key={WORD_KEYS[i]}
@@ -154,7 +158,7 @@ export const Hero = () => {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: "-100%", opacity: 0 }}
                   transition={{ duration: 0.4, ease }}
-                  className="absolute left-0 top-0 leading-[1.625]"
+                  className="absolute left-0 top-0 whitespace-nowrap leading-[1.625]"
                   data-testid="hero-rotating-word"
                 >
                   {t(`hero.words.${WORD_KEYS[i]}`)}

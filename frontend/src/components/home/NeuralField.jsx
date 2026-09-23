@@ -2,6 +2,8 @@
 // stock "neural network" photography - same visual language as
 // DataFlowDiagram, so the brand's motion graphics are consistent rather than
 // mixing custom SVG with generic abstract photos.
+import { useTx } from "@/i18n/tx";
+
 const NODES = [
   [40, 60], [140, 30], [230, 80], [320, 40], [380, 110],
   [80, 150], [190, 170], [300, 150], [370, 200],
@@ -17,8 +19,10 @@ const EDGES = [
 
 const PULSE_EDGES = [0, 4, 7, 11, 15, 19, 22];
 
-export const NeuralField = ({ className }) => (
-  <svg viewBox="0 0 420 400" className={className} role="img" aria-label="Animated network representing governed enterprise AI">
+export const NeuralField = ({ className }) => {
+  const tx = useTx();
+  return (
+  <svg viewBox="0 0 420 400" className={className} role="img" aria-label={tx("Animated network representing governed enterprise AI")}>
     <defs>
       <radialGradient id="nf-core" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="#0088CF" stopOpacity="0.35" />
@@ -53,4 +57,5 @@ export const NeuralField = ({ className }) => (
       </circle>
     ))}
   </svg>
-);
+  );
+};
