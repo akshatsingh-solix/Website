@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { PRODUCTS, SOLUTIONS } from "@/data/site";
@@ -8,6 +9,7 @@ import { ProductCard } from "@/components/home/PlatformBento";
 import { OutcomeChart } from "@/components/shared/OutcomeChart";
 import { Button } from "@/components/ui/button";
 import { InlineLeadSection } from "@/components/forms/InlineLeadSection";
+import { explorerFor } from "@/components/explorers";
 import { useTx } from "@/i18n/tx";
 
 export default function ProductDetail() {
@@ -19,6 +21,7 @@ export default function ProductDetail() {
   const related = PRODUCTS.filter((p) => p.slug !== slug).slice(0, 3);
   const solutions = SOLUTIONS.filter((s) => s.products.includes(slug));
   const Icon = product.icon;
+  const Explorer = explorerFor(slug);
 
   return (
     <div data-testid={`product-detail-${slug}`}>
@@ -38,6 +41,19 @@ export default function ProductDetail() {
           </Button>
         </div>
       </PageHero>
+
+      {Explorer && (
+        <Section className="bg-muted" id="explore">
+          <div className="container">
+            <SectionHeading eyebrow="Try it yourself" title={tx("Explore {{name}} hands-on.", { name: product.name })} description="No sign-up. Change the inputs and watch the result update." />
+            <div className="mt-10">
+              <Suspense fallback={<div className="h-[420px] animate-pulse rounded-3xl border border-line/10 bg-card" />}>
+                <Explorer key={slug} product={product} />
+              </Suspense>
+            </div>
+          </div>
+        </Section>
+      )}
 
       <Section>
         <div className="container grid gap-12 lg:grid-cols-12 lg:items-center">
