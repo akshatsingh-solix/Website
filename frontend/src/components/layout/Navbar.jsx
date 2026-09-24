@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, ArrowUpRight, ChevronDown, LogIn, Menu, Phone, Sparkles, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarDays, ChevronDown, LogIn, Menu, Phone, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { empowerLink } from "@/lib/empower";
 import { SOURCE } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -37,6 +38,9 @@ const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
 // Display copy goes through tx(); ids and test ids stay on the English
 // source so they're stable in every language.
+// Nav entries either route inside this site (`to`) or leave for another Solix site (`href`, e.g. SOLIXEmpower).
+const NavTo = ({ to, href, ...props }) => (href ? <a href={href} {...props} /> : <Link to={to} {...props} />);
+
 const GroupedPanel = ({ item, onNavigate }) => {
   const tx = useTx();
   return (
@@ -80,17 +84,17 @@ const FlatPanel = ({ item, onNavigate, label }) => {
         <div className="absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.3),transparent)]" />
         <p className="eyebrow relative mb-3">{label}</p>
         <p className="relative max-w-xs text-sm leading-relaxed text-muted-foreground">{tx(item.blurb)}</p>
-        <Link to={item.featured.to} onClick={onNavigate} data-testid={`mega-featured-${item.label.toLowerCase()}`} className="group relative mt-8 block rounded-xl border border-line/10 bg-card/70 p-5 transition-[border-color,background-color] duration-300 hover:border-primary/60 hover:bg-card">
+        <NavTo to={item.featured.to} href={item.featured.href} onClick={onNavigate} data-testid={`mega-featured-${item.label.toLowerCase()}`} className="group relative mt-8 block rounded-xl border border-line/10 bg-card/70 p-5 transition-[border-color,background-color] duration-300 hover:border-primary/60 hover:bg-card">
           <p className="font-display text-lg font-medium">{tx(item.featured.title)}</p>
           <p className="mt-1 text-sm text-muted-foreground">{tx(item.featured.desc)}</p>
           <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary-ink">
             {tx("Explore")} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </span>
-        </Link>
+        </NavTo>
       </div>
       <div className="grid gap-1 p-4 sm:grid-cols-2 lg:col-span-8 lg:p-6">
-        {item.items.map(({ label: itemLabel, desc, to, icon: Icon }) => (
-          <Link key={itemLabel} to={to} onClick={onNavigate} data-testid={`mega-link-${slug(itemLabel)}`} className="group flex items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-muted">
+        {item.items.map(({ label: itemLabel, desc, to, href, icon: Icon }) => (
+          <NavTo key={itemLabel} to={to} href={href} onClick={onNavigate} data-testid={`mega-link-${slug(itemLabel)}`} className="group flex items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-muted">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line/10 bg-accent/60 text-teal transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/10 group-hover:text-primary-ink">
               <Icon className="h-5 w-5" strokeWidth={1.5} />
             </span>
@@ -98,7 +102,7 @@ const FlatPanel = ({ item, onNavigate, label }) => {
               <span className="block font-medium text-foreground">{tx(itemLabel)}</span>
               {desc && <span className="mt-0.5 block text-sm text-muted-foreground">{tx(desc)}</span>}
             </span>
-          </Link>
+          </NavTo>
         ))}
         <Link to={item.to} onClick={onNavigate} data-testid={`mega-viewall-${item.label.toLowerCase()}`} className="group mt-2 flex items-center justify-between rounded-xl border border-dashed border-line/15 px-4 py-3 text-sm text-muted-foreground transition-colors duration-200 hover:border-line/40 hover:text-foreground sm:col-span-2">
           {tx("View all")} · {label}
@@ -198,10 +202,10 @@ const MobileNav = ({ onNavigate }) => {
                   <Link to={item.to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm font-medium text-primary-ink hover:bg-muted">
                     {tx("View all")} · {label}
                   </Link>
-                  {flatItems.map(({ label: itemLabel, to }) => (
-                    <Link key={itemLabel} to={to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
+                  {flatItems.map(({ label: itemLabel, to, href }) => (
+                    <NavTo key={itemLabel} to={to} href={href} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
                       {tx(itemLabel)}
-                    </Link>
+                    </NavTo>
                   ))}
                 </div>
               </AccordionContent>
@@ -238,6 +242,7 @@ const UtilityBar = ({ hidden }) => {
           <span className="hidden shrink-0 font-semibold text-teal group-hover:underline lg:inline">{tx("Start your 30-day free trial")} →</span>
         </Link>
         <div className="flex shrink-0 items-center gap-5 text-muted-foreground">
+          <a href={empowerLink("utility_bar")} data-intent="empower_register" className="hidden items-center gap-1.5 font-medium text-primary-ink transition-colors hover:text-foreground xl:inline-flex" data-testid="utility-empower-link"><CalendarDays className="h-3.5 w-3.5" /> SOLIXEmpower 2026 · {tx("Oct 28-30, San Diego")}</a>
           <a href="tel:18884676549" className="hidden items-center gap-1.5 transition-colors hover:text-foreground lg:inline-flex"><Phone className="h-3.5 w-3.5" /> 1.888.GO.SOLIX</a>
           <Link to="/contact?type=contact" className="transition-colors hover:text-foreground">{tx("Contact sales")}</Link>
           <LanguageSwitcher className="text-xs" />

@@ -5,15 +5,16 @@
     <title>Solix Technologies</title>
     <script>
       // GitHub Pages has no server-side routing, so a deep link (e.g. /Website/products)
-      // 404s here. Encode the path into a query string and redirect to index.html, which
-      // restores it via history.replaceState before React Router mounts.
-      var pathSegmentsToKeep = 1; // "/Website"
+      // 404s here. Encode the path into a query string and redirect to the right app's
+      // index.html, which restores it via history.replaceState before its router mounts.
+      // Two apps live under /Website: the corporate site, and the SOLIXEmpower site
+      // under /Website/empower (a separate build, see /empower in the repo).
       var l = window.location;
-      var path = l.pathname.split("/").slice(0, 1 + pathSegmentsToKeep).join("/");
+      var parts = l.pathname.split("/");
+      var keep = parts[2] === "empower" ? 2 : 1; // "/Website" or "/Website/empower"
+      var path = parts.slice(0, 1 + keep).join("/");
       var rest = l.pathname.slice(path.length);
-      l.replace(
-        path + "/?redirect=" + encodeURIComponent(rest + l.search) + l.hash
-      );
+      l.replace(path + "/?redirect=" + encodeURIComponent(rest + l.search) + l.hash);
     </script>
   </head>
   <body></body>

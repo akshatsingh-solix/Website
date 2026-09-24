@@ -60,6 +60,7 @@ const AdminSubmissions = lazy(() => import("@/pages/admin/AdminSubmissions"));
 const AdminContent = lazy(() => import("@/pages/admin/AdminContent"));
 const AdminContentEditor = lazy(() => import("@/pages/admin/AdminContentEditor"));
 const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
+const AdminEvents = lazy(() => import("@/pages/admin/AdminEvents"));
 
 const prefetchPages = () => {
   const run = () => ["Products", "ProductDetail", "Solutions", "Resources", "Article", "Contact", "Industries", "IndustryDetail", "Platform", "Company"].forEach((k, i) => setTimeout(() => pages[k]().catch(() => {}), i * 400));
@@ -102,6 +103,7 @@ function App() {
             <Route path="content" element={<AdminContent />} />
             <Route path="content/new" element={<AdminContentEditor />} />
             <Route path="content/:id" element={<AdminContentEditor />} />
+            <Route path="events" element={<AdminEvents />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route element={<Layout />}>

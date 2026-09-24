@@ -64,7 +64,10 @@ export default function PressRelease() {
       >
         <div className="inline-flex flex-wrap items-center gap-4 rounded-2xl border border-line/10 bg-card/80 p-4 text-sm shadow-soft backdrop-blur">
           <p className="inline-flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4" /> {fmt(pr.date, lng)}</p>
-          <Button onClick={downloadPdf} disabled={busy} data-testid="press-download-pdf">{busy ? <Loader2 className="animate-spin" /> : <Download />} {tx("Download PDF")}</Button>
+          {pr.registerUrl && (
+            <Button asChild data-intent="empower_register" data-testid="press-register"><a href={pr.registerUrl}>{tx("Register free")} <ArrowUpRight /></a></Button>
+          )}
+          <Button variant={pr.registerUrl ? "outline" : "default"} onClick={downloadPdf} disabled={busy} data-testid="press-download-pdf">{busy ? <Loader2 className="animate-spin" /> : <Download />} {tx("Download PDF")}</Button>
           <div className="flex gap-2" data-testid="press-share">
             <a className={iconCls} aria-label={tx("Share on LinkedIn")} target="_blank" rel="noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}><Linkedin className="h-4 w-4" /></a>
             <a className={iconCls} aria-label={tx("Share on X")} target="_blank" rel="noreferrer" href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(pr.title)}`}><Twitter className="h-4 w-4" /></a>

@@ -105,3 +105,14 @@ export async function downloadLeadsCsv(params) {
   a.remove();
   URL.revokeObjectURL(url);
 }
+
+// --- Events (SOLIXEmpower registrations) -------------------------------------
+export const fetchEvents = () => adminApi.get("/admin/events").then((r) => r.data);
+export const fetchEventSettings = (slug) => adminApi.get(`/admin/events/${slug}`).then((r) => r.data);
+export const saveEventSettings = (slug, body) => adminApi.put(`/admin/events/${slug}`, body).then((r) => r.data);
+export const fetchRegistrations = (slug, params) => adminApi.get(`/admin/events/${slug}/registrations`, { params: clean(params) }).then((r) => r.data);
+export const patchRegistration = (slug, id, body) => adminApi.patch(`/admin/events/${slug}/registrations/${id}`, body).then((r) => r.data);
+export async function exportRegistrations(slug, params, format) {
+  const res = await adminApi.get(`/admin/events/${slug}/registrations-export`, { params: { ...clean(params), format }, responseType: "blob", timeout: 120000 });
+  await saveBlob(res, `${slug}-registrations.${format}`);
+}

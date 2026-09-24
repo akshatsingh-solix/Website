@@ -12,13 +12,13 @@ import { deleteLead, downloadLeadsCsv, fetchLeads, fetchSettings, fetchStats, fe
 
 const TYPES = [
   { key: "all", label: "All" }, { key: "demo", label: "Demo" }, { key: "contact", label: "Contact" }, { key: "partner", label: "Partner" },
-  { key: "career", label: "Career" }, { key: "download", label: "Download" }, { key: "newsletter", label: "Newsletter" },
+  { key: "career", label: "Career" }, { key: "download", label: "Download" }, { key: "newsletter", label: "Newsletter" }, { key: "event", label: "Event" },
 ];
 const STATUSES = [
   { key: "all", label: "Any status" }, { key: "new", label: "New" }, { key: "contacted", label: "Contacted" }, { key: "qualified", label: "Qualified" },
 ];
 const STATUS_TONE = { new: "bg-line/5 text-muted-foreground border-line/15", contacted: "bg-amber-500/10 text-amber-300 border-amber-500/30", qualified: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" };
-const TYPE_TONE = { demo: "bg-primary/15 text-primary-ink border-primary/30", contact: "bg-teal/10 text-teal border-teal/30", partner: "bg-violet-500/10 text-violet-300 border-violet-500/30", career: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30", download: "bg-sky-500/10 text-sky-300 border-sky-500/30", newsletter: "bg-line/5 text-muted-foreground border-line/15" };
+const TYPE_TONE = { demo: "bg-primary/15 text-primary-ink border-primary/30", contact: "bg-teal/10 text-teal border-teal/30", partner: "bg-violet-500/10 text-violet-300 border-violet-500/30", career: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30", download: "bg-sky-500/10 text-sky-300 border-sky-500/30", newsletter: "bg-line/5 text-muted-foreground border-line/15", event: "bg-amber-500/10 text-amber-700 border-amber-500/30" };
 const PAGE_SIZE = 25;
 const TEST_INBOX = "delivered@resend.dev";
 

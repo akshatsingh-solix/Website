@@ -1,3 +1,4 @@
+import { empowerLink } from "@/lib/empower";
 import { localizedSource } from "@/i18n/localize";
 const PRESS_RELEASES_EN = [
   {
@@ -15,15 +16,15 @@ const PRESS_RELEASES_EN = [
     ],
   },
   {
-    id: "empower-2026", date: "2026-05-14", year: "2026", category: "Event", image: "/Website/images/company-office.jpg",
-    title: "Solix Empower 2026 Returns to Santa Clara, October 14-15",
-    summary: "Annual customer summit expands to 40+ sessions and hands-on labs on archive-first cloud programs, retirement factories and governed RAG.",
+    id: "empower-2026", date: "2026-05-14", year: "2026", category: "Event", image: "/Website/images/company-office.jpg", registerUrl: empowerLink("press_release", "register"),
+    title: "SOLIXEmpower 2026 Comes to UC San Diego, October 28-30",
+    summary: "The Agentic Enterprise: three days of Enterprise AI keynotes, panels, hands-on workshops and a hackathon at the Qualcomm Institute.",
     body: [
-      { type: "p", text: "SANTA CLARA, Calif. — May 14, 2026 — Solix Technologies today opened registration for Solix Empower 2026, its annual customer and partner summit, taking place October 14-15 in Santa Clara, California." },
-      { type: "p", text: "This year's program grows to more than 40 sessions across six tracks, including Enterprise Edition and the trust perimeter, archive-first cloud and S/4HANA programs, application retirement factories, privacy automation and governed RAG operations. Hands-on labs let attendees build a governed data product and a policy-aware copilot in a single afternoon." },
-      { type: "quote", text: "Empower is where our customers teach each other. The most valuable sessions every year are the ones led by the people running these programs at scale.", cite: "Chief Customer Officer, Solix Technologies" },
-      { type: "ul", items: ["Two days, 40+ sessions and labs, 500 data leaders expected", "Industry roundtables for financial services, healthcare, energy and public sector", "Partner pavilion with hyperscaler, SI and technology partners"] },
-      { type: "callout", title: "Registration", text: "Customers and partners receive priority registration. Reserve a seat through your account team or the Solix contact page." },
+      { type: "p", text: "SANTA CLARA, Calif. — Solix Technologies today opened registration for SOLIXEmpower 2026, taking place October 28-30 at the Qualcomm Institute on the UC San Diego campus in collaboration with the Halıcıoğlu School of Data Science and Computing." },
+      { type: "p", text: "Under the theme \"The Agentic Enterprise: Reimagining Enterprise Applications with Enterprise AI\", the program brings together leaders from industry and academia on Enterprise AI, enterprise data governance, the Application Knowledge Graph and cloud data management, with hands-on workshops on Data Sense and Data Ask." },
+      { type: "quote", text: "Our goal with Solix EMPOWER is to provide valuable insight on the latest technologies, while giving attendees an opportunity to network with fellow industry leaders and experts.", cite: "Sai Gundavelli, Founder & CEO, Solix Technologies" },
+      { type: "ul", items: ["Three days, October 28-30, 2026, with 25+ speakers from industry, academia and Solix", "Speakers from KPMG, JPMorganChase, Pfizer, Bristol Myers Squibb, the City of San Diego and UC San Diego", "Solix User Group cocktails and dinner, and a San Diego Supercomputer Center tour"] },
+      { type: "callout", title: "Registration", text: "Registration is required and complimentary. Seats are limited; register on the SOLIXEmpower website." },
     ],
   },
   {
