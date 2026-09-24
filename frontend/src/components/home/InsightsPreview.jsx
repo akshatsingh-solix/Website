@@ -5,11 +5,12 @@ import { RESOURCES, RESOURCE_TYPES } from "@/data/site";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { useTx, translateText } from "@/i18n/tx";
+import { useCmsResources } from "@/lib/content";
 
 // Singular form of a type's plural label: "Case Studies" -> "Case Study", "Blogs" -> "Blog".
 // Singular labels per resource type (the filter tabs use the plural ones).
 // i18n
-const TYPE_SINGULAR = { datasheet: "Datasheet", whitepaper: "White Paper", webinar: "Webinar", podcast: "Podcast", ebook: "eBook", casestudy: "Case Study", leadership: "Leadership Lesson", blog: "Blog", event: "Event" };
+const TYPE_SINGULAR = { datasheet: "Datasheet", whitepaper: "White Paper", webinar: "Webinar", podcast: "Podcast", ebook: "eBook", casestudy: "Case Study", leadership: "Leadership Lesson", blog: "Blog", event: "Event", brief: "Solution Brief", collateral: "Marketing Material" };
 export const typeLabel = (key) => translateText(TYPE_SINGULAR[key] ?? RESOURCE_TYPES.find((t) => t.key === key)?.label ?? key);
 
 export const ResourceCard = ({ r, className }) => {
@@ -42,6 +43,9 @@ export const ResourceCard = ({ r, className }) => {
 
 export const InsightsPreview = () => {
   const tx = useTx();
+  const { items: cms } = useCmsResources();
+  // Newest published CMS items lead; the built-in library fills the rest.
+  const latest = [...cms, ...RESOURCES.filter((r) => !cms.some((c) => c.slug === r.slug))].slice(0, 4);
   return (
   <Section className="bg-background" id="insights">
     <div className="container">
@@ -52,7 +56,7 @@ export const InsightsPreview = () => {
         </Link>
       </div>
       <Stagger className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {RESOURCES.slice(0, 4).map((r) => (
+        {latest.map((r) => (
           <Item key={r.id} className="flex">
             <ResourceCard r={r} />
           </Item>

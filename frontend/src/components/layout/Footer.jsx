@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useTx } from "@/i18n/tx";
 import { ArrowRight, Linkedin, Twitter, Youtube, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { NAV, OFFICES } from "@/data/site";
@@ -53,6 +54,7 @@ const NewsletterForm = () => {
 
 export const Footer = () => {
   const { t } = useTranslation();
+  const tx = useTx();
   return (
   <footer className="dark relative overflow-hidden bg-background text-foreground" data-testid="site-footer">
     <div className="absolute inset-0 grid-lines grid-fade opacity-70" />
@@ -136,6 +138,7 @@ export const Footer = () => {
         <div className="flex gap-6">
           <a href="https://www.solix.com/privacy-policy/" target="_blank" rel="noreferrer" className="hover:text-foreground">{t("footer.privacy")}</a>
           <a href="https://www.solix.com/terms-and-conditions/" target="_blank" rel="noreferrer" className="hover:text-foreground">{t("footer.terms")}</a>
+          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("solix:consent-open"))} className="hover:text-foreground" data-testid="footer-cookie-settings">{tx("Cookie settings")}</button>
           <a href="tel:18884676549" className="hover:text-foreground">1.888.GO.SOLIX</a>
         </div>
       </div>

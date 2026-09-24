@@ -4,9 +4,6 @@ import en from "./locales/en/translation.json";
 import es from "./locales/es/translation.json";
 import fr from "./locales/fr/translation.json";
 import de from "./locales/de/translation.json";
-import esContent from "./locales/es/content.json";
-import frContent from "./locales/fr/content.json";
-import deContent from "./locales/de/content.json";
 import { SUPPORTED_LANGUAGES, getStoredLanguage } from "./geoDetect";
 
 // Two namespaces:
@@ -17,9 +14,9 @@ import { SUPPORTED_LANGUAGES, getStoredLanguage } from "./geoDetect";
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
-    es: { translation: es, content: esContent },
-    fr: { translation: fr, content: frContent },
-    de: { translation: de, content: deContent },
+    es: { translation: es },
+    fr: { translation: fr },
+    de: { translation: de },
   },
   // Start in the remembered language so a returning visitor never sees an
   // English flash before detection runs.
@@ -29,7 +26,30 @@ i18n.use(initReactI18next).init({
   defaultNS: "translation",
   interpolation: { escapeValue: false },
   returnEmptyString: false,
+  // Re-render when a lazily loaded content catalogue arrives.
+  react: { bindI18nStore: "added" },
 });
+
+// The big `content` catalogues (~60 KB each, gzipped) load on demand, so a
+// visitor only downloads the language they read.
+const contentLoaders = {
+  es: () => import("./locales/es/content.json"),
+  fr: () => import("./locales/fr/content.json"),
+  de: () => import("./locales/de/content.json"),
+};
+
+export const loadContent = async (lng) => {
+  if (!contentLoaders[lng] || i18n.hasResourceBundle(lng, "content")) return;
+  const mod = await contentLoaders[lng]();
+  i18n.addResourceBundle(lng, "content", mod.default || mod, true, true);
+};
+
+i18n.on("languageChanged", (lng) => {
+  loadContent(lng).catch(() => {});
+});
+
+/** Resolves once the starting language's catalogue is ready (instant for English). */
+export const i18nReady = loadContent(i18n.language).catch(() => {});
 
 // Keep <html lang> in sync so screen readers pronounce the page in the
 // right language and browsers don't offer to "translate" it back.

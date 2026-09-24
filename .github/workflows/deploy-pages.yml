@@ -8,6 +8,13 @@ on:
       - "frontend/**"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch: {}
+  # Rebuild when content is published from the admin (optional backend
+  # GITHUB_DEPLOY_TOKEN) and every 6 hours, so the static content snapshot
+  # baked into the site stays fresh even without a token.
+  repository_dispatch:
+    types: [content-published]
+  schedule:
+    - cron: "17 */6 * * *"
 
 permissions:
   contents: read
@@ -35,6 +42,13 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Bake published content into the build
+        env:
+          REACT_APP_BACKEND_URL: ${{ vars.BACKEND_URL }}
+        # Never fails the deploy: without a reachable backend the last
+        # committed snapshot is used.
+        run: node scripts/content-snapshot.js
 
       - name: Build
         env:

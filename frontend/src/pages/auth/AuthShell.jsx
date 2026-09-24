@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Bot, FileText, Lock, ShieldCheck, BadgeCheck } from "lucide-react";
 import { useTx } from "@/i18n/tx";
 import { Logo } from "@/components/shared/Logo";
+import { useIntentTracking } from "@/lib/useIntentTracking";
 import { AuroraField } from "@/components/shared/Reveal";
 
 // i18n: translated at render.
@@ -29,6 +30,7 @@ const ease = [0.22, 1, 0.36, 1];
  */
 export const AuthShell = ({ children }) => {
   const tx = useTx();
+  useIntentTracking();
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground" data-testid="auth-shell">
       <div className="absolute inset-0 bg-[linear-gradient(160deg,#EAF3FA_0%,#FFFFFF_45%,#F1F7FC_100%)]" />

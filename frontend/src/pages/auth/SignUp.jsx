@@ -7,6 +7,7 @@ import { useTx } from "@/i18n/tx";
 import { useAccount } from "@/components/account/AccountAuth";
 import { ECS_TERMS_URL, PASSWORD_RULES, apiErrorMessage, isBusinessEmail, isEmail, isStrongPassword } from "@/lib/accountApi";
 import { AuthCard, AuthShell } from "./AuthShell";
+import { visitorId } from "@/lib/intent";
 import { CardLanguage, Field, PasswordInput, PrivacyNote, SsoButtons, SubmitButton, inputCls } from "./AuthParts";
 
 const COMPANY_SIZES = ["1–49", "50–249", "250–999", "1,000–4,999", "5,000–19,999", "20,000+"];
@@ -85,6 +86,7 @@ export default function SignUp() {
     try {
       await signup({
         ...form,
+        ...(visitorId() ? { visitor_id: visitorId() } : {}),
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         company: form.company.trim(),
