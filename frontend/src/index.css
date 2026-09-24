@@ -266,3 +266,42 @@
     gap: inherit;
   }
 }
+
+/* Family visuals (components/media/FamilyVisual.jsx): the OpenArt still
+   drifts slowly, data flows along the links, active stops pulse. Everything
+   pauses under .motion-paused (off-screen or the pause button) and stops
+   entirely for visitors who prefer reduced motion. */
+@keyframes visual-drift {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(-2%, -1.5%, 0); }
+}
+@keyframes flow-dash {
+  to { stroke-dashoffset: -20; }
+}
+@keyframes stop-pulse {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+.visual-drift {
+  animation: visual-drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.flow-dash {
+  stroke-dasharray: 3 7;
+  animation: flow-dash 1.4s linear infinite;
+}
+.stop-pulse {
+  animation: stop-pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.motion-paused .visual-drift,
+.motion-paused .flow-dash,
+.motion-paused .stop-pulse {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .visual-drift,
+  .flow-dash,
+  .stop-pulse {
+    animation: none;
+  }
+}
