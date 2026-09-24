@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Archive, ExternalLink, Eye, EyeOff, History, Loader2, Plus, Search, Globe2 } from "lucide-react";
+import { Archive, ChevronLeft, ChevronRight, ExternalLink, Eye, EyeOff, History, Loader2, Plus, Search, Globe2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { archiveContent, fetchContentList, formatApiError, importBuiltin, publishContent, unpublishContent } from "@/lib/adminApi";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { builtinContent } from "@/lib/builtinContent";
 import { Badge, ago, fmtDateTime, selectCls, useCan } from "@/components/admin/kit";
 
 export const TYPE_LABELS = {
@@ -26,7 +25,12 @@ export const sitePath = (c) => `/${c.type === "news" ? "newsroom" : "resources"}
 
 /** Takes the website's built-in articles, resources and press releases under CMS management. */
 function BuiltinDialog({ open, onOpenChange, onDone }) {
-  const data = useMemo(() => (open ? builtinContent() : null), [open]);
+  // The site's built-in content is a large bundle: load it only when the dialog opens.
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    if (!open || data) return;
+    import("@/lib/builtinContent").then((m) => setData(m.builtinContent())).catch((e) => toast.error(e.message));
+  }, [open, data]);
   const [mode, setMode] = useState("skip");
   const [busy, setBusy] = useState(false);
   const run = async () => {
@@ -50,6 +54,7 @@ function BuiltinDialog({ open, onOpenChange, onDone }) {
           <DialogTitle className="font-display text-xl font-medium">Manage the site's original content</DialogTitle>
           <DialogDescription>Brings every article, resource and press release that ships with the website into this list, published with its original date. From then on you can edit, unpublish or archive them like anything else; unpublishing one removes it from the site. Translations keep working until you change the English text.</DialogDescription>
         </DialogHeader>
+        {!data && <div className="grid h-40 place-items-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>}
         {data && (
           <div className="max-h-[42vh] space-y-4 overflow-y-auto pr-1 text-sm">
             {[["Resources and articles", data.resources], ["Press releases", data.press]].map(([label, rows]) => (
@@ -92,6 +97,8 @@ const TABS = [
 
 export const StatusBadge = ({ status }) => <Badge className={STATUS_TONE[status] || STATUS_TONE.draft} testId={`content-status-${status}`}>{status}</Badge>;
 
+const PAGE_SIZE = 25;
+
 export default function AdminContent() {
   const can = useCan();
   const navigate = useNavigate();
@@ -100,38 +107,54 @@ export default function AdminContent() {
   const [origin, setOrigin] = useState(() => new URLSearchParams(window.location.search).get("origin") || "all");
   const [builtinOpen, setBuiltinOpen] = useState(false);
   const [q, setQ] = useState("");
-  const [data, setData] = useState({ items: [], total: 0 });
+  const [query, setQuery] = useState(""); // debounced search
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState(null); // null until the first page arrives
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
+  const latest = useRef(0);
+
+  // Changing a filter goes back to page 1 in the same render, so it costs one request.
+  const filter = (set) => (v) => { set(v); setPage(1); };
+  useEffect(() => {
+    const t = setTimeout(() => { setQuery(q.trim()); setPage(1); }, 300);
+    return () => clearTimeout(t);
+  }, [q]);
 
   const load = useCallback(async () => {
+    const id = ++latest.current;
     setLoading(true);
     try {
-      setData(await fetchContentList({ status, type, origin, q: q.trim() || undefined, page_size: 100 }));
+      const d = await fetchContentList({ status, type, origin, q: query || undefined, page, page_size: PAGE_SIZE });
+      if (id === latest.current) setData(d); // ignore responses to superseded requests
     } catch (e) {
-      toast.error(formatApiError(e));
+      if (id === latest.current) toast.error(formatApiError(e));
     } finally {
-      setLoading(false);
+      if (id === latest.current) setLoading(false);
     }
-  }, [status, type, origin, q]);
+  }, [status, type, origin, query, page]);
 
-  useEffect(() => {
-    const t = setTimeout(load, q ? 300 : 0);
-    return () => clearTimeout(t);
-  }, [load, q]);
+  useEffect(() => { load(); }, [load]);
 
+  // Publish / unpublish / archive update the row in place instead of reloading the list.
   const act = async (item, fn, msg) => {
     setBusy(item.id);
     try {
-      await fn();
+      const updated = await fn();
       toast.success(msg);
-      load();
+      setData((d) => {
+        const gone = !updated?.id || (status !== "all" && updated.status !== status);
+        const items = gone ? d.items.filter((i) => i.id !== item.id) : d.items.map((i) => (i.id === item.id ? { ...i, ...updated, body: undefined, views_30d: i.views_30d, downloads_30d: i.downloads_30d } : i));
+        return { ...d, items, total: gone ? d.total - 1 : d.total };
+      });
     } catch (e) {
       toast.error(formatApiError(e));
     } finally {
       setBusy(null);
     }
   };
+  const items = data?.items || [];
+  const pages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
   return (
     <div data-testid="admin-content-page">
@@ -153,14 +176,14 @@ export default function AdminContent() {
       <div className="mt-6 flex flex-wrap items-center gap-2 rounded-2xl border border-line/10 bg-card/60 p-3">
         <div className="flex flex-wrap gap-1" role="tablist">
           {TABS.map((t) => (
-            <button key={t.key} role="tab" aria-selected={status === t.key} onClick={() => setStatus(t.key)} className={cn("rounded-full border px-3 py-1.5 text-xs transition-colors", status === t.key ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:text-foreground")} data-testid={`content-tab-${t.key}`}>{t.label}</button>
+            <button key={t.key} role="tab" aria-selected={status === t.key} onClick={() => filter(setStatus)(t.key)} className={cn("rounded-full border px-3 py-1.5 text-xs transition-colors", status === t.key ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:text-foreground")} data-testid={`content-tab-${t.key}`}>{t.label}</button>
           ))}
         </div>
-        <select value={type} onChange={(e) => setType(e.target.value)} className={cn(selectCls, "h-9 text-xs")} aria-label="Type">
+        <select value={type} onChange={(e) => filter(setType)(e.target.value)} className={cn(selectCls, "h-9 text-xs")} aria-label="Type">
           <option value="all">All types</option>
           {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
-        <select value={origin} onChange={(e) => setOrigin(e.target.value)} className={cn(selectCls, "h-9 text-xs")} aria-label="Source" data-testid="content-origin">
+        <select value={origin} onChange={(e) => filter(setOrigin)(e.target.value)} className={cn(selectCls, "h-9 text-xs")} aria-label="Source" data-testid="content-origin">
           {ORIGINS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
         </select>
         <div className="relative ml-auto min-w-[220px]">
@@ -182,8 +205,14 @@ export default function AdminContent() {
               <th className="px-4 py-3 text-right font-normal">Actions</th>
             </tr>
           </thead>
-          <tbody className={cn(loading && "opacity-50")}>
-            {data.items.map((c) => (
+          <tbody className={cn("transition-opacity duration-200", loading && data && "opacity-60")}>
+            {!data && Array.from({ length: 8 }, (_, i) => (
+              <tr key={i} className="border-b border-line/5" aria-hidden>
+                <td className="px-4 py-3"><div className="h-4 w-64 animate-pulse rounded bg-line/10" /><div className="mt-2 h-3 w-40 animate-pulse rounded bg-line/5" /></td>
+                {Array.from({ length: 6 }, (__, j) => <td key={j} className="px-2 py-3"><div className="h-3 w-12 animate-pulse rounded bg-line/10" /></td>)}
+              </tr>
+            ))}
+            {items.map((c) => (
               <tr key={c.id} className="border-b border-line/5 hover:bg-line/5" data-testid="content-row">
                 <td className="max-w-[360px] px-4 py-3">
                   <Link to={`/admin/content/${c.id}`} className="block truncate font-medium text-foreground hover:text-teal">{c.title}</Link>
@@ -217,17 +246,26 @@ export default function AdminContent() {
                 </td>
               </tr>
             ))}
-            {!loading && data.items.length === 0 && (
+            {data && !loading && items.length === 0 && (
               <tr><td colSpan={7} className="px-4 py-16 text-center text-muted-foreground">Nothing here yet.{can("editContent") && <> <Link to="/admin/content/new" className="text-teal hover:underline">Create your first item</Link>.</>}</td></tr>
             )}
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        {data.total} item{data.total === 1 ? "" : "s"}
-        {data.origin_counts && ` · ${data.origin_counts.builtin} from the original site · ${data.origin_counts.import} migrated`}
-        {data.origin_counts?.builtin === 0 && can("editContent") && <> · The site's original articles and press releases aren't managed here yet: <button type="button" className="text-teal hover:underline" onClick={() => setBuiltinOpen(true)}>bring them in</button>.</>}
-      </p>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+        <p>
+          {data ? <>{data.total ? `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, data.total)} of ` : ""}{data.total} item{data.total === 1 ? "" : "s"}</> : "Loading…"}
+          {data?.origin_counts && ` · ${data.origin_counts.builtin} from the original site · ${data.origin_counts.import} migrated`}
+          {data?.origin_counts?.builtin === 0 && can("editContent") && <> · The site's original articles and press releases aren't managed here yet: <button type="button" className="text-teal hover:underline" onClick={() => setBuiltinOpen(true)}>bring them in</button>.</>}
+        </p>
+        {pages > 1 && (
+          <div className="flex items-center gap-1" data-testid="content-pager">
+            <Button variant="outline" size="sm" className="h-8 px-2" disabled={page <= 1} onClick={() => setPage(page - 1)} aria-label="Previous page"><ChevronLeft /></Button>
+            <span className="px-2 font-mono">{page} / {pages}</span>
+            <Button variant="outline" size="sm" className="h-8 px-2" disabled={page >= pages} onClick={() => setPage(page + 1)} aria-label="Next page"><ChevronRight /></Button>
+          </div>
+        )}
+      </div>
       <BuiltinDialog open={builtinOpen} onOpenChange={setBuiltinOpen} onDone={load} />
     </div>
   );
