@@ -7,17 +7,20 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { fetchNotifications, fetchSettings, formatApiError, saveSettings } from "@/lib/adminApi";
 import { TeamCard } from "@/components/admin/TeamCard";
+import { PasswordCard, ScoringCard, UsersCard } from "@/components/admin/SettingsCards";
+import { useCan } from "@/components/admin/kit";
 
 const STATUS = { sent: "text-emerald-300 border-emerald-500/30 bg-emerald-500/10", failed: "text-red-300 border-red-500/30 bg-red-500/10", skipped: "text-amber-300 border-amber-500/30 bg-amber-500/10" };
 
 export default function AdminSettings() {
+  const can = useCan();
   const [settings, setSettings] = useState(null);
   const [email, setEmail] = useState("");
   const [saving, setSaving] = useState(false);
   const [log, setLog] = useState([]);
 
-  const load = () => Promise.all([fetchSettings(), fetchNotifications()]).then(([s, n]) => { setSettings(s); setEmail(s.alert_email || ""); setLog(n); }).catch((e) => toast.error(formatApiError(e)));
-  useEffect(() => { load(); }, []);
+  const load = () => (can("manage") ? Promise.all([fetchSettings(), fetchNotifications()]).then(([s, n]) => { setSettings(s); setEmail(s.alert_email || ""); setLog(n); }).catch((e) => toast.error(formatApiError(e))) : Promise.resolve());
+  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSave = async (e) => {
     e.preventDefault();
@@ -35,10 +38,18 @@ export default function AdminSettings() {
 
   return (
     <div data-testid="admin-settings-page">
-      <p className="eyebrow mb-2">Alerts & settings</p>
-      <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">Where new leads get announced, and who works them.</h1>
+      <p className="eyebrow mb-2">Settings</p>
+      <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">Scoring, team access and lead alerts.</h1>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-12">
+      <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <ScoringCard />
+        <div className="space-y-6">
+          {can("manage") && <UsersCard />}
+          <PasswordCard />
+        </div>
+      </div>
+
+      {can("manage") && <div className="mt-6 grid gap-6 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-5">
         <form onSubmit={onSave} className="rounded-2xl border border-line/10 bg-card p-6" data-testid="admin-alert-form">
           <div className="flex items-center gap-3">
@@ -83,7 +94,7 @@ export default function AdminSettings() {
             ))}
           </ul>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

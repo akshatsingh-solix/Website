@@ -42,6 +42,59 @@ export const fetchSettings = () => adminApi.get("/admin/settings").then((r) => r
 export const saveSettings = (body) => adminApi.put("/admin/settings", body).then((r) => r.data);
 export const fetchNotifications = () => adminApi.get("/admin/notifications").then((r) => r.data);
 
+// --- Leads, reports, views, scoring, users ---------------------------------
+const clean = (params) => Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== "all"));
+export const fetchPeople = (params) => adminApi.get("/admin/leads", { params: clean(params) }).then((r) => r.data);
+export const fetchLeadsMeta = () => adminApi.get("/admin/leads/meta").then((r) => r.data);
+export const fetchLead = (id) => adminApi.get(`/admin/leads/${id}`).then((r) => r.data);
+export const patchLead = (id, body) => adminApi.patch(`/admin/leads/${id}`, body).then((r) => r.data);
+export const bulkPatchLeads = (body) => adminApi.post("/admin/leads/bulk", body).then((r) => r.data);
+export const rescoreLead = (id) => adminApi.post(`/admin/leads/${id}/rescore`).then((r) => r.data);
+export const fetchOverview = (params) => adminApi.get("/admin/reports/overview", { params: clean(params) }).then((r) => r.data);
+export const fetchViews = () => adminApi.get("/admin/views").then((r) => r.data);
+export const createView = (body) => adminApi.post("/admin/views", body).then((r) => r.data);
+export const deleteView = (id) => adminApi.delete(`/admin/views/${id}`);
+export const fetchScoring = () => adminApi.get("/admin/scoring").then((r) => r.data);
+export const saveScoring = (body) => adminApi.put("/admin/scoring", body).then((r) => r.data);
+export const fetchUsers = () => adminApi.get("/admin/users").then((r) => r.data);
+export const createUser = (body) => adminApi.post("/admin/users", body).then((r) => r.data);
+export const updateUser = (id, body) => adminApi.patch(`/admin/users/${id}`, body).then((r) => r.data);
+export const changePassword = (body) => adminApi.post("/auth/password", body);
+
+// --- Content (CMS) ----------------------------------------------------------
+export const fetchContentList = (params) => adminApi.get("/admin/content", { params: clean(params) }).then((r) => r.data);
+export const fetchContentItem = (id) => adminApi.get(`/admin/content/${id}`).then((r) => r.data);
+export const createContent = (body) => adminApi.post("/admin/content", body).then((r) => r.data);
+export const updateContent = (id, body) => adminApi.put(`/admin/content/${id}`, body).then((r) => r.data);
+export const publishContent = (id, publish_at) => adminApi.post(`/admin/content/${id}/publish`, { publish_at: publish_at || null }).then((r) => r.data);
+export const unpublishContent = (id) => adminApi.post(`/admin/content/${id}/unpublish`).then((r) => r.data);
+export const archiveContent = (id) => adminApi.delete(`/admin/content/${id}`);
+export const fetchContentVersions = (id) => adminApi.get(`/admin/content/${id}/versions`).then((r) => r.data);
+export const restoreContentVersion = (id, v) => adminApi.post(`/admin/content/${id}/versions/${v}/restore`).then((r) => r.data);
+export const uploadFile = (file) => {
+  const form = new FormData();
+  form.append("file", file);
+  return adminApi.post("/admin/files", form, { timeout: 120000 }).then((r) => r.data);
+};
+export const fetchFiles = (params) => adminApi.get("/admin/files", { params }).then((r) => r.data);
+/** Absolute URL for a backend file path like /api/files/<id>/<name>. */
+export const apiFileUrl = (path) => (path && path.startsWith("/api/") ? `${API}${path.slice(4)}` : path);
+
+async function saveBlob(res, fallback) {
+  const name = /filename="?([^"]+)"?/.exec(res.headers["content-disposition"] || "")?.[1] || fallback;
+  const url = URL.createObjectURL(res.data);
+  const a = Object.assign(document.createElement("a"), { href: url, download: name });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+export async function exportPeople(params, format) {
+  const res = await adminApi.get("/admin/leads-export", { params: { ...clean(params), format }, responseType: "blob", timeout: 120000 });
+  await saveBlob(res, `solix-leads.${format}`);
+}
+
 export async function downloadLeadsCsv(params) {
   const res = await adminApi.get("/admin/submissions/export", { params, responseType: "blob" });
   const name = /filename="?([^"]+)"?/.exec(res.headers["content-disposition"] || "")?.[1] || "solix-leads.csv";

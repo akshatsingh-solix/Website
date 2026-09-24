@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { submitLead } from "@/lib/api";
+import { leadContext, track } from "@/lib/intent";
 import { useTx } from "@/i18n/tx";
 
 const schema = z.object({
@@ -61,10 +62,11 @@ export const LeadForm = ({
 
   const onSubmit = async (values) => {
     try {
-      await submitLead({ type, ...values, ...extra, source_page: window.location.pathname });
+      const created = await submitLead({ type, ...values, ...extra, ...leadContext(), source_page: window.location.pathname });
+      if (type === "download") track("resource_download", { meta: { title: extra?.resource } });
       setDone(true);
       toast.success(tx("Submission received."));
-      onSuccess?.();
+      onSuccess?.(created);
     } catch {
       toast.error(tx("Something went wrong. Please try again."));
     }

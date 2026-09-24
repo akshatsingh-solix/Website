@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 import { CHAT_SUGGESTIONS } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { clearChatHistory, fetchChatHistory, streamChat } from "@/lib/api";
-import { createLocalConcierge } from "@/lib/localConcierge";
+import { createLocalConcierge, detectTopics, isPricingQuestion } from "@/lib/localConcierge";
+import { pageTopics, track } from "@/lib/intent";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
 
@@ -130,6 +131,10 @@ export const ConciergeWidget = () => {
     if (!message || busy) return;
     setInput("");
     setBusy(true);
+    // Intent signals only: which products the question is about, never the text itself.
+    const topics = detectTopics(message);
+    if (topics.length) track("chat_topic", { topics });
+    if (isPricingQuestion(message)) track("pricing_intent", { topics: topics.length ? topics : pageTopics() });
     setMessages((m) => [...m, { role: "user", content: message }, { role: "assistant", content: "", streaming: true }]);
     const append = (delta) =>
       setMessages((m) => {

@@ -111,6 +111,15 @@ const productKeywords = (p) => [normalize(p.name), ...(PRODUCT_KEYWORDS[p.slug] 
 // English name, the name in the visitor's language, and extra keywords.
 const industryKeywords = (i, localName) => [normalize(i.name.split(" & ")[0]), normalize(localName.split(" & ")[0]), ...(INDUSTRY_KEYWORDS[i.slug] || [])];
 
+/** Products a free-text question is about (used for intent tracking). */
+export const detectTopics = (raw) => {
+  const text = normalize(raw || "");
+  const product = bestMatch(text, Object.fromEntries(SOURCE.PRODUCTS.map((p) => [p.slug, productKeywords(p)])));
+  return product.score >= 3 ? [product.key] : [];
+};
+
+export const isPricingQuestion = (raw) => bestMatch(normalize(raw || ""), INTENTS).key === "pricing";
+
 /**
  * One conversation per chat session. `reply(message, lng)` resolves to
  * { text, booking? } where booking carries a saved demo request.

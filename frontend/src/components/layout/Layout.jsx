@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "./Navbar";
@@ -5,9 +6,12 @@ import { Footer } from "./Footer";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ConciergeWidget } from "@/components/chat/ConciergeWidget";
 import { pageTransitionVariants } from "@/components/shared/Reveal";
+import { ConsentBanner } from "@/components/shared/ConsentBanner";
+import { useIntentTracking } from "@/lib/useIntentTracking";
 
 export const Layout = () => {
   const location = useLocation();
+  useIntentTracking();
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <ScrollToTop />
@@ -21,12 +25,15 @@ export const Layout = () => {
             animate="animate"
             exit="exit"
           >
-            <Outlet />
+            <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" />}>
+              <Outlet />
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </main>
       <Footer />
       <ConciergeWidget />
+      <ConsentBanner />
     </div>
   );
 };

@@ -1,303 +1,331 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { AlertTriangle, Bot, Check, ChevronLeft, ChevronRight, Download, Loader2, Search, Trash2, UserCircle2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Bookmark, ChevronLeft, ChevronRight, Download, FileSpreadsheet, Filter, Loader2, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { deleteLead, downloadLeadsCsv, fetchLeads, fetchSettings, fetchStats, fetchTeam, formatApiError, updateLead } from "@/lib/adminApi";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { bulkPatchLeads, createView, deleteView, exportPeople, fetchLeadsMeta, fetchPeople, fetchViews, formatApiError } from "@/lib/adminApi";
+import { CHANNEL_LABELS, LineBadge, ScoreBar, STAGE_LABELS, StageBadge, ago, productName, selectCls, useCan } from "@/components/admin/kit";
+import { LeadDrawer } from "@/components/admin/LeadDrawer";
 
-const TYPES = [
-  { key: "all", label: "All" }, { key: "demo", label: "Demo" }, { key: "contact", label: "Contact" }, { key: "partner", label: "Partner" },
-  { key: "career", label: "Career" }, { key: "download", label: "Download" }, { key: "newsletter", label: "Newsletter" },
-];
-const STATUSES = [
-  { key: "all", label: "Any status" }, { key: "new", label: "New" }, { key: "contacted", label: "Contacted" }, { key: "qualified", label: "Qualified" },
-];
-const STATUS_TONE = { new: "bg-line/5 text-muted-foreground border-line/15", contacted: "bg-amber-500/10 text-amber-300 border-amber-500/30", qualified: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" };
-const TYPE_TONE = { demo: "bg-primary/15 text-primary-ink border-primary/30", contact: "bg-teal/10 text-teal border-teal/30", partner: "bg-violet-500/10 text-violet-300 border-violet-500/30", career: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30", download: "bg-sky-500/10 text-sky-300 border-sky-500/30", newsletter: "bg-line/5 text-muted-foreground border-line/15" };
 const PAGE_SIZE = 25;
-const TEST_INBOX = "delivered@resend.dev";
+const FILTER_KEYS = ["q", "line", "product", "stage", "owner", "channel", "country", "industry", "min_score", "date_field", "date_from", "date_to", "active_days"];
+const SORTS = [
+  { key: "score", label: "Highest score" },
+  { key: "recent", label: "Most recent activity" },
+  { key: "created", label: "Newest" },
+  { key: "mql", label: "Newest MQL" },
+  { key: "name", label: "Name" },
+];
 
-const fmt = (iso) => new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-
-const TypeBadge = ({ type }) => <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em]", TYPE_TONE[type] ?? TYPE_TONE.newsletter)}>{type}</span>;
-const StatusBadge = ({ status = "new" }) => <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em]", STATUS_TONE[status] ?? STATUS_TONE.new)} data-testid={`status-badge-${status}`}>{status}</span>;
-
-const LeadWorkflow = ({ lead, team, onSaved }) => {
-  const [status, setStatus] = useState(lead.status || "new");
-  const [notes, setNotes] = useState(lead.notes || "");
-  const [owner, setOwner] = useState(lead.owner || "");
-  const [saving, setSaving] = useState(false);
-  const dirty = status !== (lead.status || "new") || notes !== (lead.notes || "") || owner !== (lead.owner || "");
-
-  const save = async () => {
-    setSaving(true);
-    try {
-      const updated = await updateLead(lead.id, { status, notes, owner });
-      toast.success("Lead updated");
-      onSaved(updated);
-    } catch (err) {
-      toast.error(formatApiError(err));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const selectCls = "h-10 w-full rounded-lg border border-line/15 bg-background px-3 text-sm text-foreground outline-none focus:border-primary/60";
-
-  return (
-    <div className="mt-4 rounded-2xl border border-line/10 bg-card p-4" data-testid="lead-workflow">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <p className="eyebrow mb-3">Status</p>
-          <div className="flex flex-wrap gap-2" role="radiogroup">
-            {STATUSES.slice(1).map((s) => (
-              <button key={s.key} role="radio" aria-checked={status === s.key} onClick={() => setStatus(s.key)} data-testid={`lead-status-${s.key}`} className={cn("rounded-full border px-3.5 py-1.5 text-sm transition-colors", status === s.key ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:border-line/40")}>{s.label}</button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="eyebrow mb-3">Owner</p>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} className={selectCls} data-testid="lead-owner-select" aria-label="Assign owner">
-            <option value="">Unassigned</option>
-            {team.map((m) => <option key={m.email} value={m.email}>{m.name}</option>)}
-          </select>
-          {team.length === 0 && <p className="mt-1.5 text-[11px] text-muted-foreground">Add salespeople in <Link to="/admin/settings" className="text-primary-ink hover:underline">Alerts & settings</Link>.</p>}
-        </div>
-      </div>
-      <p className="eyebrow mb-2 mt-5">Private notes</p>
-      <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Call summary, next step, owner…" className="rounded-lg border-line/15 bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0" data-testid="lead-notes-input" />
-      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-        <span>{lead.updated_at ? `Last updated ${fmt(lead.updated_at)}` : "Not yet worked"}</span>
-        <Button size="sm" onClick={save} disabled={!dirty || saving} data-testid="lead-save-button">{saving ? <Loader2 className="animate-spin" /> : <Check />} Save</Button>
-      </div>
-    </div>
-  );
-};
-
-const Stat = ({ label, value, tone = "text-foreground", testId }) => (
-  <div className="rounded-2xl border border-line/10 bg-card p-5">
-    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
-    <p className={cn("mt-2 font-display text-4xl font-medium tracking-tighter", tone)} data-testid={testId}>{value ?? "—"}</p>
-  </div>
-);
-
-const Detail = ({ label, value }) => value ? (
-  <div className="grid grid-cols-3 gap-3 border-b border-line/5 py-2.5 text-sm">
-    <dt className="text-muted-foreground">{label}</dt>
-    <dd className="col-span-2 break-words text-foreground">{value}</dd>
-  </div>
-) : null;
+const presets = (threshold) => [
+  { id: "all", name: "All leads", filters: {} },
+  { id: "mql", name: "MQLs to work", filters: { stage: "mql" }, sort: "mql" },
+  { id: "hot", name: "Hot this week", filters: { active_days: "7", min_score: String(threshold) }, sort: "recent" },
+  { id: "unassigned", name: "Unassigned MQLs", filters: { stage: "mql", owner: "unassigned" } },
+  { id: "pipeline", name: "SQL & pipeline", filters: { stage: "sql_plus" }, sort: "recent" },
+];
 
 export default function AdminLeads() {
-  const [stats, setStats] = useState(null);
-  const [type, setType] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [owner, setOwner] = useState("all");
-  const [team, setTeam] = useState([]);
-  const [q, setQ] = useState("");
-  const [debounced, setDebounced] = useState("");
-  const [page, setPage] = useState(1);
+  const can = useCan();
+  const [params, setParams] = useSearchParams();
+  const [meta, setMeta] = useState(null);
+  const [views, setViews] = useState([]);
   const [data, setData] = useState({ items: [], total: 0 });
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
-  const [exporting, setExporting] = useState(false);
-  const [alertEmail, setAlertEmail] = useState(null);
+  const [selected, setSelected] = useState(new Set());
+  const [openId, setOpenId] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [search, setSearch] = useState(params.get("q") || "");
+  const [exporting, setExporting] = useState(null);
+
+  const filters = useMemo(() => Object.fromEntries(FILTER_KEYS.map((k) => [k, params.get(k) || ""]).filter(([, v]) => v)), [params]);
+  const sort = params.get("sort") || "score";
+  const page = Number(params.get("page") || 1);
+  const threshold = meta?.settings?.mql_threshold ?? 45;
+
+  const setFilter = useCallback((patch) => {
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      Object.entries(patch).forEach(([k, v]) => (v === "" || v == null || v === "all" ? next.delete(k) : next.set(k, v)));
+      if (!("page" in patch)) next.delete("page");
+      return next;
+    });
+  }, [setParams]);
 
   useEffect(() => {
-    fetchSettings().then((s) => setAlertEmail(s.alert_email)).catch(() => {});
-    fetchTeam().then((t) => setTeam(t.members)).catch(() => {});
+    fetchLeadsMeta().then(setMeta).catch((e) => toast.error(formatApiError(e)));
+    fetchViews().then(setViews).catch(() => {});
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(q.trim()), 300);
+    const t = setTimeout(() => (search.trim() !== (params.get("q") || "") ? setFilter({ q: search.trim() }) : null), 350);
     return () => clearTimeout(t);
-  }, [q]);
-
-  useEffect(() => setPage(1), [type, status, owner, debounced]);
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [s, d] = await Promise.all([fetchStats(), fetchLeads({ type, status, owner, q: debounced || undefined, page, page_size: PAGE_SIZE })]);
-      setStats(s);
-      setData(d);
-    } catch (err) {
-      toast.error(formatApiError(err));
+      setData(await fetchPeople({ ...filters, sort, page, page_size: PAGE_SIZE }));
+    } catch (e) {
+      toast.error(formatApiError(e));
     } finally {
       setLoading(false);
     }
-  }, [type, status, owner, debounced, page]);
+  }, [filters, sort, page]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+    setSelected(new Set());
+  }, [load]);
 
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
-  const filtered = type !== "all" || status !== "all" || owner !== "all" || debounced;
-  const ownerName = (email) => team.find((m) => m.email === email)?.name || email;
+  const lineProducts = meta?.lines?.find((l) => l.key === filters.line)?.products || meta?.lines?.flatMap((l) => l.products) || [];
+  const ownerName = (email) => meta?.owners?.find((m) => m.email === email)?.name || email;
+  const activeCount = Object.keys(filters).filter((k) => k !== "q").length;
 
-  const onExport = async () => {
-    setExporting(true);
+  const applyView = (v) => {
+    const next = new URLSearchParams();
+    Object.entries(v.filters || {}).forEach(([k, val]) => val && next.set(k, val));
+    if (v.sort && v.sort !== "score") next.set("sort", v.sort);
+    setSearch(v.filters?.q || "");
+    setParams(next);
+  };
+  const isActiveView = (v) => {
+    const f = v.filters || {};
+    return Object.keys(filters).length === Object.keys(f).length && Object.entries(f).every(([k, val]) => filters[k] === val) && (v.sort || "score") === sort;
+  };
+
+  const saveView = async () => {
+    const name = window.prompt("Name this view (shared with your team):");
+    if (!name?.trim()) return;
     try {
-      await downloadLeadsCsv({ type, status, owner, q: debounced || undefined });
-      toast.success("CSV exported");
-    } catch (err) {
-      toast.error(formatApiError(err));
-    } finally {
-      setExporting(false);
+      const v = await createView({ name: name.trim(), filters, sort });
+      setViews((vs) => [...vs, v].sort((a, b) => a.name.localeCompare(b.name)));
+      toast.success("View saved");
+    } catch (e) {
+      toast.error(formatApiError(e));
     }
   };
 
-  const onDelete = async (id) => {
-    if (!window.confirm("Delete this submission permanently?")) return;
+  const removeView = async (v) => {
+    if (!window.confirm(`Delete the view "${v.name}"?`)) return;
     try {
-      await deleteLead(id);
-      toast.success("Submission deleted");
-      setSelected(null);
+      await deleteView(v.id);
+      setViews((vs) => vs.filter((x) => x.id !== v.id));
+    } catch (e) {
+      toast.error(formatApiError(e));
+    }
+  };
+
+  const bulk = async (patch, label) => {
+    try {
+      const r = await bulkPatchLeads({ ids: [...selected], ...patch });
+      toast.success(`${label} for ${r.updated} lead${r.updated === 1 ? "" : "s"}`);
       load();
-    } catch (err) {
-      toast.error(formatApiError(err));
+    } catch (e) {
+      toast.error(formatApiError(e));
     }
   };
 
-  const onSaved = (updated) => {
-    setSelected(updated);
-    setData((d) => ({ ...d, items: d.items.map((i) => (i.id === updated.id ? updated : i)) }));
-    fetchStats().then(setStats).catch(() => {});
+  const doExport = async (format) => {
+    setExporting(format);
+    try {
+      await exportPeople({ ...filters, sort }, format);
+    } catch (e) {
+      toast.error(formatApiError(e));
+    } finally {
+      setExporting(null);
+    }
   };
+
+  const toggleAll = (on) => setSelected(on ? new Set(data.items.map((i) => i.id)) : new Set());
+  const toggle = (id) => setSelected((s) => {
+    const n = new Set(s);
+    n.has(id) ? n.delete(id) : n.add(id);
+    return n;
+  });
+
+  // Plain render helper (not a component) so selects keep focus across renders.
+  const sel = (k, label, children) => (
+    <label className="flex flex-col gap-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+      {label}
+      <select value={filters[k] || ""} onChange={(e) => setFilter({ [k]: e.target.value })} className={selectCls} data-testid={`filter-${k}`}>{children}</select>
+    </label>
+  );
 
   return (
     <div data-testid="admin-leads-page">
-      {alertEmail === TEST_INBOX && (
-        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-100 sm:flex-row sm:items-center sm:justify-between" data-testid="alert-inbox-banner">
-          <span className="flex items-center gap-3"><AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" /> Lead alerts are still going to the test inbox <code className="font-mono text-xs">{TEST_INBOX}</code>. Set your real sales email so the team gets notified.</span>
-          <Button asChild size="sm" variant="secondary" data-testid="alert-inbox-banner-link"><Link to="/admin/settings">Set sales inbox</Link></Button>
-        </div>
-      )}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="eyebrow mb-2">Leads</p>
-          <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">Every submission, in one place.</h1>
+          <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">Every lead, tagged to what they want.</h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Scores combine what people did on the site with who they are. Leads become MQLs when they ask for a demo, trial or contact, or when their score passes {threshold}.</p>
         </div>
-        <Button onClick={onExport} disabled={exporting || data.total === 0} data-testid="admin-export-csv">
-          {exporting ? <Loader2 className="animate-spin" /> : <Download />} Export CSV{filtered ? " (filtered)" : ""}
-        </Button>
-      </div>
-
-      <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-6">
-        <Stat label="Total leads" value={stats?.total} testId="admin-stat-total" />
-        <Stat label="Last 7 days" value={stats?.last_7_days} tone="text-teal" testId="admin-stat-week" />
-        <Stat label="Demo requests" value={stats?.by_type?.demo ?? 0} tone="text-primary-ink" testId="admin-stat-demo" />
-        <Stat label="Awaiting contact" value={stats?.by_status?.new ?? 0} tone="text-amber-300" testId="admin-stat-new" />
-        <Stat label="Qualified" value={stats?.by_status?.qualified ?? 0} tone="text-emerald-300" testId="admin-stat-qualified" />
-        <Stat label="Booked by Sol (chat)" value={stats?.chat_leads} testId="admin-stat-chat" />
-      </div>
-
-      <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap items-center gap-2" role="tablist" data-testid="admin-type-filters">
-          {TYPES.map((t) => (
-            <button key={t.key} role="tab" aria-selected={type === t.key} onClick={() => setType(t.key)} data-testid={`admin-filter-${t.key}`} className={cn("rounded-full border px-3.5 py-1.5 text-sm transition-colors", type === t.key ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:border-line/40 hover:text-foreground")}>
-              {t.label}{stats?.by_type && t.key !== "all" && <span className="ml-1.5 font-mono text-[10px] opacity-70">{stats.by_type[t.key] ?? 0}</span>}
-            </button>
-          ))}
-          <span className="mx-1 hidden h-5 w-px bg-line/10 sm:block" />
-          <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filter by status" data-testid="admin-status-filter" className="h-9 rounded-full border border-line/15 bg-background px-3 text-sm text-muted-foreground outline-none focus:border-primary/60">
-            {STATUSES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
-          </select>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Filter by owner" data-testid="admin-owner-filter" className="h-9 rounded-full border border-line/15 bg-background px-3 text-sm text-muted-foreground outline-none focus:border-primary/60">
-            <option value="all">Any owner</option>
-            <option value="unassigned">Unassigned{stats?.by_owner ? ` (${stats.by_owner.unassigned ?? 0})` : ""}</option>
-            {team.map((m) => <option key={m.email} value={m.email}>{m.name}{stats?.by_owner ? ` (${stats.by_owner[m.email] ?? 0})` : ""}</option>)}
-          </select>
-        </div>
-        <div className="relative lg:w-80">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, email, company, message" className="h-10 rounded-full border-line/15 bg-background pl-11 focus-visible:ring-primary" data-testid="admin-search-input" aria-label="Search leads" />
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => doExport("csv")} disabled={!!exporting} data-testid="export-csv">{exporting === "csv" ? <Loader2 className="animate-spin" /> : <Download />} CSV</Button>
+          <Button variant="outline" size="sm" onClick={() => doExport("xlsx")} disabled={!!exporting} data-testid="export-xlsx">{exporting === "xlsx" ? <Loader2 className="animate-spin" /> : <FileSpreadsheet />} Excel</Button>
         </div>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-line/10 bg-card">
-        <Table data-testid="admin-leads-table">
-          <TableHeader>
-            <TableRow className="border-line/10 hover:bg-transparent">
-              <TableHead className="font-mono text-[10px] uppercase tracking-[0.16em]">Received</TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-[0.16em]">Type</TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-[0.16em]">Status</TableHead>
-              <TableHead className="hidden font-mono text-[10px] uppercase tracking-[0.16em] xl:table-cell">Owner</TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-[0.16em]">Contact</TableHead>
-              <TableHead className="hidden font-mono text-[10px] uppercase tracking-[0.16em] md:table-cell">Company</TableHead>
-              <TableHead className="hidden font-mono text-[10px] uppercase tracking-[0.16em] lg:table-cell">Interest / role / resource</TableHead>
-              <TableHead className="hidden font-mono text-[10px] uppercase tracking-[0.16em] md:table-cell">Source</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading && data.items.length === 0 ? (
-              <TableRow><TableCell colSpan={8} className="py-16 text-center text-muted-foreground"><Loader2 className="mx-auto h-5 w-5 animate-spin" /></TableCell></TableRow>
-            ) : data.items.length === 0 ? (
-              <TableRow><TableCell colSpan={8} className="py-16 text-center text-muted-foreground" data-testid="admin-leads-empty">No submissions match.</TableCell></TableRow>
-            ) : (
-              data.items.map((s) => (
-                <TableRow key={s.id} onClick={() => setSelected(s)} data-testid={`admin-lead-row-${s.id}`} className="cursor-pointer border-line/5 transition-colors hover:bg-line/[0.04]">
-                  <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">{fmt(s.created_at)}</TableCell>
-                  <TableCell><TypeBadge type={s.type} /></TableCell>
-                  <TableCell><StatusBadge status={s.status} /></TableCell>
-                  <TableCell className="hidden text-sm xl:table-cell" data-testid="lead-owner-cell">{s.owner ? <span className="inline-flex items-center gap-1.5 text-foreground"><UserCircle2 className="h-3.5 w-3.5 text-teal" /> {ownerName(s.owner)}</span> : <span className="text-muted-foreground">Unassigned</span>}</TableCell>
-                  <TableCell>
-                    <p className="font-medium">{s.name || "—"}</p>
-                    <p className="text-xs text-muted-foreground">{s.email}</p>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">{s.company || "—"}</TableCell>
-                  <TableCell className="hidden max-w-[260px] truncate text-sm text-muted-foreground lg:table-cell">{s.interest || s.role || s.resource || "—"}</TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {s.source === "chat" ? <span className="inline-flex items-center gap-1.5 text-xs text-teal"><Bot className="h-3.5 w-3.5" /> Sol chat</span> : <span className="text-xs text-muted-foreground">{s.source_page || "web"}</span>}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        <div className="flex items-center justify-between border-t border-line/10 px-4 py-3 text-xs text-muted-foreground">
-          <span data-testid="admin-leads-count">{data.total} result{data.total === 1 ? "" : "s"}</span>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} data-testid="admin-prev-page"><ChevronLeft /> Prev</Button>
-            <span className="font-mono">{page} / {pages}</span>
-            <Button variant="ghost" size="sm" disabled={page >= pages} onClick={() => setPage((p) => p + 1)} data-testid="admin-next-page">Next <ChevronRight /></Button>
+      {/* Views */}
+      <div className="mt-6 flex flex-wrap items-center gap-2" data-testid="lead-views">
+        {presets(threshold).map((v) => (
+          <button key={v.id} onClick={() => applyView(v)} className={cn("rounded-full border px-3.5 py-1.5 text-xs transition-colors", isActiveView(v) ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:text-foreground")} data-testid={`view-${v.id}`}>{v.name}</button>
+        ))}
+        {views.map((v) => (
+          <span key={v.id} className={cn("group inline-flex items-center rounded-full border text-xs transition-colors", isActiveView(v) ? "border-teal bg-teal/15 text-foreground" : "border-line/15 text-muted-foreground hover:text-foreground")}>
+            <button onClick={() => applyView(v)} className="inline-flex items-center gap-1.5 py-1.5 pl-3.5 pr-2"><Bookmark className="h-3 w-3" /> {v.name}</button>
+            <button onClick={() => removeView(v)} aria-label={`Delete view ${v.name}`} className="pr-2.5 opacity-50 hover:opacity-100"><X className="h-3 w-3" /></button>
+          </span>
+        ))}
+        <Button variant="ghost" size="sm" onClick={saveView} className="text-xs" data-testid="save-view"><Bookmark /> Save current view</Button>
+      </div>
+
+      {/* Filters */}
+      <div className="mt-4 rounded-2xl border border-line/10 bg-card/60 p-3" data-testid="lead-filters">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, email, company, notes…" className="h-10 border-line/15 bg-background pl-9 text-sm" data-testid="lead-search" />
           </div>
+          <select value={filters.line || ""} onChange={(e) => setFilter({ line: e.target.value, product: "" })} className={selectCls} aria-label="Product line" data-testid="filter-line-quick">
+            <option value="">All product lines</option>
+            {meta?.lines?.map((l) => <option key={l.key} value={l.key}>{l.label}</option>)}
+            <option value="none">No product signal yet</option>
+          </select>
+          <select value={filters.stage || ""} onChange={(e) => setFilter({ stage: e.target.value })} className={selectCls} aria-label="Stage" data-testid="filter-stage-quick">
+            <option value="">Any stage</option>
+            <option value="mql_plus">MQL or later</option>
+            <option value="sql_plus">SQL or later</option>
+            {meta?.stages?.map((s) => <option key={s} value={s}>{STAGE_LABELS[s]}</option>)}
+          </select>
+          <select value={sort} onChange={(e) => setFilter({ sort: e.target.value === "score" ? "" : e.target.value })} className={selectCls} aria-label="Sort" data-testid="lead-sort">
+            {SORTS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+          </select>
+          <Button variant={showFilters ? "secondary" : "ghost"} size="sm" onClick={() => setShowFilters((v) => !v)} data-testid="more-filters"><Filter /> More filters{activeCount ? ` (${activeCount})` : ""}</Button>
+          {(activeCount > 0 || filters.q) && <Button variant="ghost" size="sm" onClick={() => { setSearch(""); setParams(new URLSearchParams()); }}>Clear</Button>}
+        </div>
+        {showFilters && (
+          <div className="mt-3 grid grid-cols-2 gap-3 border-t border-line/10 pt-3 md:grid-cols-4 xl:grid-cols-6">
+            {sel("product", "Product", <>
+              <option value="">Any product</option>
+              {lineProducts.map((p) => <option key={p} value={p}>{productName(p)}</option>)}
+            </>)}
+            {sel("owner", "Owner", <>
+              <option value="">Anyone</option>
+              <option value="unassigned">Unassigned</option>
+              {meta?.owners?.map((o) => <option key={o.email} value={o.email}>{o.name}</option>)}
+            </>)}
+            {sel("channel", "Source", <>
+              <option value="">Any source</option>
+              {meta?.channels?.map((c) => <option key={c} value={c}>{CHANNEL_LABELS[c] || c}</option>)}
+            </>)}
+            {sel("country", "Country", <>
+              <option value="">Any country</option>
+              {meta?.countries?.map((c) => <option key={c} value={c}>{c}</option>)}
+            </>)}
+            {sel("industry", "Industry", <>
+              <option value="">Any industry</option>
+              {meta?.industries?.map((c) => <option key={c} value={c}>{productName(c)}</option>)}
+            </>)}
+            {sel("active_days", "Active in", <>
+              <option value="">Any time</option>
+              <option value="1">Last 24 hours</option>
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+            </>)}
+            <label className="flex flex-col gap-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+              Min score
+              <Input type="number" min="0" value={filters.min_score || ""} onChange={(e) => setFilter({ min_score: e.target.value })} className="h-10 border-line/15 bg-background text-sm" data-testid="filter-min_score" />
+            </label>
+            {sel("date_field", "Date means", <>
+              <option value="">Created</option>
+              <option value="mql_at">Became MQL</option>
+              <option value="last_activity_at">Last active</option>
+            </>)}
+            <label className="flex flex-col gap-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+              From
+              <Input type="date" value={filters.date_from || ""} onChange={(e) => setFilter({ date_from: e.target.value })} className="h-10 border-line/15 bg-background text-sm" />
+            </label>
+            <label className="flex flex-col gap-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+              To
+              <Input type="date" value={filters.date_to || ""} onChange={(e) => setFilter({ date_to: e.target.value })} className="h-10 border-line/15 bg-background text-sm" />
+            </label>
+          </div>
+        )}
+      </div>
+
+      {/* Bulk actions */}
+      {selected.size > 0 && can("editLeads") && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-teal/30 bg-teal/10 px-4 py-2.5 text-sm" data-testid="bulk-bar">
+          <span className="font-medium">{selected.size} selected</span>
+          <select defaultValue="" onChange={(e) => { if (e.target.value) bulk({ owner: e.target.value === "__none" ? "" : e.target.value }, "Owner updated"); e.target.value = ""; }} className={cn(selectCls, "h-9")} aria-label="Assign owner" data-testid="bulk-owner">
+            <option value="" disabled>Assign owner…</option>
+            <option value="__none">Unassign</option>
+            {meta?.owners?.map((o) => <option key={o.email} value={o.email}>{o.name}</option>)}
+          </select>
+          <select defaultValue="" onChange={(e) => { if (e.target.value) bulk({ stage: e.target.value, reason: "Bulk update" }, "Stage updated"); e.target.value = ""; }} className={cn(selectCls, "h-9")} aria-label="Set stage" data-testid="bulk-stage">
+            <option value="" disabled>Set stage…</option>
+            {meta?.stages?.map((s) => <option key={s} value={s}>{STAGE_LABELS[s]}</option>)}
+          </select>
+          <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>Clear selection</Button>
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="mt-4 overflow-x-auto rounded-2xl border border-line/10 bg-card">
+        <table className="w-full min-w-[980px] text-sm" data-testid="leads-table">
+          <thead className="border-b border-line/10 text-left text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+            <tr>
+              <th className="w-10 px-4 py-3"><Checkbox checked={data.items.length > 0 && selected.size === data.items.length} onCheckedChange={(v) => toggleAll(!!v)} aria-label="Select all" /></th>
+              <th className="px-2 py-3 font-normal">Lead</th>
+              <th className="px-2 py-3 font-normal">Product line</th>
+              <th className="px-2 py-3 font-normal">Top product</th>
+              <th className="px-2 py-3 font-normal">Score</th>
+              <th className="px-2 py-3 font-normal">Stage</th>
+              <th className="px-2 py-3 font-normal">Owner</th>
+              <th className="px-2 py-3 font-normal">Source</th>
+              <th className="px-4 py-3 font-normal">Last active</th>
+            </tr>
+          </thead>
+          <tbody className={cn(loading && "opacity-50")}>
+            {data.items.map((l) => (
+              <tr key={l.id} className="cursor-pointer border-b border-line/5 transition-colors hover:bg-line/5" onClick={() => setOpenId(l.id)} data-testid="lead-row">
+                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}><Checkbox checked={selected.has(l.id)} onCheckedChange={() => toggle(l.id)} aria-label={`Select ${l.email}`} /></td>
+                <td className="max-w-[240px] px-2 py-3">
+                  <p className="truncate font-medium text-foreground">{l.name || l.email}</p>
+                  <p className="truncate text-xs text-muted-foreground">{[l.company, l.job_title].filter(Boolean).join(" · ") || l.email}</p>
+                </td>
+                <td className="px-2 py-3"><LineBadge line={l.primary_line} /></td>
+                <td className="max-w-[160px] truncate px-2 py-3 text-xs text-muted-foreground">{l.primary_product ? productName(l.primary_product) : "—"}</td>
+                <td className="px-2 py-3"><ScoreBar score={l.score || 0} threshold={threshold} /></td>
+                <td className="px-2 py-3"><StageBadge stage={l.stage} /></td>
+                <td className="max-w-[140px] truncate px-2 py-3 text-xs text-muted-foreground">{l.owner ? ownerName(l.owner) : <span className="text-amber-300/80">Unassigned</span>}</td>
+                <td className="px-2 py-3 text-xs text-muted-foreground">{CHANNEL_LABELS[l.channel] || l.channel || "—"}</td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">{ago(l.last_activity_at || l.created_at)}</td>
+              </tr>
+            ))}
+            {!loading && data.items.length === 0 && (
+              <tr><td colSpan={9} className="px-4 py-16 text-center text-muted-foreground" data-testid="leads-empty">No leads match these filters yet.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+        <span data-testid="leads-total">{data.total.toLocaleString()} lead{data.total === 1 ? "" : "s"}</span>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setFilter({ page: String(page - 1) })} aria-label="Previous page"><ChevronLeft /></Button>
+          <span className="font-mono text-xs">{page} / {pages}</span>
+          <Button variant="outline" size="sm" disabled={page >= pages} onClick={() => setFilter({ page: String(page + 1) })} aria-label="Next page"><ChevronRight /></Button>
         </div>
       </div>
 
-      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="dark max-h-[90vh] overflow-y-auto border-line/10 bg-background sm:max-w-xl" data-testid="admin-lead-dialog">
-          {selected && (
-            <>
-              <DialogHeader>
-                <div className="flex items-center gap-3"><TypeBadge type={selected.type} /><StatusBadge status={selected.status} />{selected.source === "chat" && <span className="inline-flex items-center gap-1 text-xs text-teal"><Bot className="h-3.5 w-3.5" /> Booked by Sol</span>}</div>
-                <DialogTitle className="font-display text-2xl font-medium tracking-tight">{selected.name || selected.email}</DialogTitle>
-                <DialogDescription className="font-mono text-xs">{fmt(selected.created_at)} · {selected.id}</DialogDescription>
-              </DialogHeader>
-              <dl className="mt-2">
-                <Detail label="Email" value={<a href={`mailto:${selected.email}`} className="text-primary-ink hover:underline">{selected.email}</a>} />
-                <Detail label="Company" value={selected.company} />
-                <Detail label="Job title" value={selected.job_title} />
-                <Detail label="Phone" value={selected.phone} />
-                <Detail label="Interest" value={selected.interest} />
-                <Detail label="Role applied" value={selected.role} />
-                <Detail label="Resource" value={selected.resource} />
-                <Detail label="Message" value={selected.message} />
-                <Detail label="Owner" value={selected.owner ? ownerName(selected.owner) : null} />
-                <Detail label="Source" value={selected.source === "chat" ? "AI concierge chat" : selected.source_page || "web"} />
-              </dl>
-              <LeadWorkflow key={selected.id + (selected.updated_at || "")} lead={selected} team={team} onSaved={onSaved} />
-              <div className="mt-4 flex justify-end">
-                <Button variant="outline" size="sm" onClick={() => onDelete(selected.id)} data-testid="admin-delete-lead" className="border-red-500/30 text-red-300 hover:border-red-500/60 hover:bg-red-500/10"><Trash2 /> Delete</Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <LeadDrawer id={openId} meta={meta} onClose={() => setOpenId(null)} onChanged={load} />
     </div>
   );
 }

@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/intent";
+import { useCmsResources } from "@/lib/content";
+import { detectTopics } from "@/lib/localConcierge";
 import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,16 +13,32 @@ import { ResourceCard } from "@/components/home/InsightsPreview";
 import { CTABand } from "@/components/shared/CTABand";
 import { Input } from "@/components/ui/input";
 import { useTx } from "@/i18n/tx";
+import { useTranslation } from "react-i18next";
 
 export default function Resources() {
   const tx = useTx();
+  const { i18n } = useTranslation();
   const [params, setParams] = useSearchParams();
   const type = params.get("type") ?? "all";
   const [q, setQ] = useState("");
+  // Record what people search for (and which products it maps to) once they pause typing.
+  useEffect(() => {
+    const term = q.trim();
+    if (term.length < 3) return;
+    const t = setTimeout(() => track("search", { topics: detectTopics(term), meta: { q: term.slice(0, 80) } }), 1200);
+    return () => clearTimeout(t);
+  }, [q]);
 
+  const { items: cms } = useCmsResources();
+  // Published CMS items first (newest), then the built-in library; a CMS item replaces a built-in one with the same slug.
+  const all = useMemo(() => {
+    const cmsSlugs = new Set(cms.map((c) => c.slug));
+    return [...cms, ...RESOURCES.filter((r) => !cmsSlugs.has(r.slug))];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cms, i18n.language]);
   const list = useMemo(
-    () => RESOURCES.filter((r) => (type === "all" || r.type === type) && (q === "" || `${r.title} ${r.desc} ${r.tag}`.toLowerCase().includes(q.toLowerCase()))),
-    [type, q]
+    () => all.filter((r) => (type === "all" || r.type === type) && (q === "" || `${r.title} ${r.desc} ${r.tag}`.toLowerCase().includes(q.toLowerCase()))),
+    [all, type, q]
   );
 
   return (
