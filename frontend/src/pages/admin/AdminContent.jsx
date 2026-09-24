@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { archiveContent, fetchContentList, formatApiError, importBuiltin, publishContent, unpublishContent } from "@/lib/adminApi";
+import { archiveContent, fetchContentList, formatApiError, importBuiltin, publishContent, publishImported, restoreImportedDates, unpublishContent } from "@/lib/adminApi";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge, ago, fmtDateTime, selectCls, useCan } from "@/components/admin/kit";
+import { Badge, ago, fmtDate, fmtDateTime, selectCls, useCan } from "@/components/admin/kit";
 
 export const TYPE_LABELS = {
   blog: "Blog", whitepaper: "White paper", datasheet: "Datasheet", casestudy: "Case study", ebook: "eBook", webinar: "Webinar",
@@ -153,6 +153,24 @@ export default function AdminContent() {
       setBusy(null);
     }
   };
+  // Migrated content: publish every draft, or put live items back on their old-site dates.
+  const bulk = async (what) => {
+    setBusy("bulk");
+    try {
+      if (what === "publish") {
+        const r = await publishImported();
+        toast.success(`Published ${r.published} migrated item${r.published === 1 ? "" : "s"} with their original dates`);
+      } else {
+        const r = await restoreImportedDates();
+        toast.success(`Restored the original date on ${r.fixed} item${r.fixed === 1 ? "" : "s"}`);
+      }
+      load();
+    } catch (e) {
+      toast.error(formatApiError(e));
+    } finally {
+      setBusy(null);
+    }
+  };
   const items = data?.items || [];
   const pages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
@@ -201,6 +219,7 @@ export default function AdminContent() {
               <th className="px-2 py-3 font-normal">Status</th>
               <th className="px-2 py-3 font-normal">Views (30d)</th>
               <th className="px-2 py-3 font-normal">Downloads (30d)</th>
+              <th className="px-2 py-3 font-normal" title="Date shown on the website. Migrated drafts show their original date.">Published</th>
               <th className="px-2 py-3 font-normal">Updated</th>
               <th className="px-4 py-3 text-right font-normal">Actions</th>
             </tr>
@@ -209,7 +228,7 @@ export default function AdminContent() {
             {!data && Array.from({ length: 8 }, (_, i) => (
               <tr key={i} className="border-b border-line/5" aria-hidden>
                 <td className="px-4 py-3"><div className="h-4 w-64 animate-pulse rounded bg-line/10" /><div className="mt-2 h-3 w-40 animate-pulse rounded bg-line/5" /></td>
-                {Array.from({ length: 6 }, (__, j) => <td key={j} className="px-2 py-3"><div className="h-3 w-12 animate-pulse rounded bg-line/10" /></td>)}
+                {Array.from({ length: 7 }, (__, j) => <td key={j} className="px-2 py-3"><div className="h-3 w-12 animate-pulse rounded bg-line/10" /></td>)}
               </tr>
             ))}
             {items.map((c) => (
@@ -228,6 +247,11 @@ export default function AdminContent() {
                 </td>
                 <td className="px-2 py-3 font-mono text-xs">{c.views_30d}</td>
                 <td className="px-2 py-3 font-mono text-xs">{c.downloads_30d}</td>
+                <td className="px-2 py-3 text-xs text-muted-foreground" data-testid="content-published-date">
+                  {c.status === "draft" || c.status === "archived"
+                    ? (c.original_date ? <span title="Original date on the old website; used when you publish">{fmtDate(c.original_date)}<br /><span className="text-[10px]">original</span></span> : "—")
+                    : fmtDate(c.publish_at)}
+                </td>
                 <td className="px-2 py-3 text-xs text-muted-foreground" title={fmtDateTime(c.updated_at)}>{ago(c.updated_at)}<br /><span className="text-[10px]">{c.updated_by}</span></td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
@@ -247,7 +271,7 @@ export default function AdminContent() {
               </tr>
             ))}
             {data && !loading && items.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-16 text-center text-muted-foreground">Nothing here yet.{can("editContent") && <> <Link to="/admin/content/new" className="text-teal hover:underline">Create your first item</Link>.</>}</td></tr>
+              <tr><td colSpan={8} className="px-4 py-16 text-center text-muted-foreground">Nothing here yet.{can("editContent") && <> <Link to="/admin/content/new" className="text-teal hover:underline">Create your first item</Link>.</>}</td></tr>
             )}
           </tbody>
         </table>
@@ -257,6 +281,12 @@ export default function AdminContent() {
           {data ? <>{data.total ? `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, data.total)} of ` : ""}{data.total} item{data.total === 1 ? "" : "s"}</> : "Loading…"}
           {data?.origin_counts && ` · ${data.origin_counts.builtin} from the original site · ${data.origin_counts.import} migrated`}
           {data?.origin_counts?.builtin === 0 && can("editContent") && <> · The site's original articles and press releases aren't managed here yet: <button type="button" className="text-teal hover:underline" onClick={() => setBuiltinOpen(true)}>bring them in</button>.</>}
+          {can("editContent") && data?.origin_counts?.import_drafts > 0 && (
+            <> · <button type="button" className="text-teal hover:underline disabled:opacity-50" disabled={!!busy} onClick={() => bulk("publish")} data-testid="content-publish-migrated">Publish {data.origin_counts.import_drafts} migrated draft{data.origin_counts.import_drafts === 1 ? "" : "s"} with their original dates</button></>
+          )}
+          {can("editContent") && data?.origin_counts?.misdated > 0 && (
+            <> · <button type="button" className="text-amber-300 hover:underline disabled:opacity-50" disabled={!!busy} onClick={() => bulk("dates")} data-testid="content-restore-dates">Restore original dates on {data.origin_counts.misdated} item{data.origin_counts.misdated === 1 ? "" : "s"}</button></>
+          )}
         </p>
         {pages > 1 && (
           <div className="flex items-center gap-1" data-testid="content-pager">

@@ -256,13 +256,13 @@ export default function AdminMigrate() {
                   {opts.type_mode === "fixed" && <select value={opts.fixed_type} onChange={(e) => set({ fixed_type: e.target.value })} className={selectCls}>{Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>}
                 </span>
               </Opt>
-              <Opt label="Publish straight away" hint="On: items go live with their original dates. Off: they arrive as drafts to review first.">
+              <Opt label="Publish straight away" hint="On: items go live with their original dates. Off: they arrive as drafts; publishing them later (one by one or all at once from Content) still uses their original dates.">
                 <Switch checked={opts.status === "published"} onCheckedChange={(v) => set({ status: v ? "published" : "draft" })} data-testid="migrate-publish" />
               </Opt>
-              <Opt label="Copy images and PDFs" hint="Stores them here (up to 10 MB each) so nothing depends on the old site staying up.">
+              <Opt label="Copy images and attachments" hint="Stores cover images and each item's PDF here (up to 15 MB each), including downloads the old site kept behind a form, so nothing depends on the old site staying up.">
                 <Switch checked={opts.mirror_media} onCheckedChange={(v) => set({ mirror_media: v })} />
               </Opt>
-              <Opt label="Attach the first linked PDF as the downloadable file">
+              <Opt label="Attach each item's PDF as its download" hint="Found from links on the page or where the old site stores it (next to the cover image).">
                 <Switch checked={opts.attach_pdfs} onCheckedChange={(v) => set({ attach_pdfs: v })} />
               </Opt>
               <Opt label="Gate attached files" hint="Visitors fill in the download form and get the file by email.">
