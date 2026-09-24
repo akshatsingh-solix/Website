@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
-import { ConciergeWidget } from "@/components/chat/ConciergeWidget";
+import { LazyConcierge } from "@/components/chat/LazyConcierge";
 import { pageTransitionVariants } from "@/components/shared/Reveal";
 import { ConsentBanner } from "@/components/shared/ConsentBanner";
 import { EmpowerPromo } from "@/components/shared/EmpowerPromo";
@@ -33,7 +33,7 @@ export const Layout = () => {
         </AnimatePresence>
       </main>
       <Footer />
-      <ConciergeWidget />
+      <LazyConcierge />
       <ConsentBanner />
       <EmpowerPromo />
     </div>

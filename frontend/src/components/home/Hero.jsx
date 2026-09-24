@@ -5,6 +5,9 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Bot, Check, Database, Play, ShieldCheck, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Magnetic, AuroraField } from "@/components/shared/Reveal";
+import { webpSrcSet } from "@/components/shared/Picture";
+
+const HERO_IMAGE = "/Website/images/hero-architecture.jpg";
 
 const WORD_KEYS = ["activates", "governs", "preserves", "unlocks"];
 const ease = [0.22, 1, 0.36, 1];
@@ -71,13 +74,19 @@ const HeroVisual = () => {
       <div className="absolute -right-6 bottom-0 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.2),transparent)]" />
 
       <div className="dark relative overflow-hidden rounded-[28px] border border-line/10 bg-background shadow-[0_2px_6px_rgba(13,25,45,0.08),0_60px_120px_-50px_rgba(13,25,45,0.6)]">
-        <motion.img
-          src="/Website/images/hero-architecture.jpg"
-          alt={t("hero.imageAlt")}
-          style={{ y: imgY, scale: 1.1 }}
-          className="aspect-[5/4] w-full object-cover"
-          fetchpriority="high"
-        />
+        <picture style={{ display: "contents" }}>
+          <source type="image/webp" srcSet={webpSrcSet(HERO_IMAGE)} sizes="(min-width: 1024px) 620px, 100vw" />
+          <motion.img
+            src={HERO_IMAGE}
+            alt={t("hero.imageAlt")}
+            style={{ y: imgY, scale: 1.1 }}
+            className="aspect-[5/4] w-full object-cover"
+            width={1264}
+            height={848}
+            decoding="async"
+            fetchpriority="high"
+          />
+        </picture>
         <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 py-4">
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/80">{t("hero.liveDataFabric")}</span>
           <span className="flex gap-1.5" aria-hidden="true">

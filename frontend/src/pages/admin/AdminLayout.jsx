@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -54,7 +55,10 @@ export default function AdminLayout() {
         </nav>
       </header>
       <main className="container py-8 sm:py-10">
-        <Outlet />
+        {/* Only the page area waits for a page's code; the navigation stays put. */}
+        <Suspense fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

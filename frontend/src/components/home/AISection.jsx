@@ -6,6 +6,7 @@ import { AuroraField, Reveal } from "@/components/shared/Reveal";
 import { NeuralField } from "./NeuralField";
 import { useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
+import { Picture } from "@/components/shared/Picture";
 
 const POINTS = [
   { icon: Lock, title: "Trust perimeter", desc: "Access, masking and retention policies travel with every query, prompt and answer." },
@@ -27,7 +28,7 @@ export const AISection = () => {
     <div className="container relative grid items-center gap-14 lg:grid-cols-12 lg:gap-12">
       <Reveal className="group relative lg:col-span-6">
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-line/10 bg-background shadow-[0_60px_120px_-50px_rgba(0,0,0,0.85)]">
-          <img src="/Website/images/ai-neural.jpg" alt={tx("Neural network of governed enterprise data")} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
+          <Picture src="/Website/images/ai-neural.jpg" sizes="(min-width: 1024px) 50vw, 100vw" alt={tx("Neural network of governed enterprise data")} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
           <NeuralField className="absolute inset-0 h-full w-full opacity-60 mix-blend-screen" />
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background/85 to-transparent" />
 

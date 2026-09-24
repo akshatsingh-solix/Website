@@ -14,6 +14,7 @@ import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
+import { Picture } from "@/components/shared/Picture";
 
 const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
 
@@ -88,7 +89,7 @@ export default function PressRelease() {
         <div className="container grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <Reveal className="mb-8 overflow-hidden rounded-3xl border border-line/10">
-              <img src={pr.image} alt="" className="aspect-[21/9] w-full object-cover" data-testid="press-hero-image" />
+              <Picture src={pr.image} loading="eager" className="aspect-[21/9] w-full object-cover" data-testid="press-hero-image" />
             </Reveal>
             <ArticleBody blocks={pr.body} />
             <div className="mt-12 rounded-2xl border border-line/10 bg-card p-6" data-testid="press-boilerplate">

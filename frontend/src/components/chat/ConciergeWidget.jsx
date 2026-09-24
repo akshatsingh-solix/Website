@@ -94,10 +94,10 @@ const Bubble = ({ role, content, streaming }) => (
   </div>
 );
 
-export const ConciergeWidget = () => {
+export const ConciergeWidget = ({ defaultOpen = false }) => {
   const tx = useTx();
   const { i18n } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -296,3 +296,4 @@ export const ConciergeWidget = () => {
     </>
   );
 };
+export default ConciergeWidget;

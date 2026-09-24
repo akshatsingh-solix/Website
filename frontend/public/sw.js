@@ -1,21 +1,25 @@
 /* Solix site service worker: a small, conservative caching layer.
  *
  * - Pages (navigations): network first, so a new deploy is picked up
- *   immediately; the cached app shell is used only when offline.
+ *   immediately; the cached app shell is used when offline, or when the
+ *   network hasn't answered within PAGE_TIMEOUT_MS (slow or high-latency
+ *   links), while the network copy still refreshes the cache.
  * - Built JS/CSS (/static/, content-hashed): cache first, kept forever.
  * - Images and fonts: stale-while-revalidate.
- * - Published content (content-snapshot.json, GET /api/content, /api/files):
+ * - Published content and site settings (content-snapshot.json,
+ *   GET /api/content, /api/files, /api/site):
  *   stale-while-revalidate, so repeat visits render instantly and refresh
  *   in the background.
  * - Everything else (forms, tracking, admin, chat) goes straight to the
  *   network and is never cached.
  */
-const VERSION = "v2";
+const VERSION = "v3";
 const STATIC_CACHE = `solix-static-${VERSION}`;
 const RUNTIME_CACHE = `solix-runtime-${VERSION}`;
 const SCOPE = new URL(self.registration.scope).pathname; // e.g. /Website/
 const SHELL = `${SCOPE}index.html`;
 const RUNTIME_LIMIT = 150;
+const PAGE_TIMEOUT_MS = 3500;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(STATIC_CACHE).then((c) => c.add(SHELL)).catch(() => {}).then(() => self.skipWaiting()));
@@ -62,15 +66,19 @@ const staleWhileRevalidate = async (event, req) => {
   return refresh;
 };
 
-const networkFirstPage = async (req) => {
-  try {
-    const res = await fetch(req);
-    if (res.ok) caches.open(STATIC_CACHE).then((c) => c.put(SHELL, res.clone()));
+const networkFirstPage = async (event, req) => {
+  const network = fetch(req).then((res) => {
+    if (res.ok) {
+      const copy = res.clone();
+      event.waitUntil(caches.open(STATIC_CACHE).then((c) => c.put(SHELL, copy)));
+    }
     return res;
-  } catch {
-    const shell = await caches.match(SHELL);
-    return shell || Response.error();
-  }
+  });
+  const shell = await caches.match(SHELL);
+  if (!shell) return network.catch(() => Response.error());
+  const slow = new Promise((resolve) => setTimeout(() => resolve(shell), PAGE_TIMEOUT_MS));
+  event.waitUntil(network.catch(() => {}));
+  return Promise.race([network.catch(() => shell), slow]);
 };
 
 self.addEventListener("fetch", (event) => {
@@ -82,7 +90,7 @@ self.addEventListener("fetch", (event) => {
 
   if (req.mode === "navigate" && url.origin === self.location.origin) {
     if (url.pathname.startsWith(`${SCOPE}admin`)) return;
-    event.respondWith(networkFirstPage(req));
+    event.respondWith(networkFirstPage(event, req));
     return;
   }
   if (url.origin === self.location.origin) {
@@ -93,7 +101,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   // Public, cacheable API reads only (never forms, tracking, chat or admin).
-  if (/\/api\/(content(\/[^/]+)?|files\/.+)$/.test(url.pathname) && !url.searchParams.has("t")) {
+  if (/\/api\/(site|content(\/[^/]+)?|files\/.+)$/.test(url.pathname) && !url.searchParams.has("t")) {
     event.respondWith(staleWhileRevalidate(event, req));
     return;
   }

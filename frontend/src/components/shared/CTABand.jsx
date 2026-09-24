@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
 import { Reveal } from "./Reveal";
+import { Picture } from "@/components/shared/Picture";
 
 /**
  * The closing "act" of every page: a contained navy panel on the light
@@ -24,7 +25,7 @@ export const CTABand = ({
     <div className="container">
       <Reveal>
         <div className="dark relative isolate overflow-hidden rounded-[32px] bg-background text-foreground shadow-[0_60px_120px_-60px_rgba(13,25,45,0.7)]">
-          <img src={image} alt="" loading="lazy" className="absolute inset-y-0 right-0 -z-10 h-full w-full object-cover opacity-60 sm:opacity-100 lg:w-[58%]" />
+          <Picture src={image} sizes="(min-width: 1024px) 58vw, 100vw" className="absolute inset-y-0 right-0 -z-10 h-full w-full object-cover opacity-60 sm:opacity-100 lg:w-[58%]" />
           <div className="absolute inset-0 -z-10 bg-gradient-to-r from-background via-background/90 to-background/20 lg:via-background/80 lg:to-transparent" />
           <div className="absolute inset-0 -z-10 grid-lines opacity-60" />
           <div className="absolute -left-24 -top-24 -z-10 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.35),transparent)]" />
