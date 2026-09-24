@@ -116,3 +116,22 @@ export async function exportRegistrations(slug, params, format) {
   const res = await adminApi.get(`/admin/events/${slug}/registrations-export`, { params: { ...clean(params), format }, responseType: "blob", timeout: 120000 });
   await saveBlob(res, `${slug}-registrations.${format}`);
 }
+
+// --- Built-in content, website migration, site settings, asset emails -------
+export const importBuiltin = (items, on_conflict = "skip") => adminApi.post("/admin/content/import-builtin", { items, on_conflict }, { timeout: 120000 }).then((r) => r.data);
+export const previewMigration = (body) => adminApi.post("/admin/migrations/preview", body, { timeout: 180000 }).then((r) => r.data);
+export const startMigration = (body) => adminApi.post("/admin/migrations", body, { timeout: 60000 }).then((r) => r.data);
+export const fetchMigrations = () => adminApi.get("/admin/migrations").then((r) => r.data);
+export const fetchMigration = (id) => adminApi.get(`/admin/migrations/${id}`).then((r) => r.data);
+export const cancelMigration = (id) => adminApi.post(`/admin/migrations/${id}/cancel`).then((r) => r.data);
+export async function downloadRedirects(format) {
+  const res = await adminApi.get("/admin/migrations/redirects", { params: { format }, responseType: "blob" });
+  await saveBlob(res, `redirects.${format === "nginx" ? "nginx.conf" : format === "apache" ? "htaccess" : "csv"}`);
+}
+export const fetchSite = () => adminApi.get("/admin/site").then((r) => r.data);
+export const saveSite = (body) => adminApi.put("/admin/site", body).then((r) => r.data);
+export const fetchDelivery = () => adminApi.get("/admin/delivery").then((r) => r.data);
+export const saveDelivery = (body) => adminApi.put("/admin/delivery", body).then((r) => r.data);
+export const fetchDeliveries = (params) => adminApi.get("/admin/deliveries", { params: clean(params) }).then((r) => r.data);
+export const testDelivery = (body) => adminApi.post("/admin/deliveries/test", body, { timeout: 60000 }).then((r) => r.data);
+export const resendDelivery = (id) => adminApi.post(`/admin/deliveries/${id}/resend`, null, { timeout: 60000 }).then((r) => r.data);

@@ -14,11 +14,11 @@ import {
   restoreContentVersion, unpublishContent, updateContent, uploadFile,
 } from "@/lib/adminApi";
 import { fmtDateTime, inputCls, productName, selectCls, useCan } from "@/components/admin/kit";
-import { StatusBadge, TYPE_LABELS } from "@/pages/admin/AdminContent";
+import { StatusBadge, TYPE_LABELS, sitePath } from "@/pages/admin/AdminContent";
 
 const EMPTY = {
   title: "", type: "blog", slug: "", summary: "", body: "", tag: "", products: [], industries: [], author: "", author_role: "",
-  cover_image: "", file_id: "", gated: false, event_date: "", video_url: "", seo_title: "", seo_description: "",
+  cover_image: "", file_id: "", gated: false, event_date: "", video_url: "", seo_title: "", seo_description: "", source_url: "",
 };
 const slugify = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 100);
 const FIELDS = Object.keys(EMPTY);
@@ -214,7 +214,7 @@ function Editor() {
         <div className="flex flex-wrap items-center gap-2">
           {item && <StatusBadge status={item.status} />}
           {item?.status === "scheduled" && <span className="text-xs text-muted-foreground">goes live {fmtDateTime(item.publish_at)}</span>}
-          {live && <Button asChild variant="ghost" size="sm"><a href={`${process.env.PUBLIC_URL}/resources/${saved.slug}`} target="_blank" rel="noreferrer"><ExternalLink /> View live</a></Button>}
+          {live && <Button asChild variant="ghost" size="sm"><a href={`${process.env.PUBLIC_URL}${sitePath(saved)}`} target="_blank" rel="noreferrer"><ExternalLink /> View live</a></Button>}
           {editable && (
             <>
               <Button variant="outline" size="sm" onClick={save} disabled={!!busy || (!dirty && !!id) || form.title.trim().length < 3} data-testid="content-save">{busy === "save" ? <Loader2 className="animate-spin" /> : <Check />} {id ? "Save" : "Save draft"}</Button>
@@ -243,7 +243,7 @@ function Editor() {
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </Field>
-              <Field label="URL" hint={`${window.location.origin}${process.env.PUBLIC_URL}/resources/${form.slug || "…"}`} className="sm:col-span-2">
+              <Field label="URL" hint={`${window.location.origin}${process.env.PUBLIC_URL}${sitePath({ ...form, slug: form.slug || "…" })}${item?.source_url ? ` · migrated from ${item.source_url}` : ""}`} className="sm:col-span-2">
                 <Input value={form.slug} onChange={(e) => { setSlugTouched(true); set({ slug: slugify(e.target.value) }); }} className={inputCls} disabled={!editable} data-testid="content-slug" />
               </Field>
               <Field label="Topic label" hint="Short tag shown on the card, e.g. SAP">

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
 import { fileHref, useCmsArticle, useCmsResources } from "@/lib/content";
-import { markdownToBlocks } from "@/lib/markdown";
+import { localizeBlocks, markdownToBlocks } from "@/lib/markdown";
 import { setPageTopics, track } from "@/lib/intent";
 import { api } from "@/lib/api";
 
@@ -40,16 +40,19 @@ const Share = ({ title }) => {
 };
 
 // Built-in article (data/articles.js) or a published CMS item, in one shape.
+// A built-in item that editors withdrew in the CMS is gone (404) like any unpublished page.
 function useResource(slug) {
+  const { i18n } = useTranslation();
   const staticR = RESOURCES.find((x) => x.slug === slug);
   const staticArticle = ARTICLES[slug];
-  const { items: cms } = useCmsResources();
+  const { items: cms, withdrawn } = useCmsResources();
   const cmsListed = cms.some((c) => c.slug === slug);
-  const isStatic = !!(staticR && staticArticle) && !cmsListed;
+  const isStatic = !!(staticR && staticArticle) && !cmsListed && !withdrawn.has(slug);
   const { resource: cmsR, loading, missing } = useCmsArticle(isStatic ? null : slug);
-  const blocks = useMemo(() => (isStatic ? staticArticle.body : cmsR ? markdownToBlocks(cmsR.body) : []), [isStatic, staticArticle, cmsR]);
-  if (isStatic) return { r: staticR, summary: staticArticle.summary, blocks, related: [...cms, ...RESOURCES] };
-  return { r: cmsR, summary: cmsR?.desc, blocks, loading, missing, related: [...cms, ...RESOURCES.filter((x) => !cms.some((c) => c.slug === x.slug))] };
+  const blocks = useMemo(() => (isStatic ? staticArticle.body : cmsR ? localizeBlocks(markdownToBlocks(cmsR.body), i18n.language) : []), [isStatic, staticArticle, cmsR, i18n.language]);
+  const builtins = RESOURCES.filter((x) => !withdrawn.has(x.slug) && !cms.some((c) => c.slug === x.slug));
+  if (isStatic) return { r: staticR, summary: staticArticle.summary, blocks, related: [...cms, ...builtins] };
+  return { r: cmsR, summary: cmsR?.desc, blocks, loading, missing, related: [...cms, ...builtins] };
 }
 
 export default function Article() {
@@ -59,6 +62,20 @@ export default function Article() {
   const { r, summary, blocks: allBlocks, loading, missing, related: pool } = useResource(slug);
   const [unlocked, setUnlocked] = useState(() => readUnlocked().includes(slug));
   const [download, setDownload] = useState(null);
+
+  // "Read the full content" links in delivery emails carry a signed access token.
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("access");
+    if (!token || unlocked) return;
+    api.get(`/content-access/${encodeURIComponent(slug)}`, { params: { t: token } })
+      .then(({ data }) => {
+        if (!data?.ok) return;
+        sessionStorage.setItem(UNLOCK_KEY, JSON.stringify([...readUnlocked(), slug]));
+        setUnlocked(true);
+        if (data.url) setDownload(fileHref(data.url));
+      })
+      .catch(() => {});
+  }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Intent: this page is about the resource's products.
   const topicsKey = (r?.products || []).join(",");
@@ -191,7 +208,7 @@ export default function Article() {
                   <h3 className="font-display text-2xl font-medium tracking-tight">{tx("Unlock the full {{type}}.", { type: i18n.language === "de" ? typeLabel(r.type) : typeLabel(r.type).toLowerCase() })}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{tx("Tell us a little about yourself. We'll unlock the complete content instantly and send a copy to your inbox.")}</p>
                   <div className="mt-6">
-                    <LeadForm type="download" extra={{ resource: r.title, topics: r.products?.length ? r.products : undefined }} submitLabel="Unlock full content" successTitle="Unlocked." successDesc="The full content is now visible below and a copy is on its way to your inbox." showInterest={false} showMessage={false} compact onSuccess={unlock} />
+                    <LeadForm type="download" extra={{ resource: r.title, resource_slug: slug, topics: r.products?.length ? r.products : undefined }} submitLabel="Unlock full content" successTitle="Unlocked." successDesc="The full content is now visible below and a copy is on its way to your inbox." showInterest={false} showMessage={false} compact onSuccess={unlock} />
                   </div>
                 </div>
               </Reveal>

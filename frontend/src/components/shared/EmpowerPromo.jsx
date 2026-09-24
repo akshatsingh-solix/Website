@@ -7,6 +7,7 @@ import { EMPOWER, empowerIsLive, empowerLink } from "@/lib/empower";
 import { useTx } from "@/i18n/tx";
 import { mediaSources } from "@/lib/media";
 import { MediaImage } from "@/components/media/MediaImage";
+import { useSiteSettings } from "@/lib/site";
 
 // Bottom-left invitation to SOLIXEmpower. It waits until the cookie choice is
 // made (the consent banner uses the same corner), opens once, and after it's
@@ -45,6 +46,7 @@ export const EmpowerPromo = () => {
   const tx = useTx();
   const { pathname } = useLocation();
   const days = useDaysLeft();
+  const site = useSiteSettings();
   const [ready, setReady] = useState(false);
   // Phones start with the compact pill: a full card would cover most of the first screen.
   const [mode, setMode] = useState(() => {
@@ -73,7 +75,7 @@ export const EmpowerPromo = () => {
     if (ready && mode === "card") track("cta", { meta: { cta: "empower_promo_view" } });
   }, [ready, mode]);
 
-  if (!empowerIsLive() || HIDE_ON.test(pathname) || mode === "hidden") return null;
+  if (!empowerIsLive() || HIDE_ON.test(pathname) || mode === "hidden" || site?.empower_promo === false) return null;
 
   const minimize = () => { setMode("min"); writeState("min", false); };
   const hide = () => { setMode("hidden"); writeState("hidden", false); };

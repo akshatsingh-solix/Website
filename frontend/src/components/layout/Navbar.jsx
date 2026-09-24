@@ -15,6 +15,7 @@ import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { LanguageDetectionNotice } from "@/components/shared/LanguageDetectionNotice";
 import { useAccount } from "@/components/account/AccountAuth";
 import { useTx } from "@/i18n/tx";
+import { useSiteSettings } from "@/lib/site";
 
 // Only the site's top-level nav chrome is translated so far - the deep
 // mega-menu content (product/solution/industry names) is still English
@@ -229,18 +230,45 @@ const MobileNav = ({ onNavigate }) => {
  * frees the main bar for a clearly labelled Login button in every
  * language. It folds away once the page scrolls.
  */
+// The promo on the left is editable in Admin > Website (announcement bar).
+const Announcement = () => {
+  const tx = useTx();
+  const a = useSiteSettings()?.announcement;
+  if (a && (!a.enabled || !a.text)) return <span />;
+  const badge = (
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-2 py-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.14em] text-primary-foreground">
+      <Sparkles className="h-3 w-3" /> {a?.badge ? tx(a.badge) : tx("New")}
+    </span>
+  );
+  if (!a) {
+    return (
+      <Link to="/signup" className="group flex min-w-0 items-center gap-2 text-muted-foreground transition-colors hover:text-foreground" data-testid="utility-trial-link">
+        {badge}
+        <span className="truncate">{tx("Solix ECS: talk to your enterprise data.")}</span>
+        <span className="hidden shrink-0 font-semibold text-teal group-hover:underline lg:inline">{tx("Start your 30-day free trial")} →</span>
+      </Link>
+    );
+  }
+  const inner = (
+    <>
+      {badge}
+      <span className="truncate">{tx(a.text)}</span>
+      {a.link_label && <span className="hidden shrink-0 font-semibold text-teal group-hover:underline lg:inline">{tx(a.link_label)} →</span>}
+    </>
+  );
+  const cls = "group flex min-w-0 items-center gap-2 text-muted-foreground transition-colors hover:text-foreground";
+  if (!a.link_url) return <span className={cls} data-testid="utility-announcement">{inner}</span>;
+  return a.link_url.startsWith("/")
+    ? <Link to={a.link_url} className={cls} data-testid="utility-announcement">{inner}</Link>
+    : <a href={a.link_url} target="_blank" rel="noreferrer" className={cls} data-testid="utility-announcement">{inner}</a>;
+};
+
 const UtilityBar = ({ hidden }) => {
   const tx = useTx();
   return (
     <div className={cn("hidden overflow-hidden border-b border-line/10 bg-muted/80 transition-[max-height,opacity] duration-300 md:block", hidden ? "max-h-0 border-transparent opacity-0" : "max-h-10 opacity-100")} data-testid="utility-bar">
       <div className="container flex h-9 items-center justify-between gap-6 text-xs">
-        <Link to="/signup" className="group flex min-w-0 items-center gap-2 text-muted-foreground transition-colors hover:text-foreground" data-testid="utility-trial-link">
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-2 py-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.14em] text-primary-foreground">
-            <Sparkles className="h-3 w-3" /> {tx("New")}
-          </span>
-          <span className="truncate">{tx("Solix ECS: talk to your enterprise data.")}</span>
-          <span className="hidden shrink-0 font-semibold text-teal group-hover:underline lg:inline">{tx("Start your 30-day free trial")} →</span>
-        </Link>
+        <Announcement />
         <div className="flex shrink-0 items-center gap-5 text-muted-foreground">
           <a href={empowerLink("utility_bar")} data-intent="empower_register" className="hidden items-center gap-1.5 font-medium text-primary-ink transition-colors hover:text-foreground xl:inline-flex" data-testid="utility-empower-link"><CalendarDays className="h-3.5 w-3.5" /> SOLIXEmpower 2026 · {tx("Oct 28-30, San Diego")}</a>
           <a href="tel:18884676549" className="hidden items-center gap-1.5 transition-colors hover:text-foreground lg:inline-flex"><Phone className="h-3.5 w-3.5" /> 1.888.GO.SOLIX</a>

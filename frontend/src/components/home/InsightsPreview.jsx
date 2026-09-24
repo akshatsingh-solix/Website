@@ -43,9 +43,9 @@ export const ResourceCard = ({ r, className }) => {
 
 export const InsightsPreview = () => {
   const tx = useTx();
-  const { items: cms } = useCmsResources();
+  const { items: cms, withdrawn } = useCmsResources();
   // Newest published CMS items lead; the built-in library fills the rest.
-  const latest = [...cms, ...RESOURCES.filter((r) => !cms.some((c) => c.slug === r.slug))].slice(0, 4);
+  const latest = [...cms, ...RESOURCES.filter((r) => !cms.some((c) => c.slug === r.slug) && !withdrawn.has(r.slug))].slice(0, 4);
   return (
   <Section className="bg-background" id="insights">
     <div className="container">

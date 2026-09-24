@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowUpRight, Calendar, Copy, Download, Link2, Linkedin, Loader2, Mail, Twitter } from "lucide-react";
+import { localizeBlocks, markdownToBlocks } from "@/lib/markdown";
+import { usePressReleases } from "@/lib/press";
 import { toast } from "sonner";
-import { BOILERPLATE, PRESS_CONTACT, PRESS_RELEASES } from "@/data/newsroom";
+import { BOILERPLATE, PRESS_CONTACT } from "@/data/newsroom";
 import { API } from "@/lib/api";
 import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
@@ -20,11 +22,17 @@ export default function PressRelease() {
   const tx = useTx();
   const { i18n } = useTranslation();
   const lng = i18n.language;
-  const pr = PRESS_RELEASES.find((p) => p.id === id);
+  const { releases, ready } = usePressReleases();
+  const found = releases.find((p) => p.id === id);
+  // CMS releases carry Markdown; built-in ones already have blocks.
+  const pr = useMemo(() => (found?.cms ? { ...found, body: localizeBlocks(markdownToBlocks(found.markdown), lng) } : found), [found, lng]);
   const [busy, setBusy] = useState(false);
-  if (!pr) return <Navigate to="/404" replace />;
+  if (!pr) {
+    if (!ready) return <div className="grid min-h-[60vh] place-items-center" data-testid="press-loading"><Loader2 className="h-6 w-6 animate-spin text-primary-ink" /></div>;
+    return <Navigate to="/404" replace />;
+  }
 
-  const others = PRESS_RELEASES.filter((p) => p.id !== id).slice(0, 3);
+  const others = releases.filter((p) => p.id !== id).slice(0, 3);
   const url = window.location.href;
   const copy = async (text, msg) => { await navigator.clipboard?.writeText(text); toast.success(msg); };
 

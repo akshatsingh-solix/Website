@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bot, Check, FileText, Loader2, MousePointerClick, RefreshCw, Sparkles, UserRound } from "lucide-react";
+import { Bot, Check, FileText, Loader2, Mail, MousePointerClick, RefreshCw, Sparkles, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -25,9 +25,10 @@ const Row = ({ label, children }) => (children ? (
 ) : null);
 
 const TimelineItem = ({ t }) => {
-  const Icon = t.kind === "form" ? FileText : t.kind === "stage" ? Sparkles : t.type === "chat_topic" ? Bot : t.type === "cta_click" ? MousePointerClick : UserRound;
+  const Icon = t.kind === "form" ? FileText : t.kind === "stage" ? Sparkles : t.kind === "email" ? Mail : t.type === "chat_topic" ? Bot : t.type === "cta_click" ? MousePointerClick : UserRound;
   let text;
-  if (t.kind === "form") text = <><strong className="font-medium text-foreground">{FORM_LABELS[t.type] || t.type}</strong>{t.detail ? ` · ${t.detail}` : ""}</>;
+  if (t.kind === "email") text = <>{t.type === "asset_sent" ? "Emailed their copy of" : "Couldn't email"} <span className="text-foreground">{t.detail}</span>{t.meta?.attached ? " (file attached)" : ""}{t.type !== "asset_sent" && t.meta?.reason ? ` · ${t.meta.reason}` : ""}</>;
+  else if (t.kind === "form") text = <><strong className="font-medium text-foreground">{FORM_LABELS[t.type] || t.type}</strong>{t.detail ? ` · ${t.detail}` : ""}</>;
   else if (t.kind === "stage") text = <>Stage → <strong className="font-medium text-foreground">{STAGE_LABELS[t.type] || t.type}</strong>{t.detail ? ` · ${t.detail}` : ""}{t.by && t.by !== "system" ? ` (${t.by})` : ""}</>;
   else {
     const what = t.type === "page_view" || t.type === "engaged" || t.type === "deep_scroll" ? t.path : t.meta?.title || t.path;

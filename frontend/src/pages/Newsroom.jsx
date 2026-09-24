@@ -10,6 +10,7 @@ import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
+import { usePressReleases } from "@/lib/press";
 import { Button } from "@/components/ui/button";
 
 const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
@@ -21,8 +22,10 @@ export default function Newsroom() {
   const { i18n } = useTranslation();
   const lng = i18n.language;
   const [cat, setCat] = useState("All");
-  const featured = PRESS_RELEASES.find((p) => p.featured);
-  const list = useMemo(() => PRESS_RELEASES.filter((p) => !p.featured && (cat === "All" || p.category === cat)), [cat, lng]); // eslint-disable-line react-hooks/exhaustive-deps
+  const { releases } = usePressReleases();
+  const featuredId = PRESS_RELEASES.find((p) => p.featured)?.id;
+  const featured = releases.find((p) => p.id === featuredId) || null;
+  const list = useMemo(() => releases.filter((p) => p !== featured && (cat === "All" || p.category === cat)), [releases, featured, cat]);
 
   const copyBoilerplate = async () => {
     await navigator.clipboard?.writeText(tx(BOILERPLATE));
