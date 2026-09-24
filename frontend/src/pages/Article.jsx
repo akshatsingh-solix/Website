@@ -136,7 +136,7 @@ export default function Article() {
           </div>
           {r.registerUrl && (
             <Button asChild data-intent="empower_register" data-testid="article-register">
-              <a href={r.registerUrl}>{tx("Register free")} <ArrowRight /></a>
+              <a href={r.registerUrl}>{tx("Register now")} <ArrowRight /></a>
             </Button>
           )}
           <Share title={r.title} />

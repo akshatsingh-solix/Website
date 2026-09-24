@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, CreditCard, FileText, Lock, Tag, Ticket, Utensils, Code2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, CreditCard, FileText, Lock, RotateCcw, Tag, Ticket, Utensils, Code2 } from "lucide-react";
 import { Spinner } from "@/components/ui";
-import { money, useEvent } from "@/lib/useEvent";
+import { fmtDate, money, useEvent } from "@/lib/useEvent";
 import { getQuote, linkage, register, utm } from "@/lib/api";
 import { payWithEventbrite, payWithStripeLink, rememberRegistration } from "@/lib/payments";
 import { COUNTRIES } from "@/data/countries";
@@ -57,7 +57,10 @@ export default function Register() {
 
   const tickets = event.tickets || [];
   const ticket = tickets.find((t) => t.id === form.ticket_id) || null;
-  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k, v) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErrors((e) => (e[k] ? { ...e, [k]: undefined } : e));
+  };
   const toggleIn = (k, v) => setForm((f) => ({ ...f, [k]: f[k].includes(v) ? f[k].filter((x) => x !== v) : [...f[k], v] }));
 
   useEffect(() => { document.title = `Register · ${EVENT.name}`; }, []);
@@ -65,7 +68,8 @@ export default function Register() {
   useEffect(() => {
     if (form.ticket_id && tickets.some((t) => t.id === form.ticket_id)) return;
     const wanted = params.get("pass");
-    const pick = tickets.find((t) => t.id === wanted) || tickets.find((t) => !t.sold_out) || tickets[0];
+    const onSale = tickets.filter((t) => !t.sales_ended);
+    const pick = onSale.find((t) => t.id === wanted) || onSale.find((t) => !t.sold_out) || onSale[0];
     if (pick) set("ticket_id", pick.id);
   }, [tickets, params]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -87,6 +91,7 @@ export default function Register() {
     try {
       const q = await getQuote(ticket.id, form.promo_code.trim());
       setQuote({ ...q, ticket_id: ticket.id });
+      // promo_valid is null for Eventbrite passes: Eventbrite checks the code at checkout.
       setPromoState({ busy: false, message: q.promo_message, valid: q.promo_valid });
     } catch (e) {
       setPromoState({ busy: false, message: e.message, valid: false });
@@ -112,6 +117,9 @@ export default function Register() {
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const payable = price && price.total > 0 && ticket?.provider !== "free";
+  const viaEventbrite = ticket?.provider === "eventbrite";
+  const showPromo = ticket?.price > 0 && (event.has_promo_codes || viaEventbrite);
+  const promoToSend = form.promo_code.trim() && (promoState.valid || viaEventbrite) ? form.promo_code.trim() : null;
   const needsInvoice = payable && ticket?.provider === "invoice";
   const waitlist = event.waitlist || ticket?.sold_out;
 
@@ -129,7 +137,7 @@ export default function Register() {
       const body = {
         ...form,
         email: form.email.trim(),
-        promo_code: promoState.valid ? form.promo_code.trim() : null,
+        promo_code: promoToSend,
         phone: form.phone || null, country: form.country || null, dietary: form.dietary || null, accessibility: form.accessibility || null,
         how_heard: form.how_heard || null, billing_contact: form.billing_contact || null, po_number: form.po_number || null,
         utm: utm(), ...linkage(),
@@ -138,7 +146,14 @@ export default function Register() {
       const pay = reg.payment;
       if (reg.status === "pending_payment" && pay?.provider === "eventbrite" && pay.eventbrite_event_id) {
         setSubmit({ busy: false, error: null, pending: reg });
-        await payWithEventbrite({ eventId: pay.eventbrite_event_id, promoCode: pay.promo_code, code: reg.code, email: reg.email });
+        try {
+          await payWithEventbrite({ eventId: pay.eventbrite_event_id, promoCode: pay.promo_code, code: reg.code, email: reg.email });
+        } catch (err) {
+          // Widget blocked (ad blocker, offline): offer Eventbrite's own page instead.
+          rememberRegistration(reg);
+          setSubmit({ busy: false, error: err.message, pending: reg, fallback: `https://www.eventbrite.com/e/${pay.eventbrite_event_id}` });
+          return;
+        }
         finish({ ...reg, status: "payment_reported" });
         return;
       }
@@ -191,7 +206,7 @@ export default function Register() {
                         {tickets.map((t) => {
                           const active = t.id === form.ticket_id;
                           return (
-                            <button type="button" key={t.id} onClick={() => { set("ticket_id", t.id); setQuote(null); setPromoState({ busy: false, message: null, valid: false }); }}
+                            <button type="button" key={t.id} disabled={t.sales_ended} onClick={() => { set("ticket_id", t.id); setQuote(null); setPromoState({ busy: false, message: null, valid: false }); }}
                               className={`flex w-full items-start gap-4 rounded-2xl border p-5 text-left transition ${active ? "border-primary bg-primary/[0.04] ring-4 ring-primary/10" : "border-line/15 hover:border-line/30"}`}
                               data-testid={`ticket-${t.id}`}>
                               <span className={`mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${active ? "border-primary" : "border-line/30"}`}>{active && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}</span>
@@ -204,14 +219,15 @@ export default function Register() {
                                 <span className="mt-2 flex flex-wrap gap-2">
                                   {t.seats_left != null && !t.sold_out && <span className="chip border-amber-500/30 bg-amber-500/10 text-amber-800">{t.seats_left} seats left</span>}
                                   {t.sold_out && <span className="chip">Sold out · waitlist</span>}
-                                  {t.price > 0 && <span className="chip"><CreditCard className="h-3.5 w-3.5" />{t.provider === "invoice" ? "Pay by invoice" : "Secure online payment"}</span>}
+                                  {t.sales_ended ? <span className="chip">Sales ended</span> : t.sales_end_at && <span className="chip">Sales end {fmtDate(t.sales_end_at)}</span>}
+                                  {t.price > 0 && <span className="chip"><CreditCard className="h-3.5 w-3.5" />{t.provider === "invoice" ? "Pay by invoice" : t.provider === "eventbrite" ? "Secure checkout by Eventbrite" : "Secure online payment"}</span>}
                                 </span>
                               </span>
                             </button>
                           );
                         })}
                         {errors.ticket_id && <p className="text-sm text-primary-ink">{errors.ticket_id}</p>}
-                        {event.has_promo_codes && ticket?.price > 0 && (
+                        {showPromo && (
                           <div className="flex flex-col gap-2 rounded-2xl border border-dashed border-line/20 p-4 sm:flex-row sm:items-end">
                             <Field label="Promo code" className="flex-1">
                               <input className="field uppercase" value={form.promo_code} onChange={(e) => set("promo_code", e.target.value.toUpperCase())} placeholder="e.g. EARLYBIRD" />
@@ -219,7 +235,10 @@ export default function Register() {
                             <button type="button" onClick={applyPromo} className="btn-ghost h-11" disabled={promoState.busy || !form.promo_code.trim()}>{promoState.busy ? <Spinner /> : <><Tag className="h-4 w-4" />Apply</>}</button>
                           </div>
                         )}
-                        {promoState.message && <p className={`text-sm ${promoState.valid ? "text-emerald-700" : "text-primary-ink"}`}>{promoState.message}</p>}
+                        {promoState.message && <p className={`text-sm ${promoState.valid ? "text-emerald-700" : promoState.valid === null ? "text-blue" : "text-primary-ink"}`}>{promoState.message}</p>}
+                        {viaEventbrite && ticket?.price > 0 && (
+                          <p className="text-sm text-muted-foreground">After you confirm your details, Eventbrite's secure checkout opens here to take payment. {event.refund_policy}</p>
+                        )}
                       </div>
                     )}
 
@@ -313,6 +332,9 @@ export default function Register() {
                           {errors.accept_terms && <p className="text-sm text-primary-ink">{errors.accept_terms}</p>}
                         </div>
                         {submit.error && <p className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm text-primary-ink" role="alert">{submit.error}</p>}
+                        {submit.fallback && (
+                          <a href={submit.fallback} target="_blank" rel="noreferrer" className="btn-primary w-full" data-testid="eventbrite-fallback">Pay on Eventbrite <ArrowUpRight className="h-4 w-4" /></a>
+                        )}
                         {submit.pending && (
                           <p className="rounded-xl border border-blue-brand/30 bg-blue-brand/5 p-3 text-sm">
                             Your seat is held as <span className="font-mono font-semibold">{submit.pending.code}</span>. Finish payment in the checkout window. <Link className="text-blue underline" to="/register/confirmed" state={{ registration: submit.pending }}>View my registration</Link>
@@ -349,13 +371,16 @@ export default function Register() {
                   <dl className="space-y-2 text-sm">
                     <div className="flex justify-between text-white/70"><dt>Pass</dt><dd>{money(price.price, price.currency)}</dd></div>
                     {price.discount > 0 && <div className="flex justify-between text-emerald-300"><dt>Promo {form.promo_code}</dt><dd>-{money(price.discount, price.currency)}</dd></div>}
+                    {promoToSend && !price.discount && <div className="flex justify-between text-sky-300"><dt>Promo {promoToSend}</dt><dd>applied at checkout</dd></div>}
                     <div className="flex justify-between border-t border-white/10 pt-3 font-display text-xl font-semibold text-white"><dt>Total</dt><dd data-testid="reg-total">{money(price.total, price.currency)}</dd></div>
                   </dl>
                 )}
                 <ul className="mt-6 space-y-2 text-sm text-white/70">
                   {INCLUDED.slice(0, 4).map((i) => <li key={i} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{i}</li>)}
                 </ul>
-                {payable && <p className="mt-6 flex items-center gap-2 text-xs text-white/50"><Lock className="h-3.5 w-3.5" />{ticket.provider === "eventbrite" ? "Checkout by Eventbrite" : ticket.provider === "stripe_link" ? "Secure checkout by Stripe" : "Invoice / PO accepted"}</p>}
+                {payable && <p className="mt-6 flex items-center gap-2 text-xs text-white/50"><Lock className="h-3.5 w-3.5" />{ticket.provider === "eventbrite" ? "Secure checkout by Eventbrite" : ticket.provider === "stripe_link" ? "Secure checkout by Stripe" : "Invoice / PO accepted"}</p>}
+                {payable && event.refund_policy && <p className="mt-2 flex items-start gap-2 text-xs text-white/50"><RotateCcw className="mt-0.5 h-3.5 w-3.5 shrink-0" />{event.refund_policy}</p>}
+                {ticket?.sales_end_at && <p className="mt-2 text-xs text-white/50">Sales end {fmtDate(ticket.sales_end_at)}</p>}
               </div>
             </div>
             <p className="mt-4 px-2 text-sm text-muted-foreground">Already registered? <Link to="/register/confirmed" className="font-medium text-blue underline-offset-4 hover:underline">Find your registration</Link></p>

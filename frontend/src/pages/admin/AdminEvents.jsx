@@ -198,7 +198,7 @@ function Registrations({ slug, event }) {
   );
 }
 
-const newTicket = () => ({ id: "", name: "", description: "", price: 0, currency: "USD", provider: "free", capacity: null, eventbrite_event_id: null, payment_link: null, active: true });
+const newTicket = () => ({ id: "", name: "", description: "", price: 0, currency: "USD", provider: "free", capacity: null, eventbrite_event_id: null, payment_link: null, sales_end_at: null, active: true });
 const newPromo = () => ({ code: "", percent_off: 10, active: true, max_uses: null, tickets: [], uses: 0 });
 
 function Settings({ slug, event, onSaved }) {
@@ -217,8 +217,8 @@ function Settings({ slug, event, onSaved }) {
     try {
       const body = {
         name: form.name, theme: form.theme || "", registration_open: !!form.registration_open, capacity: form.capacity || null,
-        contact_email: form.contact_email || null, eventbrite_event_id: form.eventbrite_event_id || null,
-        tickets: form.tickets.map((t) => ({ ...t, id: t.id || t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""), price: Math.round(Number(t.price) || 0), capacity: t.capacity || null, eventbrite_event_id: t.eventbrite_event_id || null, payment_link: t.payment_link || null })),
+        contact_email: form.contact_email || null, eventbrite_event_id: form.eventbrite_event_id || null, refund_policy: form.refund_policy || null,
+        tickets: form.tickets.map((t) => ({ ...t, id: t.id || t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""), price: Math.round(Number(t.price) || 0), capacity: t.capacity || null, eventbrite_event_id: t.eventbrite_event_id || null, payment_link: t.payment_link || null, sales_end_at: t.sales_end_at || null })),
         promo_codes: form.promo_codes || [],
       };
       const saved = await saveEventSettings(slug, body);
@@ -244,6 +244,7 @@ function Settings({ slug, event, onSaved }) {
           <label className="text-sm"><span className="mb-1 block font-medium">Total capacity</span><Input type="number" min={1} className={inputCls} value={form.capacity ?? ""} onChange={(e) => set({ capacity: num(e.target.value) })} placeholder="No limit" disabled={!editable} /><span className="mt-1 block text-xs text-muted-foreground">When full, new registrations join the waitlist.</span></label>
           <label className="text-sm"><span className="mb-1 block font-medium">Contact email</span><Input className={inputCls} value={form.contact_email || ""} onChange={(e) => set({ contact_email: e.target.value })} disabled={!editable} /></label>
           <label className="text-sm"><span className="mb-1 block font-medium">Eventbrite event ID</span><Input className={inputCls} value={form.eventbrite_event_id || ""} onChange={(e) => set({ eventbrite_event_id: e.target.value.replace(/\D/g, "") })} disabled={!editable} /><span className="mt-1 block text-xs text-muted-foreground">Used by passes paid through Eventbrite.</span></label>
+          <label className="text-sm md:col-span-2"><span className="mb-1 block font-medium">Refund policy</span><Input className={inputCls} value={form.refund_policy || ""} onChange={(e) => set({ refund_policy: e.target.value })} placeholder="e.g. Refunds up to 7 days before the event." disabled={!editable} /><span className="mt-1 block text-xs text-muted-foreground">Shown next to the price and at checkout on the Empower site.</span></label>
         </div>
       </Panel>
 
@@ -265,6 +266,7 @@ function Settings({ slug, event, onSaved }) {
                 </label>
                 <label className="text-xs"><span className="mb-1 block font-medium">Price ({t.currency})</span><Input type="number" min={0} step="0.01" className={inputCls} value={t.price ? t.price / 100 : 0} onChange={(e) => setTicket(i, { price: Math.round(Number(e.target.value || 0) * 100) })} disabled={!editable || t.provider === "free"} data-testid={`ticket-price-${i}`} /></label>
                 <label className="text-xs"><span className="mb-1 block font-medium">Currency</span><Input className={cn(inputCls, "uppercase")} maxLength={3} value={t.currency} onChange={(e) => setTicket(i, { currency: e.target.value.toUpperCase() })} disabled={!editable} /></label>
+                <label className="text-xs md:col-span-2"><span className="mb-1 block font-medium">Sales end</span><Input className={cn(inputCls, "font-mono")} value={t.sales_end_at || ""} onChange={(e) => setTicket(i, { sales_end_at: e.target.value.trim() })} placeholder="2026-10-28T23:59:00-07:00" disabled={!editable} /><span className="mt-1 block text-muted-foreground">Registration for this pass closes after this time. Leave empty for no end.</span></label>
                 <label className="text-xs"><span className="mb-1 block font-medium">Seats for this pass</span><Input type="number" min={1} className={inputCls} value={t.capacity ?? ""} onChange={(e) => setTicket(i, { capacity: num(e.target.value) })} placeholder="No limit" disabled={!editable} /></label>
                 {t.provider === "stripe_link" && <label className="text-xs md:col-span-4"><span className="mb-1 block font-medium">Stripe Payment Link</span><Input className={inputCls} value={t.payment_link || ""} onChange={(e) => setTicket(i, { payment_link: e.target.value })} placeholder="https://buy.stripe.com/..." disabled={!editable} data-testid={`ticket-link-${i}`} /><span className="mt-1 block text-muted-foreground">In Stripe, set the link's confirmation page to redirect to {new URL(`${EMPOWER_URL}register/confirmed`, window.location.origin).href}</span></label>}
                 {t.provider === "eventbrite" && <label className="text-xs md:col-span-2"><span className="mb-1 block font-medium">Eventbrite event ID (optional)</span><Input className={inputCls} value={t.eventbrite_event_id || ""} onChange={(e) => setTicket(i, { eventbrite_event_id: e.target.value.replace(/\D/g, "") })} placeholder={form.eventbrite_event_id || "uses the event's ID"} disabled={!editable} /></label>}

@@ -24,7 +24,7 @@ const PRESS_RELEASES_EN = [
       { type: "p", text: "Under the theme \"The Agentic Enterprise: Reimagining Enterprise Applications with Enterprise AI\", the program brings together leaders from industry and academia on Enterprise AI, enterprise data governance, the Application Knowledge Graph and cloud data management, with hands-on workshops on Data Sense and Data Ask." },
       { type: "quote", text: "Our goal with Solix EMPOWER is to provide valuable insight on the latest technologies, while giving attendees an opportunity to network with fellow industry leaders and experts.", cite: "Sai Gundavelli, Founder & CEO, Solix Technologies" },
       { type: "ul", items: ["Three days, October 28-30, 2026, with 25+ speakers from industry, academia and Solix", "Speakers from KPMG, JPMorganChase, Pfizer, Bristol Myers Squibb, the City of San Diego and UC San Diego", "Solix User Group cocktails and dinner, and a San Diego Supercomputer Center tour"] },
-      { type: "callout", title: "Registration", text: "Registration is required and complimentary. Seats are limited; register on the SOLIXEmpower website." },
+      { type: "callout", title: "Registration", text: "The Full Event Pass is $299 for all three days. Seats are limited; register on the SOLIXEmpower website." },
     ],
   },
   {

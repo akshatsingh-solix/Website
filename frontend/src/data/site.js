@@ -136,7 +136,7 @@ const NAV_EN = [
     label: "Resources",
     to: "/resources",
     blurb: "Field-tested guidance from two decades of enterprise data programs.",
-    featured: { title: "SOLIXEmpower 2026", desc: "The Agentic Enterprise. Oct 28-30 at UC San Diego. Registration is free.", href: empowerLink("nav_featured") },
+    featured: { title: "SOLIXEmpower 2026", desc: "The Agentic Enterprise. Oct 28-30 at UC San Diego. Full event pass $299.", href: empowerLink("nav_featured") },
     items: [
       { label: "Datasheets", to: "/resources?type=datasheet", icon: FileSpreadsheet },
       { label: "White Papers", to: "/resources?type=whitepaper", icon: FileText },

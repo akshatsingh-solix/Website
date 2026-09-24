@@ -29,6 +29,20 @@ export const EVENT = {
   hashtag: "#solixempower",
 };
 
+// The pass as sold on the live site. The backend (Admin > Events) is the source
+// of truth; this is only the fallback while the API wakes up.
+export const PASS = {
+  id: "full-pass",
+  name: "Full Event Pass",
+  price: 29900, // cents
+  currency: "USD",
+  provider: "eventbrite",
+  eventbriteEventId: "1994300379119",
+  salesEnd: "2026-10-28T23:59:00-07:00",
+  salesEndLabel: "Oct 28, 2026",
+  refundPolicy: "Refunds up to 7 days before the event. Eventbrite's fee is non-refundable.",
+};
+
 export const LINKS = {
   mainSite: import.meta.env.VITE_MAIN_SITE_URL || "/Website/",
   justificationLetter: "https://empower.solix.com/documents/SOLIXEmpower2026-Trip-Justification-Letter.docx",
@@ -135,8 +149,11 @@ export const CUSTOMERS = [
 ].map(([name, file]) => ({ name, src: `${LOGO}/${file}` }));
 
 export const FAQ = [
-  { q: "Is there a fee to attend?", a: "Registration is required, and the full event pass is complimentary. Seats are limited, so register early to hold your place." },
+  { q: "How much is a pass?", a: "The Full Event Pass is $299 and covers all three days. Payment is taken securely by Eventbrite, which accepts major cards. Pass sales end October 28, 2026, and seats are limited." },
   { q: "What does the pass include?", a: "All three days (October 28-30): keynotes, panel discussions, hands-on workshops, the hackathon finals, networking breakfasts and lunches, and the evening receptions on October 28 and 29." },
+  { q: "What is the refund policy?", a: "Refunds are available up to 7 days before the event. Eventbrite's fee is non-refundable." },
+  { q: "Can I register colleagues?", a: "Yes. Each attendee needs their own pass, so each person registers with their own details. Share the event with your team from your confirmation page." },
+  { q: "Do you have promo codes?", a: "If you've received a promo code from Solix, enter it when you register. It is applied in the Eventbrite checkout." },
   { q: "Where is the event, and where do I park?", a: "The Qualcomm Institute, Atkinson Hall, on the UC San Diego campus at the corner of Voigt Drive and Equality Lane (3195 Voigt Drive, La Jolla, CA 92093). Visitor parking is in UC San Diego's Hopkins Parking Structure." },
   { q: "How do I convince my manager?", a: "Download the trip justification letter, fill in your details and share it with your supervisor. It outlines what you'll bring back to your team." },
   { q: "Can I attend only one day?", a: "Yes. Choose the days you plan to attend when you register so we can plan seating and meals." },

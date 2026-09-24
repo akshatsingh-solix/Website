@@ -13,7 +13,7 @@ import { EVENT, LINKS } from "@/data/event";
 const STATUS = {
   confirmed: { title: "You're in.", text: "Your seat is confirmed. We've saved your pass below; bring it (or just your name) to check-in.", Icon: Check, tone: "text-emerald-400" },
   paid: { title: "You're in.", text: "Payment received and your seat is confirmed.", Icon: Check, tone: "text-emerald-400" },
-  payment_reported: { title: "Payment received.", text: "Thanks! Your seat is held while the events team matches your payment. You don't need to do anything else.", Icon: Clock, tone: "text-sky-300" },
+  payment_reported: { title: "Payment received.", text: "Thanks! Eventbrite emails your receipt, and your seat is held while the events team matches your payment. You don't need to do anything else.", Icon: Clock, tone: "text-sky-300" },
   pending_payment: { title: "Almost there.", text: "Your seat is held. Complete payment to confirm it.", Icon: CreditCard, tone: "text-amber-300" },
   invoice_requested: { title: "Seat held, invoice on its way.", text: "The events team will email an invoice to your billing contact. Your seat is confirmed once it's paid.", Icon: FileText, tone: "text-sky-300" },
   waitlisted: { title: "You're on the waitlist.", text: "The event is at capacity. We'll email you as soon as a seat opens up.", Icon: Hourglass, tone: "text-amber-300" },
@@ -53,7 +53,7 @@ function LookupForm({ onFound, initial }) {
       <label className="block"><span className="label">Email</span><input className="field" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label>
       {state.error && <p className="text-sm text-primary-ink" role="alert">{state.error}</p>}
       <button className="btn-primary w-full" disabled={state.busy}>{state.busy ? <Spinner /> : "Find registration"}</button>
-      <p className="text-center text-sm text-muted-foreground">Not registered yet? <Link to="/register" className="font-medium text-blue">Register free</Link></p>
+      <p className="text-center text-sm text-muted-foreground">Not registered yet? <Link to="/register" className="font-medium text-blue">Register now</Link></p>
     </form>
   );
 }
@@ -90,8 +90,13 @@ export default function Confirmed() {
     try {
       if (pay.provider === "stripe_link" && pay.url) return payWithStripeLink(pay.url);
       if (pay.provider === "eventbrite") {
-        await payWithEventbrite({ eventId: pay.eventbrite_event_id, promoCode: pay.promo_code, code: reg.code, email: reg.email });
-        setReg({ ...reg, status: "payment_reported" });
+        try {
+          await payWithEventbrite({ eventId: pay.eventbrite_event_id, promoCode: pay.promo_code, code: reg.code, email: reg.email });
+          setReg({ ...reg, status: "payment_reported" });
+        } catch {
+          // Widget blocked (ad blocker, offline): use Eventbrite's own event page.
+          window.open(`https://www.eventbrite.com/e/${pay.eventbrite_event_id}`, "_blank", "noopener");
+        }
       }
     } finally {
       setPayBusy(false);
