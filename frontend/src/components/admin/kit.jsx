@@ -81,7 +81,7 @@ export const StatTile = ({ label, value, sub, testId }) => (
 );
 
 export const Panel = ({ title, sub, action, children, className, testId }) => (
-  <section className={cn("rounded-2xl border border-line/10 bg-card p-5 sm:p-6", className)} data-testid={testId}>
+  <section className={cn("min-w-0 rounded-2xl border border-line/10 bg-card p-5 sm:p-6", className)} data-testid={testId}>
     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
       <div>
         <h2 className="font-display text-base font-medium text-foreground">{title}</h2>

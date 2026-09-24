@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog } from "lucide-react";
+import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog, Radar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/Logo";
 import { useAdmin } from "@/components/admin/AdminAuth";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 const links = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/leads", label: "Leads", icon: Users },
+  { to: "/admin/seo", label: "SEO", icon: Radar },
   { to: "/admin/content", label: "Content", icon: FileText },
   { to: "/admin/migrate", label: "Migrate", icon: Globe2 },
   { to: "/admin/website", label: "Website", icon: MonitorCog },

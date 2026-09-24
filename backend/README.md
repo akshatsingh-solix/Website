@@ -43,6 +43,29 @@ Any other Python host (Railway, Fly.io, a VM) works too — the `Dockerfile`
 here builds and runs the same service; just set the same environment
 variables (see `.env.example`).
 
+## SEO / AEO / GEO analytics (Admin → SEO)
+
+`seo.py` powers the admin's **SEO** section. Each data source is optional; until
+one is connected the dashboard shows clearly labelled sample data for it.
+
+| Source | Env var | What it feeds |
+|---|---|---|
+| Semrush Analytics API | `SEMRUSH_API_KEY` | Organic traffic and 12-month trend, keywords, pages, 10+ competitors per country, keyword gap, category demand, per-URL rankings in the CMS editor |
+| Claude with web search | `ANTHROPIC_API_KEY` | GEO check: asks your buyer questions to an AI assistant and records which brands it names and cites |
+| Google News, Hacker News, Reddit | none | Hot-topic radar (cached 6 hours) |
+
+- **Semrush units:** a sync pulls one country (about 300 keywords, 100 pages,
+  and up to 20 competitors with 12-month history). Snapshots are stored in
+  MongoDB and reused until an admin presses **Sync**, so browsing the
+  dashboard costs no units. Lower `limits` in the `seo` settings document to
+  spend fewer. The Semrush *Traffic Analytics* (.Trends) API is not used; its
+  numbers come from the Analytics API's organic estimates.
+- **New site:** set **New site domain** in SEO settings once it's live. Each
+  CMS page then shows rankings for its new URL, and migrated pages also show
+  the old-site URL's rankings so redirects can protect them.
+- Competitors, category keywords, topics and AI buyer questions are all
+  editable in SEO → Settings (admins only).
+
 ## Local development
 
 ```bash
