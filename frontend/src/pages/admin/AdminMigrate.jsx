@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, ArrowRight, Check, Download, FileUp, Globe2, Loader2, Play, Rss, Search, Square, Link2, Map as MapIcon } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Download, FileUp, Globe2, List, Loader2, Play, Rss, Search, Square, Link2, Map as MapIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,11 @@ import { Badge, Panel, ago, fmtDate, fmtDateTime, inputCls, selectCls, useCan } 
 import { TYPE_LABELS } from "@/pages/admin/AdminContent";
 
 const SOURCES = [
+  { key: "link", label: "Paste any link", icon: Link2, help: "An article, a blog home or category page, a listing page, a sitemap or a feed. Articles come through the site's WordPress API when it has one (including a separate blog under /blog/); listing pages bring in every article they link to." },
   { key: "wordpress", label: "WordPress site", icon: Globe2, help: "Reads posts, pages or any custom post type through the site's REST API (/wp-json), with featured images, authors and categories." },
   { key: "sitemap", label: "Sitemap", icon: MapIcon, help: "Any website: every page in sitemap.xml (or a sitemap index) is fetched and its main content extracted." },
   { key: "rss", label: "RSS / Atom feed", icon: Rss, help: "Blog or news feed. Items that only carry a teaser are read from the page." },
-  { key: "urls", label: "Page addresses", icon: Link2, help: "Paste the pages you want, one per line." },
+  { key: "urls", label: "Several links", icon: List, help: "Paste the pages you want, one per line. Each is handled like a pasted link." },
   { key: "file", label: "CSV / JSON file", icon: FileUp, help: "An export with columns such as title, type, date, summary, body (Markdown) or body_html, url, cover_image, tag, author, file_url, gated." },
 ];
 const STATUS_TONE = {
@@ -102,7 +103,7 @@ function JobCard({ job, onCancel }) {
 
 export default function AdminMigrate() {
   const can = useCan();
-  const [source, setSource] = useState("wordpress");
+  const [source, setSource] = useState("link");
   const [url, setUrl] = useState("");
   const [urls, setUrls] = useState("");
   const [records, setRecords] = useState(null);
@@ -204,7 +205,7 @@ export default function AdminMigrate() {
       <div className="mt-8 grid gap-6 xl:grid-cols-12">
         <section className="space-y-6 xl:col-span-7">
           <Panel title="1. Where is the content?" testId="migrate-source">
-            <div className="grid gap-2 sm:grid-cols-5" role="radiogroup" aria-label="Source">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6" role="radiogroup" aria-label="Source">
               {SOURCES.map((s) => (
                 <button key={s.key} type="button" role="radio" aria-checked={source === s.key} onClick={() => { setSource(s.key); setPreview(null); }}
                   className={cn("flex flex-col items-start gap-2 rounded-xl border p-3 text-left text-xs transition-colors", source === s.key ? "border-teal bg-teal/10 text-foreground" : "border-line/10 text-muted-foreground hover:text-foreground")} data-testid={`migrate-source-${s.key}`}>
@@ -214,9 +215,9 @@ export default function AdminMigrate() {
             </div>
             <p className="mt-3 text-xs text-muted-foreground">{src.help}</p>
             <div className="mt-4 space-y-3">
-              {(source === "wordpress" || source === "sitemap" || source === "rss") && (
+              {(source === "link" || source === "wordpress" || source === "sitemap" || source === "rss") && (
                 <Input value={url} onChange={(e) => setUrl(e.target.value)} className={inputCls} data-testid="migrate-url"
-                  placeholder={source === "wordpress" ? "https://www.solix.com" : source === "sitemap" ? "https://www.solix.com/sitemap_index.xml" : "https://www.solix.com/feed/"} />
+                  placeholder={source === "link" ? "https://www.solix.com/blog/the-second-data-lake/  or  https://www.solix.com/blog/" : source === "wordpress" ? "https://www.solix.com or any page on it" : source === "sitemap" ? "https://www.solix.com/sitemap_index.xml" : "https://www.solix.com/feed/"} />
               )}
               {source === "wordpress" && (
                 <div>
@@ -282,7 +283,16 @@ export default function AdminMigrate() {
 
           {preview && (
             <Panel title={`Preview · ${preview.found}${preview.capped ? "+" : ""} item${preview.found === 1 ? "" : "s"} found`} sub={Object.entries(preview.types).map(([k, v]) => `${v} ${TYPE_LABELS[k] || k}`).join(" · ") || "Nothing matched"} testId="migrate-preview-panel">
-              {preview.log?.length > 0 && <p className="mb-3 flex items-start gap-2 text-xs text-amber-200"><AlertTriangle className="h-4 w-4 shrink-0" /> {preview.log[0].msg}</p>}
+              {preview.log?.map((l, i) => (
+                <p key={i} className={cn("mb-2 flex items-start gap-2 text-xs", l.level === "error" ? "text-amber-200" : "text-muted-foreground")}>
+                  {l.level === "error" ? <AlertTriangle className="h-4 w-4 shrink-0" /> : <Check className="h-4 w-4 shrink-0 text-teal" />} <span className="min-w-0 break-words">{l.msg}{l.url ? <span className="opacity-60"> · {l.url}</span> : null}</span>
+                </p>
+              ))}
+              {preview.found === 0 && (
+                <p className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-xs text-amber-200" data-testid="migrate-nothing">
+                  Nothing was found at that address. Check that it opens in a normal browser without signing in, and that any include/exclude filters match its path. If the site blocks automated requests, export the content to CSV or JSON and use the file option instead.
+                </p>
+              )}
               <ul className="divide-y divide-line/5">
                 {preview.items.map((it, i) => (
                   <li key={i} className="py-3 text-sm">
