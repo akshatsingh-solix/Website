@@ -28,9 +28,10 @@ async function main() {
       const res = await fetch(`${base}/api/content?full=true&limit=1000`, { signal: ctrl.signal });
       clearTimeout(t);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { items } = await res.json();
+      const { items, withdrawn = [] } = await res.json();
       if (!Array.isArray(items)) throw new Error("unexpected response");
-      fs.writeFileSync(OUT, JSON.stringify({ items, generated_at: new Date().toISOString() }) + "\n");
+      // `withdrawn`: built-in items editors unpublished or archived, hidden from the site.
+      fs.writeFileSync(OUT, JSON.stringify({ items, withdrawn, generated_at: new Date().toISOString() }) + "\n");
       console.log(`content-snapshot: wrote ${items.length} published item(s)`);
       return;
     } catch (err) {

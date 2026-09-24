@@ -23,11 +23,12 @@ export const EVENT = {
   address: "3195 Voigt Drive, La Jolla, CA 92093",
   city: "San Diego, California",
   heroImage: `${IMG}/banner-inner-event-san-diego-new.jpg`,
-  // Keynote-stage visual generated with OpenArt, served by the main site once
-  // a clean (unwatermarked) copy is vendored there (see
-  // frontend/src/data/openart-media.json); until then the venue banner shows.
+  // Keynote-stage visual generated with OpenArt (free-plan preview, for now).
+  // Served by the main site (frontend/scripts/vendor-media.js), then the
+  // OpenArt CDN, then the original venue banner.
   heroImages: [
     `${import.meta.env.VITE_MAIN_SITE_URL || "/Website/"}media/openart/empower-stage.webp`,
+    "https://cdn.openart.ai/watermarked_images/J38Yrkmv56lc0MkH6wrJ/thumbnail_09cbb65b_1790235816962.webp",
     `${IMG}/banner-inner-event-san-diego-new.jpg`,
   ],
   shareImage: "https://empower.solix.com/wp-content/uploads/2026/04/solixempower-2026-popup-new2.jpg",

@@ -29,13 +29,14 @@ export default function Resources() {
     return () => clearTimeout(t);
   }, [q]);
 
-  const { items: cms } = useCmsResources();
-  // Published CMS items first (newest), then the built-in library; a CMS item replaces a built-in one with the same slug.
+  const { items: cms, withdrawn } = useCmsResources();
+  // Published CMS items first (newest), then the built-in library; a CMS item replaces a built-in one
+  // with the same slug, and built-ins editors withdrew in the CMS are hidden.
   const all = useMemo(() => {
     const cmsSlugs = new Set(cms.map((c) => c.slug));
-    return [...cms, ...RESOURCES.filter((r) => !cmsSlugs.has(r.slug))];
+    return [...cms, ...RESOURCES.filter((r) => !cmsSlugs.has(r.slug) && !withdrawn.has(r.slug))];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cms, i18n.language]);
+  }, [cms, withdrawn, i18n.language]);
   const list = useMemo(
     () => all.filter((r) => (type === "all" || r.type === type) && (q === "" || `${r.title} ${r.desc} ${r.tag}`.toLowerCase().includes(q.toLowerCase()))),
     [all, type, q]

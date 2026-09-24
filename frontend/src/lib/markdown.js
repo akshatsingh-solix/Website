@@ -5,8 +5,13 @@
 //   :::callout Title
 //   Text
 //   :::
+// Figures and steps (one item per line, "value | label" / "title | text"):
+//   :::stats            :::steps
+//   60-80% | inactive   Assess | Profile growth
+//   :::                 :::
 // Inline **bold**, *italic*, `code` and [links](url) are rendered by
 // ArticleBody without ever injecting HTML.
+import { translateText } from "@/i18n/tx";
 
 export function markdownToBlocks(md) {
   const lines = (md || "").replace(/\r\n?/g, "\n").split("\n");
@@ -35,6 +40,16 @@ export function markdownToBlocks(md) {
       const code = [];
       for (i += 1; i < lines.length && !/^```/.test(lines[i].trim()); i++) code.push(lines[i]);
       blocks.push({ type: "code", text: code.join("\n") });
+    } else if ((m = /^:::(stats|steps)\s*$/.exec(t))) {
+      endPara();
+      const items = [];
+      for (i += 1; i < lines.length && lines[i].trim() !== ":::"; i++) {
+        const [a, ...rest] = lines[i].trim().split("|");
+        if (!a.trim()) continue;
+        const b = rest.join("|").trim();
+        items.push(m[1] === "stats" ? { value: a.trim(), label: b } : { title: a.trim(), desc: b });
+      }
+      if (items.length) blocks.push({ type: m[1], items });
     } else if ((m = /^:::callout\s*(.*)$/.exec(t))) {
       endPara();
       const body = [];
@@ -86,3 +101,43 @@ export function inlineTokens(text) {
 }
 
 export const safeHref = (href) => (/^(https?:|mailto:|\/|#)/i.test(href) ? href : null);
+
+/** The site's block format -> CMS Markdown (lossless for every block type ArticleBody renders). */
+export function blocksToMarkdown(blocks) {
+  return (blocks || [])
+    .map((b) => {
+      switch (b.type) {
+        case "h2": return `## ${b.text}`;
+        case "h3": return `### ${b.text}`;
+        case "p": return b.text;
+        case "ul": return (b.items || []).map((x) => `- ${x}`).join("\n");
+        case "quote": return `> ${b.text}${b.cite ? `\n> — ${b.cite}` : ""}`;
+        case "callout": return `:::callout ${b.title || "Note"}\n${b.text}\n:::`;
+        case "stats": return `:::stats\n${(b.items || []).map((x) => `${x.value} | ${x.label}`).join("\n")}\n:::`;
+        case "steps": return `:::steps\n${(b.items || []).map((x) => `${x.title} | ${x.desc}`).join("\n")}\n:::`;
+        case "img": return `![${b.alt || ""}](${b.src})`;
+        case "code": return `\`\`\`\n${b.text}\n\`\`\``;
+        default: return b.text || "";
+      }
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+/**
+ * Run CMS block text through the site's translations. Translations are keyed
+ * by the English text, so content taken over from the built-in site keeps
+ * its Spanish, French and German versions until an editor changes the words.
+ */
+export function localizeBlocks(blocks, lng) {
+  if (!lng || lng === "en") return blocks;
+  const t = (x) => (typeof x === "string" ? translateText(x, undefined, lng) : x);
+  return blocks.map((b) => ({
+    ...b,
+    text: t(b.text),
+    title: t(b.title),
+    cite: t(b.cite),
+    alt: t(b.alt),
+    items: Array.isArray(b.items) ? b.items.map((x) => (typeof x === "string" ? t(x) : { ...x, label: t(x.label), title: t(x.title), desc: t(x.desc) })) : b.items,
+  }));
+}
