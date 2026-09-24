@@ -8,7 +8,7 @@ import { translateText } from "./tx";
 const SKIP_KEYS = new Set([
   "id", "slug", "to", "href", "file", "image", "icon", "accent", "span", "type", "key", "tone",
   "fill", "hex", "email", "phone", "year", "products", "category", "group", "meta",
-  "readTime", "featured", "gated", "suffix", "pct", "color",
+  "readTime", "featured", "gated", "suffix", "pct", "color", "registerUrl",
 ]);
 
 const isPlainObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v) && Object.getPrototypeOf(v) === Object.prototype && !v.$$typeof;

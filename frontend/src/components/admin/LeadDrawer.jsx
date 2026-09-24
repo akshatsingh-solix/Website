@@ -14,7 +14,7 @@ const EVENT_LABELS = {
   resource_download: "Downloaded", chat_topic: "Asked the concierge about", cta_click: "Clicked", pricing_intent: "Asked about pricing",
   search: "Searched resources", session_start: "Started a visit",
 };
-const FORM_LABELS = { demo: "Requested a demo", contact: "Contacted sales", trial: "Started the ECS trial", download: "Downloaded gated content", newsletter: "Subscribed to the newsletter", partner: "Applied to partner", career: "Applied for a job" };
+const FORM_LABELS = { demo: "Requested a demo", contact: "Contacted sales", trial: "Started the ECS trial", download: "Downloaded gated content", newsletter: "Subscribed to the newsletter", partner: "Applied to partner", career: "Applied for a job", event: "Registered for an event" };
 const FIT_LABELS = { business_email: "Business email", seniority: "Seniority", company_size: "Company size", phone: "Phone provided" };
 
 const Row = ({ label, children }) => (children ? (

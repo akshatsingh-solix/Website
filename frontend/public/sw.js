@@ -10,7 +10,7 @@
  * - Everything else (forms, tracking, admin, chat) goes straight to the
  *   network and is never cached.
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const STATIC_CACHE = `solix-static-${VERSION}`;
 const RUNTIME_CACHE = `solix-runtime-${VERSION}`;
 const SCOPE = new URL(self.registration.scope).pathname; // e.g. /Website/
@@ -77,6 +77,8 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  // SOLIXEmpower (/empower/) is a separate site with its own shell and assets.
+  if (url.origin === self.location.origin && url.pathname.startsWith(`${SCOPE}empower/`)) return;
 
   if (req.mode === "navigate" && url.origin === self.location.origin) {
     if (url.pathname.startsWith(`${SCOPE}admin`)) return;

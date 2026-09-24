@@ -1,4 +1,5 @@
 import { localizedSource } from "@/i18n/localize";
+import { empowerLink } from "@/lib/empower";
 import {
   Archive, Database, Layers, PowerOff, Scale, ShieldCheck, Sparkles, Landmark, HeartPulse, Factory,
   Building2, ShoppingBag, Zap, RadioTower, Umbrella, Server, Gauge, Cloud, Vault, RefreshCw, BrainCircuit,
@@ -135,7 +136,7 @@ const NAV_EN = [
     label: "Resources",
     to: "/resources",
     blurb: "Field-tested guidance from two decades of enterprise data programs.",
-    featured: { title: "White Paper", desc: "How to build an enterprise archive in the cloud.", to: "/resources?type=whitepaper" },
+    featured: { title: "SOLIXEmpower 2026", desc: "The Agentic Enterprise. Oct 28-30 at UC San Diego. Registration is free.", href: empowerLink("nav_featured") },
     items: [
       { label: "Datasheets", to: "/resources?type=datasheet", icon: FileSpreadsheet },
       { label: "White Papers", to: "/resources?type=whitepaper", icon: FileText },
@@ -146,6 +147,7 @@ const NAV_EN = [
       { label: "Leadership Lessons", to: "/resources?type=leadership", icon: GraduationCap },
       { label: "Blogs", to: "/resources?type=blog", icon: Newspaper },
       { label: "Events", to: "/resources?type=event", icon: CalendarDays },
+      { label: "SOLIXEmpower 2026", href: empowerLink("nav_resources"), icon: Sparkles },
       { label: "Solix User Group", to: "/resources?type=event", icon: Users },
     ],
   },
@@ -965,7 +967,7 @@ const RESOURCES_EN = [
   { id: 5, slug: "trust-perimeter-model-for-business-led-ai", products: ["enterprise-edition", "enterprise-ai"], type: "blog", title: "The Trust Perimeter: A New Model for Business-Led AI", desc: "Why IT should define boundaries, not build every solution, and how Enterprise Edition makes it real.", tag: "Strategy", readTime: "9 min", date: "May 2026", icon: Newspaper, author: "Office of the CTO, Solix", authorRole: "Platform strategy" },
   { id: 6, slug: "consumer-data-privacy-automation-playbook", products: ["consumer-data-privacy"], type: "whitepaper", title: "Consumer Data Privacy Automation Playbook", desc: "From PII discovery to DSAR fulfilment: operating models, KPIs and reference workflows.", tag: "Privacy", readTime: "31 min", date: "Mar 2026", gated: true, icon: FileText, author: "Solix Privacy Practice", authorRole: "Privacy engineering & compliance" },
   { id: 7, slug: "data-of-every-era-conversations-on-preservation", products: ["data-preservation"], type: "podcast", title: "Data of Every Era: Conversations on Preservation", desc: "Episode 14: A CDO on treating decades-old records as first-class AI inputs.", tag: "Podcast", readTime: "38 min", date: "Jun 2026", icon: Mic2, author: "Solix Editorial", authorRole: "Podcast production" },
-  { id: 8, slug: "solix-empower-2026-santa-clara", products: [], type: "event", title: "Solix Empower 2026 - Santa Clara", desc: "Our annual customer summit on data management for the AI-driven enterprise. October 14-15.", tag: "Event", readTime: "2 days", date: "Oct 2026", icon: CalendarDays, author: "Solix Events", authorRole: "Customer programs" },
+  { id: 8, slug: "solix-empower-2026-san-diego", products: ["enterprise-ai", "agentic"], type: "event", title: "SOLIXEmpower 2026: The Agentic Enterprise", desc: "Three days of Enterprise AI keynotes, panels and hands-on workshops at the Qualcomm Institute, UC San Diego. October 28-30.", tag: "SOLIXEmpower", readTime: "3 days", date: "Oct 2026", icon: CalendarDays, author: "Solix Events", authorRole: "Customer programs", registerUrl: empowerLink("resource_article", "register") },
   { id: 9, slug: "hipaa-compliant-legacy-ehr-retirement-at-scale", products: ["application-retirement", "ai-healthcare"], type: "casestudy", title: "HIPAA-Compliant Legacy EHR Retirement at Scale", desc: "A health system consolidated 23 EHR systems while keeping clinicians one click from history.", tag: "Healthcare", readTime: "10 min", date: "Feb 2026", gated: true, icon: BookOpen, author: "Solix Healthcare Practice", authorRole: "Clinical data programs" },
   { id: 10, slug: "application-retirement-factory-templates-that-scale", products: ["application-retirement"], type: "webinar", title: "Application Retirement Factory: Templates That Scale", desc: "How to decommission portfolios, not one-offs, with reusable patterns.", tag: "Modernization", readTime: "40 min", date: "Apr 2026", icon: Video, author: "Solix Professional Services", authorRole: "Retirement factory delivery" },
   { id: 11, slug: "enterprise-edition-datasheet", products: ["enterprise-edition"], type: "datasheet", title: "Solix Enterprise Edition Datasheet", desc: "Specs, deployment models and architecture diagram for the platform, in one two-page reference.", tag: "Platform", readTime: "5 min", date: "Jun 2026", icon: FileSpreadsheet, author: "Solix Product Marketing", authorRole: "Platform positioning" },

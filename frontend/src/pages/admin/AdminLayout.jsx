@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users } from "lucide-react";
+import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/Logo";
 import { useAdmin } from "@/components/admin/AdminAuth";
@@ -10,6 +10,7 @@ const links = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/leads", label: "Leads", icon: Users },
   { to: "/admin/content", label: "Content", icon: FileText },
+  { to: "/admin/events", label: "Events", icon: CalendarDays },
   { to: "/admin/inbox", label: "Form inbox", icon: Inbox },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];

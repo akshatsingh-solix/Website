@@ -118,17 +118,17 @@ const ARTICLES_EN = {
       { type: "callout", title: "Listen", text: "Data of Every Era is available on all major podcast platforms. New episodes twice a month." },
     ],
   },
-  "solix-empower-2026-santa-clara": {
-    summary: "Solix Empower is our annual gathering of data leaders, architects and partners. Two days in Santa Clara on the practical work of activating enterprise data for AI.",
+  "solix-empower-2026-san-diego": {
+    summary: "SOLIXEmpower 2026 brings CIOs, chief data officers, researchers and Solix users to UC San Diego for three days on the Agentic Enterprise: reimagining enterprise applications with Enterprise AI.",
     body: [
-      { type: "h2", text: "October 14-15, 2026 · Santa Clara, California" },
-      { type: "p", text: "Empower brings together the people who run enterprise data at scale: CDOs, platform architects, privacy leaders, SAP and Oracle program owners, and the partners who deliver alongside them. Expect deep technical sessions, candid customer stories and hands-on labs on the Common Data Platform and Enterprise AI." },
-      { type: "h2", text: "Tracks" },
-      { type: "ul", items: ["Enterprise Edition: building inside the trust perimeter", "Archive-first cloud and S/4HANA programs", "Application retirement factories at portfolio scale", "Privacy automation across live and archived data", "Governed RAG and agent operations", "Industry roundtables: financial services, healthcare, energy, public sector"] },
-      { type: "stats", items: [{ value: "2", label: "days" }, { value: "40+", label: "sessions and labs" }, { value: "500", label: "data leaders expected" }] },
-      { type: "h2", text: "Hands-on labs" },
-      { type: "p", text: "Bring a laptop. Labs cover building a governed data product, wiring a policy-aware copilot, designing a retention schedule and running a retirement template end to end." },
-      { type: "callout", title: "Registration", text: "Registration opens in July. Customers and partners receive priority access. Contact your account team or use the contact page to reserve a seat." },
+      { type: "h2", text: "October 28-30, 2026 · The Qualcomm Institute, UC San Diego" },
+      { type: "p", text: "Hosted in partnership with the UC San Diego School of Computing, Information and Data Science, the SPARK AI Consortium and the Halıcıoğlu Data Science Institute, SOLIXEmpower 2026 explores why data management is the lynchpin for data science and AI, now and into the future." },
+      { type: "h2", text: "Key topics" },
+      { type: "ul", items: ["Enterprise AI and agents: Data Sense, Data Ask and the Application Knowledge Graph", "Enterprise data and AI governance, from secure semantic layers to agent regulation", "Cloud data management and archive strategy to power AI", "AI in finance, the public sector, healthcare and life sciences", "AI-ready people and Solix Academy"] },
+      { type: "stats", items: [{ value: "3", label: "days" }, { value: "25+", label: "speakers" }, { value: "Free", label: "registration" }] },
+      { type: "h2", text: "Hands-on workshops and the hackathon" },
+      { type: "p", text: "Build your first Application Knowledge Graph with Data Sense, go hands-on with Data Ask, and see the hackathon winners announced on the final morning. Evenings include the Solix User Group cocktails and dinner and a tour of the San Diego Supercomputer Center." },
+      { type: "callout", title: "Registration", text: "Registration is required and the full event pass is complimentary. Seats are limited: register on the SOLIXEmpower website." },
     ],
   },
   "hipaa-compliant-legacy-ehr-retirement-at-scale": {

@@ -134,6 +134,11 @@ export default function Article() {
             {r.readTime && <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {r.readTime}</span>}
             {r.gated && <span className="inline-flex items-center gap-1.5 text-primary-ink">{unlocked ? <Check className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />} {unlocked ? tx("Unlocked") : tx("Gated")}</span>}
           </div>
+          {r.registerUrl && (
+            <Button asChild data-intent="empower_register" data-testid="article-register">
+              <a href={r.registerUrl}>{tx("Register free")} <ArrowRight /></a>
+            </Button>
+          )}
           <Share title={r.title} />
         </div>
       </PageHero>

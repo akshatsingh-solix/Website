@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * SOLIXEmpower uses the Solix "Luminous Data" language (see
+ * frontend/src/index.css): a light editorial canvas with navy "moments"
+ * (add `dark` to a section and every token re-resolves inside it).
+ * Brand red #EE2424 + brand blue #0088CF; small red text uses the deeper
+ * ink red for contrast.
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 218 55% 11%;
+    --card: 0 0% 100%;
+    --muted: 206 47% 97%;
+    --muted-foreground: 210 38% 39%;
+    --primary-ink: 0 75% 45%;
+    --brand-blue: 200 100% 34%;
+    --line: 13 25 45;
+    --shadow: 13 25 45;
+    color-scheme: light;
+  }
+  .dark {
+    --background: 218 55% 11%;
+    --foreground: 210 40% 98%;
+    --card: 211 41% 19%;
+    --muted: 216 45% 14%;
+    --muted-foreground: 210 22% 72%;
+    --primary-ink: 0 86% 62%;
+    --brand-blue: 201 100% 50%;
+    --line: 255 255 255;
+    --shadow: 0 0 0;
+    color-scheme: dark;
+  }
+  * { border-color: rgb(var(--line) / 0.1); }
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4, h5, h6 { @apply font-display; }
+  ::selection { background: rgba(238, 36, 36, 0.18); color: #0D192D; }
+  .dark ::selection { background: rgba(238, 36, 36, 0.35); color: #fff; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .eyebrow { @apply font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary-ink; }
+  .text-gradient-accent {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(100deg, #EE2424 0%, #FF6A4D 45%, #0088CF 100%);
+  }
+  .surface { @apply relative rounded-2xl border border-line/10 bg-card shadow-soft; }
+  .btn { @apply inline-flex whitespace-nowrap items-center justify-center gap-2 rounded-full px-5 h-11 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-brand focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50; }
+  .btn-primary { @apply btn bg-primary text-white shadow-[0_10px_30px_-10px_rgba(238,36,36,0.7)] hover:bg-primary-deep; }
+  .btn-ghost { @apply btn border border-line/15 bg-background/60 text-foreground backdrop-blur hover:border-line/30 hover:bg-muted; }
+  .btn-lg { @apply h-12 px-7 text-[15px]; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-line/10 bg-muted px-3 py-1 text-xs font-medium text-muted-foreground; }
+  .field { @apply block w-full rounded-xl border border-line/15 bg-background px-3.5 h-11 text-[15px] text-foreground placeholder:text-muted-foreground/70 transition focus:border-blue-brand focus:outline-none focus:ring-4 focus:ring-blue-brand/15; }
+  textarea.field { @apply h-auto py-2.5; }
+  .label { @apply mb-1.5 block text-[13px] font-medium text-foreground; }
+  .grid-lines {
+    background-image:
+      linear-gradient(rgb(var(--line) / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--line) / 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .glow-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .glow-field::before, .glow-field::after {
+    content: ""; position: absolute; width: 60vw; height: 60vw; max-width: 900px; max-height: 900px; border-radius: 9999px;
+    @apply animate-drift;
+  }
+  .glow-field::before { top: -35%; left: -15%; background: radial-gradient(closest-side, rgba(238, 36, 36, 0.32), transparent); }
+  .glow-field::after { bottom: -40%; right: -15%; background: radial-gradient(closest-side, rgba(0, 136, 207, 0.34), transparent); animation-delay: -9s; }
+  .shadow-soft { box-shadow: 0 1px 2px rgb(var(--shadow) / 0.05), 0 10px 30px -12px rgb(var(--shadow) / 0.16); }
+}

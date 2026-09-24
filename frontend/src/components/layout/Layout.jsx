@@ -7,6 +7,7 @@ import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ConciergeWidget } from "@/components/chat/ConciergeWidget";
 import { pageTransitionVariants } from "@/components/shared/Reveal";
 import { ConsentBanner } from "@/components/shared/ConsentBanner";
+import { EmpowerPromo } from "@/components/shared/EmpowerPromo";
 import { useIntentTracking } from "@/lib/useIntentTracking";
 
 export const Layout = () => {
@@ -34,6 +35,7 @@ export const Layout = () => {
       <Footer />
       <ConciergeWidget />
       <ConsentBanner />
+      <EmpowerPromo />
     </div>
   );
 };

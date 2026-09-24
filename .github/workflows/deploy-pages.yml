@@ -1,4 +1,4 @@
-name: Deploy frontend to GitHub Pages
+name: Deploy frontend and SOLIXEmpower to GitHub Pages
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "frontend/**"
+      - "empower/**"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch: {}
   # Rebuild when content is published from the admin (optional backend
@@ -59,6 +60,25 @@ jobs:
           # only backend-dependent features (forms, chat, admin) stay disabled.
           REACT_APP_BACKEND_URL: ${{ vars.BACKEND_URL }}
         run: yarn build
+
+      # SOLIXEmpower is a separate site (Vite) served under /Website/empower/.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: empower/package-lock.json
+
+      - name: Build SOLIXEmpower
+        working-directory: empower
+        env:
+          VITE_BASE: /Website/empower/
+          VITE_API_URL: ${{ vars.BACKEND_URL }}
+          VITE_MAIN_SITE_URL: /Website/
+        run: |
+          npm ci
+          npm run build
+          rm -rf ../frontend/build/empower
+          cp -r dist ../frontend/build/empower
 
       - uses: actions/configure-pages@v5
 
