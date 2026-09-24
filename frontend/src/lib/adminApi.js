@@ -135,3 +135,5 @@ export const saveDelivery = (body) => adminApi.put("/admin/delivery", body).then
 export const fetchDeliveries = (params) => adminApi.get("/admin/deliveries", { params: clean(params) }).then((r) => r.data);
 export const testDelivery = (body) => adminApi.post("/admin/deliveries/test", body, { timeout: 60000 }).then((r) => r.data);
 export const resendDelivery = (id) => adminApi.post(`/admin/deliveries/${id}/resend`, null, { timeout: 60000 }).then((r) => r.data);
+export const publishImported = () => adminApi.post("/admin/content-imported/publish").then((r) => r.data);
+export const restoreImportedDates = () => adminApi.post("/admin/content-imported/restore-dates").then((r) => r.data);
