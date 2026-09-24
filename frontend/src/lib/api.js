@@ -5,7 +5,49 @@ export const API = `${BACKEND_URL}/api`;
 
 export const api = axios.create({ baseURL: API, timeout: 20000 });
 
-export const submitLead = (payload) => api.post("/submissions", payload).then((r) => r.data);
+// The backend runs on a host that sleeps when idle and can take up to a
+// minute to wake. Forms therefore (1) wake it as soon as a form is shown,
+// (2) wait long enough on submit, and (3) retry once on a network error,
+// timeout or 5xx gateway error. Validation errors (4xx) are never retried.
+let warming = null;
+export const warmBackend = () => {
+  if (!BACKEND_URL) return Promise.resolve(false);
+  if (!warming) {
+    warming = api.get("/", { timeout: 70000 }).then(() => true).catch(() => { warming = null; return false; });
+  }
+  return warming;
+};
+
+const retryable = (err) => !err.response || err.code === "ECONNABORTED" || [502, 503, 504].includes(err.response?.status);
+
+export async function submitLead(payload, { attempts = 2 } = {}) {
+  if (!BACKEND_URL) throw Object.assign(new Error("Forms are not connected to a backend."), { code: "NO_BACKEND" });
+  let lastErr;
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      const r = await api.post("/submissions", payload, { timeout: 65000 });
+      return r.data;
+    } catch (err) {
+      lastErr = err;
+      if (!retryable(err) || i === attempts - 1) break;
+      await new Promise((res) => setTimeout(res, 2500));
+    }
+  }
+  throw lastErr;
+}
+
+/** A readable message for a failed form submission. */
+export const submissionError = (err) => {
+  const detail = err?.response?.data?.detail;
+  if (err?.response?.status === 422) {
+    const first = Array.isArray(detail) ? detail[0] : null;
+    const field = first?.loc?.[first.loc.length - 1];
+    if (field === "email") return "Please enter a valid work email address.";
+    return typeof detail === "string" ? detail : "Some details look incomplete. Please check the form and try again.";
+  }
+  if (err?.response?.status === 429) return "Too many attempts from your network. Please wait a minute and try again.";
+  return "We couldn't reach our servers. Your details are still here, so please try again, or email us directly.";
+};
 
 export const fetchChatHistory = (sessionId) => api.get(`/chat/${sessionId}`).then((r) => r.data);
 

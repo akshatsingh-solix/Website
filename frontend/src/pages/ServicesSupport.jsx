@@ -1,10 +1,9 @@
-import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { SERVICES } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
-import { CTABand } from "@/components/shared/CTABand";
+import { InlineLeadSection } from "@/components/forms/InlineLeadSection";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
 
@@ -19,7 +18,7 @@ export default function ServicesSupport() {
         description="Every Solix program is backed by the same team that builds the platform, an outcomes-based methodology, and a support portal that doesn't leave you guessing."
       >
         <Button asChild size="lg" data-testid="services-hero-contact">
-          <Link to="/contact?type=contact">{tx("Talk to services")} <ArrowRight /></Link>
+          <a href="#talk-to-us" onClick={(e) => { e.preventDefault(); document.getElementById("talk-to-us")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{tx("Talk to services")} <ArrowRight /></a>
         </Button>
       </PageHero>
 
@@ -63,7 +62,14 @@ export default function ServicesSupport() {
         </Section>
       ))}
 
-      <CTABand eyebrow="Ready to scope a program?" title="Bring one problem. We'll bring the method." secondary={{ label: "See the platform", to: "/platform" }} />
+      <InlineLeadSection
+        eyebrow="Ready to scope a program?"
+        title={tx("Bring one problem. We'll bring the method.")}
+        description={tx("Tell us what you need, from an assessment or a migration to managed operations or support, and our services team will scope it with you.")}
+        interest="services"
+        type="contact"
+        submitLabel="Talk to services"
+      />
     </div>
   );
 }

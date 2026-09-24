@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2, Loader2, Mail, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { INTERESTS } from "@/data/site";
@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { submitLead } from "@/lib/api";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { submissionError, submitLead, warmBackend } from "@/lib/api";
 import { leadContext, track } from "@/lib/intent";
 import { useTx } from "@/i18n/tx";
 
@@ -56,20 +56,50 @@ export const LeadForm = ({
 }) => {
   const tx = useTx();
   const [done, setDone] = useState(false);
+  const [failure, setFailure] = useState(null);
+  const [slow, setSlow] = useState(false);
+  const slowTimer = useRef(null);
+  const known = INTERESTS.some((i) => i.value === defaultInterest);
   const {
-    register, handleSubmit, control, formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema), defaultValues: { interest: defaultInterest ?? "", name: "", email: "", company: "", phone: "", job_title: "", message: "" } });
+    register, handleSubmit, control, getValues, formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema), defaultValues: { interest: known ? defaultInterest : "", name: "", email: "", company: "", phone: "", job_title: "", message: "" } });
+
+  // Wake the backend while the visitor is still typing (it may be asleep).
+  useEffect(() => { warmBackend(); return () => clearTimeout(slowTimer.current); }, []);
+
+  const groups = useMemo(() => {
+    const out = [];
+    for (const i of INTERESTS) {
+      const g = out.find((x) => x.name === i.group);
+      if (g) g.items.push(i); else out.push({ name: i.group, items: [i] });
+    }
+    return out;
+  }, []);
 
   const onSubmit = async (values) => {
+    setFailure(null);
+    setSlow(false);
+    slowTimer.current = setTimeout(() => setSlow(true), 5000);
     try {
       const created = await submitLead({ type, ...values, ...extra, ...leadContext(), source_page: window.location.pathname });
       if (type === "download") track("resource_download", { meta: { title: extra?.resource } });
       setDone(true);
       toast.success(tx("Submission received."));
       onSuccess?.(created);
-    } catch {
-      toast.error(tx("Something went wrong. Please try again."));
+    } catch (err) {
+      setFailure(submissionError(err));
+    } finally {
+      clearTimeout(slowTimer.current);
+      setSlow(false);
     }
+  };
+
+  // Last resort: the same details, pre-filled in an email to the team.
+  const mailto = () => {
+    const v = getValues();
+    const label = INTERESTS.find((i) => i.value === v.interest)?.label || v.interest || "";
+    const body = [`Name: ${v.name}`, `Email: ${v.email}`, `Company: ${v.company}`, v.job_title && `Job title: ${v.job_title}`, v.phone && `Phone: ${v.phone}`, label && `Interest: ${label}`, v.message && `\n${v.message}`, `\nPage: ${window.location.href}`].filter(Boolean).join("\n");
+    return `mailto:info@solix.com?subject=${encodeURIComponent(`${type === "demo" ? "Demo request" : "Website enquiry"}${label ? `: ${label}` : ""}`)}&body=${encodeURIComponent(body)}`;
   };
 
   if (done) {
@@ -110,9 +140,14 @@ export const LeadForm = ({
                   <SelectTrigger id="interest" className={cn(inputCls, "text-left")} data-testid="lead-interest-select">
                     <SelectValue placeholder={tx("Select a product or solution")} />
                   </SelectTrigger>
-                  <SelectContent className="border-line/10 bg-popover">
-                    {INTERESTS.map((i) => (
-                      <SelectItem key={i.value} value={i.value} data-testid={`lead-interest-option-${i.value}`}>{i.label}</SelectItem>
+                  <SelectContent className="max-h-80 border-line/10 bg-popover">
+                    {groups.map((g) => (
+                      <SelectGroup key={g.name}>
+                        <SelectLabel className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{tx(g.name)}</SelectLabel>
+                        {g.items.map((i) => (
+                          <SelectItem key={i.value} value={i.value} data-testid={`lead-interest-option-${i.value}`}>{i.label}</SelectItem>
+                        ))}
+                      </SelectGroup>
                     ))}
                   </SelectContent>
                 </Select>
@@ -125,6 +160,20 @@ export const LeadForm = ({
         <Field label="What are you trying to solve?" htmlFor="message" optional>
           <Textarea id="message" rows={4} placeholder={tx("Tell us about the systems, data volumes or deadlines involved.")} className="rounded-lg border-line/15 bg-background px-4 py-3 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0" data-testid="lead-message-input" {...register("message")} />
         </Field>
+      )}
+      {failure && (
+        <div role="alert" className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm" data-testid="lead-form-error">
+          <p className="flex items-start gap-2 text-foreground"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary-ink" />{tx(failure)}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button type="submit" size="sm" variant="outline" disabled={isSubmitting} data-testid="lead-retry-button"><RotateCcw /> {tx("Try again")}</Button>
+            <Button asChild size="sm" variant="ghost"><a href={mailto()} data-testid="lead-email-fallback"><Mail /> {tx("Email info@solix.com instead")}</a></Button>
+          </div>
+        </div>
+      )}
+      {isSubmitting && slow && (
+        <p className="flex items-center gap-2 text-xs text-muted-foreground" aria-live="polite" data-testid="lead-form-slow">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> {tx("Connecting to our servers. This can take up to a minute the first time, so please keep this page open.")}
+        </p>
       )}
       <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">{tx("By submitting you agree to our privacy policy. No spam, ever.")}</p>

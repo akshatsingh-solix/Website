@@ -10,7 +10,7 @@ import { useTx } from "@/i18n/tx";
 // made (the consent banner uses the same corner), opens once, and after it's
 // closed stays as a small pill so the event is always one click away.
 const STATE_KEY = "solix-empower-promo"; // "min" (pill) | "hidden" (pill closed too)
-const HIDE_ON = /^\/(signin|signup|account|ai\/sign)/;
+const HIDE_ON = /^\/(signin|signup|account|ai\/sign|contact)/;
 
 const readState = () => {
   try { return sessionStorage.getItem(STATE_KEY) || localStorage.getItem(STATE_KEY); } catch { return null; }

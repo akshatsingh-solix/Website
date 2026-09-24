@@ -30,7 +30,7 @@ export default function IndustryDetail() {
         image={ind.image}
       >
         <Button asChild size="lg" data-testid="industry-demo-button">
-          <Link to="/contact">{tx("Talk to an industry expert")} <ArrowRight /></Link>
+          <Link to="/contact?type=demo">{tx("Talk to an industry expert")} <ArrowRight /></Link>
         </Button>
       </PageHero>
 
