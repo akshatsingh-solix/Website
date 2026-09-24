@@ -83,3 +83,13 @@
   .glow-field::after { bottom: -40%; right: -15%; background: radial-gradient(closest-side, rgba(0, 136, 207, 0.34), transparent); animation-delay: -9s; }
   .shadow-soft { box-shadow: 0 1px 2px rgb(var(--shadow) / 0.05), 0 10px 30px -12px rgb(var(--shadow) / 0.16); }
 }
+
+/* Slow drift on the hero's keynote-stage visual (stopped by the global
+   reduced-motion rule above). */
+@keyframes hero-drift {
+  from { transform: scale(1.03) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(-1.5%, -1%, 0); }
+}
+.hero-drift {
+  animation: hero-drift 30s ease-in-out infinite alternate;
+}

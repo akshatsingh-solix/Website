@@ -10,7 +10,19 @@ import { OutcomeChart } from "@/components/shared/OutcomeChart";
 import { Button } from "@/components/ui/button";
 import { InlineLeadSection } from "@/components/forms/InlineLeadSection";
 import { explorerFor } from "@/components/explorers";
+import { ExplorerMediaContext } from "@/components/explorers/kit";
+import { FamilyVisual } from "@/components/media/FamilyVisual";
+import { FamilyTour } from "@/components/media/FamilyTour";
+import { familyOf } from "@/data/families";
 import { useTx } from "@/i18n/tx";
+
+const StepLabel = ({ n, label, className, id }) => (
+    <p id={id} className={`mb-4 flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] ${className || ""}`}>
+      {n && <span className="text-primary-ink">{n}</span>}
+      {n && <span className="h-px w-8 bg-gradient-to-r from-primary/70 to-teal/60" />}
+      <span className="text-muted-foreground">{label}</span>
+    </p>
+);
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -22,6 +34,7 @@ export default function ProductDetail() {
   const solutions = SOLUTIONS.filter((s) => s.products.includes(slug));
   const Icon = product.icon;
   const Explorer = explorerFor(slug);
+  const family = familyOf(slug);
 
   return (
     <div data-testid={`product-detail-${slug}`}>
@@ -31,6 +44,7 @@ export default function ProductDetail() {
         title={product.tagline}
         description={product.description}
         image={product.image}
+        media={family && <FamilyVisual key={family.id} family={family} />}
       >
         <div className="flex flex-wrap gap-3">
           <Button asChild size="lg" data-testid="product-demo-button">
@@ -45,12 +59,19 @@ export default function ProductDetail() {
       {Explorer && (
         <Section className="bg-muted" id="explore">
           <div className="container">
-            <SectionHeading eyebrow="Try it yourself" title={tx("Explore {{name}} hands-on.", { name: product.name })} description="No sign-up. Change the inputs and watch the result update." />
-            <div className="mt-10">
+            <SectionHeading eyebrow="Try it yourself" title={tx("Explore {{name}} hands-on.", { name: product.name })} description="No sign-up. Take the one-minute visual tour, then change the inputs and watch the result update." />
+            {family && (
+              <>
+                <StepLabel n="01" label={tx("Take the visual tour")} className="mt-10" />
+                <FamilyTour key={family.id} family={family} product={product} />
+              </>
+            )}
+            <StepLabel n={family ? "02" : null} label={tx("Now try it hands-on")} className={family ? "mt-14 scroll-mt-28" : "mt-10"} id="try" />
+            <ExplorerMediaContext.Provider value={family?.id || null}>
               <Suspense fallback={<div className="h-[420px] animate-pulse rounded-3xl border border-line/10 bg-card" />}>
                 <Explorer key={slug} product={product} />
               </Suspense>
-            </div>
+            </ExplorerMediaContext.Provider>
           </div>
         </Section>
       )}

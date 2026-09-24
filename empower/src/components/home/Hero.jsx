@@ -76,8 +76,8 @@ function PassCard() {
 export default function Hero() {
   return (
     <section className="dark relative isolate overflow-hidden bg-ink-950 pb-20 pt-32 text-foreground md:pb-28 md:pt-40">
-      <SmartImage src={EVENT.heroImage} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-35" fallback={null} />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-ink-950/70 via-ink-950/85 to-ink-950" aria-hidden />
+      <SmartImage sources={EVENT.heroImages} alt="" loading="eager" className="hero-drift absolute inset-0 -z-20 h-full w-full object-cover opacity-50" fallback={null} />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-ink-950/60 via-ink-950/80 to-ink-950" aria-hidden />
       <div className="glow-field -z-10" aria-hidden />
       <div className="grid-lines absolute inset-0 -z-10 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" aria-hidden />
 

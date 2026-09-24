@@ -1,9 +1,11 @@
-import { useCallback, useRef } from "react";
+import { createContext, useCallback, useContext, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/intent";
 import { useTx } from "@/i18n/tx";
+import { mediaSources } from "@/lib/media";
+import { MediaImage } from "@/components/media/MediaImage";
 
 const LOCALES = { en: "en-US", es: "es-ES", fr: "fr-FR", de: "de-DE" };
 export const useLocale = () => {
@@ -44,12 +46,24 @@ export const prefillLead = (message) => {
   document.getElementById("talk-to-us")?.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
+/** The product family whose OpenArt visual brands the explorer header (set by the product page). */
+export const ExplorerMediaContext = createContext(null);
+
 export const ExplorerShell = ({ title, subtitle, children, className, testId }) => {
   const tx = useTx();
+  const media = useContext(ExplorerMediaContext);
   return (
     <div className={cn("relative overflow-hidden rounded-3xl border border-line/10 bg-card shadow-soft", className)} data-testid={testId}>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/10 px-5 py-4 sm:px-7">
-        <div>
+      <div className={cn("relative flex flex-wrap items-center justify-between gap-3 overflow-hidden border-b border-line/10 px-5 py-4 sm:px-7", media && "dark bg-ink-950 text-foreground")}>
+        {media && (
+          <MediaImage
+            key={media}
+            sources={mediaSources(media)}
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 h-full w-full object-cover opacity-70 [mask-image:linear-gradient(to_left,black_10%,transparent_75%)] sm:w-2/3"
+          />
+        )}
+        <div className="relative">
           <p className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary-ink"><Sparkles className="h-3.5 w-3.5" /> {tx("Interactive")}</p>
           <h3 className="mt-1 font-display text-xl font-medium tracking-tight sm:text-2xl">{title}</h3>
           {subtitle && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>}

@@ -5,6 +5,8 @@ import { ArrowUpRight, CalendarDays, MapPin, Ticket, X } from "lucide-react";
 import { getConsent, privacySignal, track } from "@/lib/intent";
 import { EMPOWER, empowerIsLive, empowerLink } from "@/lib/empower";
 import { useTx } from "@/i18n/tx";
+import { mediaSources } from "@/lib/media";
+import { MediaImage } from "@/components/media/MediaImage";
 
 // Bottom-left invitation to SOLIXEmpower. It waits until the cookie choice is
 // made (the consent banner uses the same corner), opens once, and after it's
@@ -50,7 +52,6 @@ export const EmpowerPromo = () => {
     if (saved === "hidden" || saved === "min" || saved === "card") return saved;
     return window.matchMedia?.("(max-width: 639px)").matches ? "min" : "card";
   });
-  const [imgOk, setImgOk] = useState(true);
 
   // Appear only once the visitor has answered the cookie banner (or it won't be shown).
   useEffect(() => {
@@ -93,7 +94,7 @@ export const EmpowerPromo = () => {
           data-testid="empower-promo"
         >
           <div className="relative h-36 overflow-hidden">
-            {imgOk && <img src={EMPOWER.image} alt="" onError={() => setImgOk(false)} className="absolute inset-0 h-full w-full object-cover opacity-60" />}
+            <MediaImage sources={mediaSources("empower")} className="visual-drift absolute inset-0 h-full w-full object-cover opacity-70" />
             <div className="absolute inset-0 bg-[radial-gradient(80%_120%_at_0%_0%,rgba(238,36,36,0.55),transparent_60%),radial-gradient(80%_120%_at_100%_100%,rgba(0,136,207,0.55),transparent_60%)]" aria-hidden />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0D192D] via-[#0D192D]/40 to-transparent" aria-hidden />
             <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:28px_28px]" aria-hidden />

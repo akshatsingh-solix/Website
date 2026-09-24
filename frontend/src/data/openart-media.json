@@ -1,0 +1,65 @@
+{
+  "_about": "Visuals generated with OpenArt (Wan 2.7 Image, 2K) in the Solix palette: navy #0D192D, red #EE2424, blue #0088CF. scripts/vendor-media.js copies each `url` to public/media/openart/<file> (run on deploy, or locally before committing), so pages serve them from this site. `video` is an optional looping clip (mp4/webm under public/media/openart/) that replaces the animated still when present.",
+  "assets": {
+    "archiving": {
+      "file": "family-archiving.webp",
+      "url": "https://cdn.openart.ai/watermarked_images/J38Yrkmv56lc0MkH6wrJ/thumbnail_fd8a1d9e_1790235795866.webp",
+      "fallback": "/Website/images/prod-archiving.jpg",
+      "video": null,
+      "width": 2352,
+      "height": 1760,
+      "openart": { "historyId": "GNMDrI616nbFTQPEg5bN", "model": "wan2-7-image" },
+      "prompt": "Abstract 3D render: glowing blue data strands flowing from the left and compressing into stacked translucent glass archive tiers on the right, a thin red light line tracing the tiers, deep navy space, fine grid floor."
+    },
+    "ai": {
+      "file": "family-ai.webp",
+      "url": "https://cdn.openart.ai/watermarked_images/J38Yrkmv56lc0MkH6wrJ/thumbnail_8ef919a1_1790235799034.webp",
+      "fallback": "/Website/images/ai-neural.jpg",
+      "video": null,
+      "width": 2352,
+      "height": 1760,
+      "openart": { "historyId": "3UYSbBl0NAIjWFCNrith", "model": "wan2-7-image" },
+      "prompt": "Abstract 3D render: a luminous knowledge-graph constellation of blue nodes and filaments with a few red key nodes around a bright core, orbit rings and haze on deep navy."
+    },
+    "governance": {
+      "file": "family-governance.webp",
+      "url": "https://cdn.openart.ai/watermarked_images/J38Yrkmv56lc0MkH6wrJ/thumbnail_512f7c4f_1790235801852.webp",
+      "fallback": "/Website/images/prod-privacy.jpg",
+      "video": null,
+      "width": 2352,
+      "height": 1760,
+      "openart": { "historyId": "ioq8xczeOHBdWf513Zrf", "model": "wan2-7-image" },
+      "prompt": "Abstract 3D render: stacked frosted-glass panes of data cells, some masked and tokenised, wrapped by a blue light shield arc with a red scanning line, hexagonal lattice on deep navy."
+    },
+    "platform": {
+      "file": "family-platform.webp",
+      "url": "https://cdn.openart.ai/watermarked_images/J38Yrkmv56lc0MkH6wrJ/thumbnail_41913cb9_1790235806394.webp",
+      "fallback": "/Website/images/prod-cdp.jpg",
+      "video": null,
+      "width": 2352,
+      "height": 1760,
+      "openart": { "historyId": "jp6ym0NsMl803xNmTDEX", "model": "wan2-7-image" },
+      "prompt": "Isometric 3D render: a modular stack of glass-and-metal platform slabs joined by blue data conduits, satellite region nodes linked by light arcs, one layer edged in red, grid ground plane on deep navy."
+    },
+    "content": {
+      "file": "family-content.webp",
+      "url": "https://cdn.openart.ai/watermarked_images/J38Yrkmv56lc0MkH6wrJ/thumbnail_82ede593_1790235820843.webp",
+      "fallback": "/Website/images/prod-ediscovery.jpg",
+      "video": null,
+      "width": 2352,
+      "height": 1760,
+      "openart": { "historyId": "gIS02xphQC57AiAkDdCX", "model": "wan2-7-image" },
+      "prompt": "Abstract 3D render: an arc of translucent documents and emails fanning out of a stack, swept by a blue scanning beam that leaves highlight markers, a few documents lifted out and outlined in red, deep navy."
+    },
+    "empower": {
+      "file": "empower-stage.webp",
+      "url": "https://cdn.openart.ai/watermarked_images/J38Yrkmv56lc0MkH6wrJ/thumbnail_09cbb65b_1790235816962.webp",
+      "fallback": "https://empower.solix.com/wp-content/uploads/2026/04/solixempower-2026-popup-new2.jpg",
+      "video": null,
+      "width": 2712,
+      "height": 1528,
+      "openart": { "historyId": "ml9Jqsfw3wcCUc8woiyf", "model": "wan2-7-image" },
+      "prompt": "Cinematic keynote stage for 'The Agentic Enterprise': audience silhouettes from behind facing a curved LED wall of glowing AI-agent networks, red and blue beams through haze, navy palette."
+    }
+  }
+}

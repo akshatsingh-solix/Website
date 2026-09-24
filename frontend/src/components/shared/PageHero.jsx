@@ -10,8 +10,10 @@ import { Reveal, AuroraField } from "./Reveal";
  * at full strength in a framed navy panel on the right (the same "window
  * onto the data" device as the homepage hero) and any `children` - usually
  * CTAs - sit under the copy. Without one, `children` take the right column.
+ * `media` replaces the image with a live element (e.g. a FamilyVisual) in
+ * the same slot.
  */
-export const PageHero = ({ eyebrow, title, description, crumbs = [], children, image, className, compact = false }) => {
+export const PageHero = ({ eyebrow, title, description, crumbs = [], children, image, media, className, compact = false }) => {
   const tx = useTx();
   const { scrollY } = useScroll();
   const imgY = useTransform(scrollY, [0, 600], [0, 40]);
@@ -33,7 +35,7 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
           </Reveal>
         )}
 
-        {image ? (
+        {image || media ? (
           <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
             <Reveal blur className="lg:col-span-7">
               {eyebrow && <p className="eyebrow mb-5">{tx(eyebrow)}</p>}
@@ -44,9 +46,13 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
             <Reveal delay={0.1} className="relative lg:col-span-5">
               <div className="absolute -right-8 -top-8 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.2),transparent)]" />
               <div className="absolute -bottom-8 -left-8 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.16),transparent)]" />
-              <div className="dark relative overflow-hidden rounded-3xl border border-line/10 bg-background shadow-[0_2px_6px_rgba(13,25,45,0.08),0_50px_100px_-45px_rgba(13,25,45,0.6)]">
-                <motion.img src={image} alt="" style={{ y: imgY, scale: 1.08 }} className="aspect-[4/3] w-full object-cover" />
-              </div>
+              {media ? (
+                <div className="relative rounded-3xl shadow-[0_2px_6px_rgba(13,25,45,0.08),0_50px_100px_-45px_rgba(13,25,45,0.6)]">{media}</div>
+              ) : (
+                <div className="dark relative overflow-hidden rounded-3xl border border-line/10 bg-background shadow-[0_2px_6px_rgba(13,25,45,0.08),0_50px_100px_-45px_rgba(13,25,45,0.6)]">
+                  <motion.img src={image} alt="" style={{ y: imgY, scale: 1.08 }} className="aspect-[4/3] w-full object-cover" />
+                </div>
+              )}
             </Reveal>
           </div>
         ) : (

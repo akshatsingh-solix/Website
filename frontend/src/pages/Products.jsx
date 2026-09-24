@@ -8,6 +8,9 @@ import { ProductCard } from "@/components/home/PlatformBento";
 import { ArchitectureStack } from "@/components/products/ArchitectureStack";
 import { ProductFinder } from "@/components/explorers/ProductFinder";
 import { CTABand } from "@/components/shared/CTABand";
+import { FamilyVisual } from "@/components/media/FamilyVisual";
+import { FamilyGallery } from "@/components/media/FamilyGallery";
+import { FAMILIES } from "@/data/families";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
 
@@ -21,13 +24,21 @@ export default function Products() {
         title="One platform. Every era of your data. Every way to put it to work."
         description="Solix products are not point tools bolted together. They are capabilities on a single governed foundation, so a record archived today is searchable by legal tomorrow and usable by an AI agent next quarter."
         image="/Website/images/prod-cdp.jpg"
+        media={<FamilyVisual family={FAMILIES.find((f) => f.id === "platform")} />}
       >
         <Button asChild size="lg" data-testid="products-hero-demo">
           <Link to="/contact">{tx("Request a demo")} <ArrowRight /></Link>
         </Button>
       </PageHero>
 
-      <Section id="finder">
+      <Section id="families" className="overflow-hidden">
+        <div className="container">
+          <SectionHeading eyebrow="Explore by family" title="Five product families. One governed platform." description="Pick a family, then tap the stops on the visual to see how data moves through it. Every family has a hands-on explorer." />
+          <div className="mt-10"><FamilyGallery /></div>
+        </div>
+      </Section>
+
+      <Section id="finder" bordered className="bg-muted">
         <div className="container">
           <SectionHeading eyebrow="Not sure where to start?" title="Find your product in three questions." description="Answer three quick questions and we'll point you to the products that fit, each with a hands-on explorer." />
           <div className="mt-10"><ProductFinder /></div>

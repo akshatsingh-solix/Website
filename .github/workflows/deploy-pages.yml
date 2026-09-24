@@ -51,6 +51,12 @@ jobs:
         # committed snapshot is used.
         run: node scripts/content-snapshot.js
 
+      - name: Vendor OpenArt visuals into the build
+        # Copies the visuals listed in src/data/openart-media.json into
+        # public/media/openart/ so the site serves them itself. Never fails
+        # the deploy: pages fall back to the OpenArt CDN, then older photos.
+        run: node scripts/vendor-media.js
+
       - name: Build
         env:
           CI: "false"

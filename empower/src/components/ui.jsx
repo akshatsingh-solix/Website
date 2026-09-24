@@ -3,10 +3,12 @@ import { motion } from "framer-motion";
 
 // Remote images come from the existing Empower media library. If one fails
 // (moved, blocked, offline) we show a branded fallback instead of a broken icon.
-export function SmartImage({ src, alt, className = "", fallback, ...rest }) {
-  const [failed, setFailed] = useState(!src);
-  if (failed) return fallback ?? <div aria-hidden className={`bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950 ${className}`} />;
-  return <img src={src} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} className={className} {...rest} />;
+// `sources` is an ordered list to try in turn (e.g. local copy, CDN, original).
+export function SmartImage({ src, sources, alt, className = "", fallback, ...rest }) {
+  const list = sources || (src ? [src] : []);
+  const [i, setI] = useState(0);
+  if (i >= list.length) return fallback ?? <div aria-hidden className={`bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950 ${className}`} />;
+  return <img src={list[i]} alt={alt} loading="lazy" decoding="async" onError={() => setI((n) => n + 1)} className={className} {...rest} />;
 }
 
 export function initials(name) {
