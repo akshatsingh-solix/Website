@@ -17,6 +17,7 @@ const pages = {
   Events: () => import("@/pages/admin/AdminEvents"),
   Migrate: () => import("@/pages/admin/AdminMigrate"),
   Website: () => import("@/pages/admin/AdminWebsite"),
+  Seo: () => import("@/pages/admin/AdminSeo"),
 };
 const AdminLayout = lazy(pages.Layout);
 const AdminDashboard = lazy(pages.Dashboard);
@@ -28,6 +29,7 @@ const AdminSettings = lazy(pages.Settings);
 const AdminEvents = lazy(pages.Events);
 const AdminMigrate = lazy(pages.Migrate);
 const AdminWebsite = lazy(pages.Website);
+const AdminSeo = lazy(pages.Seo);
 
 // Fetch the other admin pages while the browser is idle, one at a time, so
 // switching tabs later never waits on the network.
@@ -54,6 +56,7 @@ export default function AdminApp() {
             <Route path="events" element={<AdminEvents />} />
             <Route path="migrate" element={<AdminMigrate />} />
             <Route path="website" element={<AdminWebsite />} />
+            <Route path="seo" element={<AdminSeo />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

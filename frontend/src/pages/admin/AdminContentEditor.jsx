@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Bold, CalendarClock, Check, ExternalLink, Eye, EyeOff, Heading2, History, ImagePlus, Italic, Link2, List, Loader2, Paperclip, Quote, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ import {
 } from "@/lib/adminApi";
 import { fmtDateTime, inputCls, productName, selectCls, useCan } from "@/components/admin/kit";
 import { StatusBadge, TYPE_LABELS, sitePath } from "@/pages/admin/AdminContent";
+import ContentSeoPanel from "@/components/admin/seo/ContentSeoPanel";
 
 const EMPTY = {
   title: "", type: "blog", slug: "", summary: "", body: "", tag: "", products: [], industries: [], author: "", author_role: "",
@@ -47,7 +48,9 @@ function Editor() {
   const navigate = useNavigate();
   const can = useCan();
   const editable = can("editContent");
-  const [form, setForm] = useState(EMPTY);
+  // A brief from the SEO content plan can open a new draft pre-filled.
+  const prefill = useLocation().state?.prefill;
+  const [form, setForm] = useState(() => (id || !prefill ? EMPTY : { ...EMPTY, ...prefill, slug: slugify(prefill.title || "") }));
   const [saved, setSaved] = useState(EMPTY);
   const [item, setItem] = useState(null);
   const [attached, setAttached] = useState(null); // file uploaded in this session
@@ -353,6 +356,8 @@ function Editor() {
               <Field label="Author role"><Input value={form.author_role} onChange={(e) => set({ author_role: e.target.value })} placeholder="ERP archiving & migration" className={inputCls} disabled={!editable} /></Field>
             </div>
           </div>
+
+          <ContentSeoPanel form={form} item={item} id={id} livePath={sitePath(saved.slug ? saved : form)} />
 
           <div className="rounded-2xl border border-line/10 bg-card p-5">
             <p className="text-sm font-medium">Search & social</p>

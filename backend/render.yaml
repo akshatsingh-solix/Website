@@ -19,3 +19,8 @@ services:
         sync: false
       - key: CORS_ORIGINS
         value: https://akshatsingh-solix.github.io
+      # Optional: live SEO data and AI answer tracking in Admin > SEO
+      - key: SEMRUSH_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false

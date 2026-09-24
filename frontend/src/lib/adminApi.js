@@ -178,3 +178,16 @@ export const testDelivery = (body) => adminApi.post("/admin/deliveries/test", bo
 export const resendDelivery = (id) => adminApi.post(`/admin/deliveries/${id}/resend`, null, { timeout: 60000 }).then((r) => r.data);
 export const publishImported = () => adminApi.post("/admin/content-imported/publish").then((r) => r.data);
 export const restoreImportedDates = () => adminApi.post("/admin/content-imported/restore-dates").then((r) => r.data);
+
+// --- SEO / AEO / GEO analytics ------------------------------------------------
+export const fetchSeoStatus = () => adminApi.get("/admin/seo/status", { fresh: true }).then((r) => r.data);
+export const fetchSeoConfig = () => adminApi.get("/admin/seo/config").then((r) => r.data);
+export const saveSeoConfig = (body) => adminApi.put("/admin/seo/config", body).then((r) => r.data);
+export const fetchSeoSnapshot = (geo) => adminApi.get("/admin/seo/snapshot", { params: { geo } }).then((r) => r.data);
+export const syncSeo = (geo) => adminApi.post("/admin/seo/sync", { geo }, { timeout: 300000 }).then((r) => r.data);
+export const discoverCompetitors = (geo) => adminApi.post("/admin/seo/competitors/discover", { geo }, { timeout: 60000 }).then((r) => r.data);
+export const fetchSeoUrl = (url, geo) => adminApi.get("/admin/seo/url", { params: { url, geo }, timeout: 60000 }).then((r) => r.data);
+export const fetchSeoKeyword = (phrase, geo) => adminApi.get("/admin/seo/keyword", { params: { phrase, geo }, timeout: 60000 }).then((r) => r.data);
+export const fetchSeoTopics = (refresh) => adminApi.get("/admin/seo/topics", { params: refresh ? { refresh: true } : {}, timeout: 120000, fresh: !!refresh }).then((r) => r.data);
+export const fetchAiVisibility = () => adminApi.get("/admin/seo/ai-visibility").then((r) => r.data);
+export const runAiVisibility = () => adminApi.post("/admin/seo/ai-visibility/run", null, { timeout: 600000 }).then((r) => r.data);
