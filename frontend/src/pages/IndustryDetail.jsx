@@ -10,6 +10,7 @@ import { ProductCard } from "@/components/home/PlatformBento";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { midSentence, useTx } from "@/i18n/tx";
+import { Picture } from "@/components/shared/Picture";
 
 export default function IndustryDetail() {
   const { slug } = useParams();
@@ -57,7 +58,7 @@ export default function IndustryDetail() {
             {others.map((o) => (
               <Item key={o.slug} className="flex">
                 <Link to={`/industries/${o.slug}`} className="dark group relative flex aspect-[4/3] w-full items-end overflow-hidden rounded-2xl border border-line/10 bg-background p-5 text-foreground shadow-soft" data-testid={`industry-related-${o.slug}`}>
-                  <img src={o.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <Picture src={o.image} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
                   <span className="relative flex items-center gap-2 font-display text-lg font-medium"><o.icon className="h-4 w-4 text-primary-ink" strokeWidth={1.5} /> {o.name}</span>
                 </Link>

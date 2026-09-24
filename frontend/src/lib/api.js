@@ -1,9 +1,11 @@
 import axios from "axios";
+import { isRetryable, makeResilient } from "./net";
 
 export const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 
-export const api = axios.create({ baseURL: API, timeout: 20000 });
+// GETs retry on flaky connections (see net.js); submissions retry below.
+export const api = makeResilient(axios.create({ baseURL: API, timeout: 20000 }));
 
 // The backend runs on a host that sleeps when idle and can take up to a
 // minute to wake. Forms therefore (1) wake it as soon as a form is shown,
@@ -18,7 +20,7 @@ export const warmBackend = () => {
   return warming;
 };
 
-const retryable = (err) => !err.response || err.code === "ECONNABORTED" || [502, 503, 504].includes(err.response?.status);
+const retryable = isRetryable;
 
 export async function submitLead(payload, { attempts = 2 } = {}) {
   if (!BACKEND_URL) throw Object.assign(new Error("Forms are not connected to a backend."), { code: "NO_BACKEND" });

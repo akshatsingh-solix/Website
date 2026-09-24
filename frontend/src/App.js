@@ -5,9 +5,9 @@ import i18n from "@/i18n";
 import { detectLanguage, getStoredLanguage } from "@/i18n/geoDetect";
 import { Toaster } from "@/components/ui/sonner";
 import { Layout } from "@/components/layout/Layout";
-import { AdminAuthProvider, RequireAdmin } from "@/components/admin/AdminAuth";
 import { AccountAuthProvider, RequireAccount } from "@/components/account/AccountAuth";
 import Home from "@/pages/Home";
+import { slowConnection } from "@/lib/net";
 
 // Route-level code splitting: the homepage ships alone; every other page is
 // its own chunk, fetched on navigation and prefetched while the browser is idle.
@@ -51,20 +51,14 @@ const NotFound = lazy(pages.NotFound);
 const Account = lazy(pages.Account);
 const SignIn = lazy(pages.SignIn);
 const SignUp = lazy(pages.SignUp);
-// Admin is a separate bundle that public visitors never download.
-const AdminLogin = lazy(() => import("@/pages/admin/AdminLogin"));
-const AdminLayout = lazy(() => import("@/pages/admin/AdminLayout"));
-const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
-const AdminLeads = lazy(() => import("@/pages/admin/AdminLeads"));
-const AdminSubmissions = lazy(() => import("@/pages/admin/AdminSubmissions"));
-const AdminContent = lazy(() => import("@/pages/admin/AdminContent"));
-const AdminContentEditor = lazy(() => import("@/pages/admin/AdminContentEditor"));
-const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
-const AdminEvents = lazy(() => import("@/pages/admin/AdminEvents"));
-const AdminMigrate = lazy(() => import("@/pages/admin/AdminMigrate"));
-const AdminWebsite = lazy(() => import("@/pages/admin/AdminWebsite"));
+// Admin (sign-in, API client and pages) is a separate bundle that public
+// visitors never download.
+const AdminApp = lazy(() => import("@/pages/admin/AdminApp"));
 
+// On slow or data-saver connections pages load on demand instead, so the
+// prefetch never competes with the page the visitor is reading.
 const prefetchPages = () => {
+  if (slowConnection()) return;
   const run = () => ["Products", "ProductDetail", "Solutions", "Resources", "Article", "Contact", "Industries", "IndustryDetail", "Platform", "Company"].forEach((k, i) => setTimeout(() => pages[k]().catch(() => {}), i * 400));
   if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: 5000 });
   else setTimeout(run, 3000);
@@ -88,52 +82,38 @@ function App() {
 
   return (
     <BrowserRouter basename="/Website">
-      <AdminAuthProvider>
-        <AccountAuthProvider>
+      <AccountAuthProvider>
         <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route path="/admin/login" element={<AdminLogin />} />
-          {/* Solix ECS trial accounts - standalone pages, like solix.com/ai/signin */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/ai/signin" element={<Navigate to="/signin" replace />} />
-          <Route path="/ai/signup" element={<Navigate to="/signup" replace />} />
-          <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="leads" element={<AdminLeads />} />
-            <Route path="inbox" element={<AdminSubmissions />} />
-            <Route path="content" element={<AdminContent />} />
-            <Route path="content/new" element={<AdminContentEditor />} />
-            <Route path="content/:id" element={<AdminContentEditor />} />
-            <Route path="events" element={<AdminEvents />} />
-            <Route path="migrate" element={<AdminMigrate />} />
-            <Route path="website" element={<AdminWebsite />} />
-            <Route path="settings" element={<AdminSettings />} />
-          </Route>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/platform" element={<Platform />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:slug" element={<ProductDetail />} />
-            <Route path="/solutions" element={<Solutions />} />
-            <Route path="/services-support" element={<ServicesSupport />} />
-            <Route path="/industries" element={<Industries />} />
-            <Route path="/industries/:slug" element={<IndustryDetail />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/resources/:slug" element={<Article />} />
-            <Route path="/company" element={<Company />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/partners" element={<Partners />} />
-            <Route path="/newsroom" element={<Newsroom />} />
-            <Route path="/newsroom/:id" element={<PressRelease />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/account" element={<RequireAccount><Account /></RequireAccount>} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
+          <Routes>
+            <Route path="/admin/*" element={<AdminApp />} />
+            {/* Solix ECS trial accounts - standalone pages, like solix.com/ai/signin */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/ai/signin" element={<Navigate to="/signin" replace />} />
+            <Route path="/ai/signup" element={<Navigate to="/signup" replace />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/platform" element={<Platform />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:slug" element={<ProductDetail />} />
+              <Route path="/solutions" element={<Solutions />} />
+              <Route path="/services-support" element={<ServicesSupport />} />
+              <Route path="/industries" element={<Industries />} />
+              <Route path="/industries/:slug" element={<IndustryDetail />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/resources/:slug" element={<Article />} />
+              <Route path="/company" element={<Company />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/partners" element={<Partners />} />
+              <Route path="/newsroom" element={<Newsroom />} />
+              <Route path="/newsroom/:id" element={<PressRelease />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/account" element={<RequireAccount><Account /></RequireAccount>} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
         </Suspense>
-        </AccountAuthProvider>
-      </AdminAuthProvider>
+      </AccountAuthProvider>
       <Toaster position="bottom-center" theme="light" richColors closeButton />
     </BrowserRouter>
   );

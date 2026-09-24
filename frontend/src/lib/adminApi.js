@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API } from "./api";
+import { makeResilient } from "./net";
 
 export const TOKEN_KEY = "solix_admin_token";
 
@@ -21,6 +22,46 @@ adminApi.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+makeResilient(adminApi);
+
+// Short-lived cache for admin reads, so moving between admin pages (or
+// reopening a lead) is instant on a slow link, and identical requests in
+// flight share one round trip. Any write clears it, so a page never shows
+// data older than your own last change. Pass { fresh: true } to bypass it
+// (polling), and file downloads are never cached.
+const GET_TTL_MS = 20000;
+const getCache = new Map();
+export const clearAdminCache = () => getCache.clear();
+const rawGet = adminApi.get.bind(adminApi);
+adminApi.get = (url, config = {}) => {
+  const { fresh, ...rest } = config;
+  if (rest.responseType) return rawGet(url, rest);
+  const key = url + "?" + JSON.stringify(rest.params || {});
+  const hit = getCache.get(key);
+  if (!fresh && hit && (hit.pending || Date.now() - hit.at < GET_TTL_MS)) return hit.promise;
+  const entry = { pending: true, at: 0 };
+  entry.promise = rawGet(url, rest).then(
+    (r) => { entry.pending = false; entry.at = Date.now(); return r; },
+    (err) => { if (getCache.get(key) === entry) getCache.delete(key); throw err; },
+  );
+  getCache.set(key, entry);
+  return entry.promise;
+};
+adminApi.interceptors.request.use((config) => {
+  if (!["get", "head", "options"].includes((config.method || "get").toLowerCase())) clearAdminCache();
+  return config;
+});
+adminApi.interceptors.response.use(
+  (r) => {
+    if (!["get", "head", "options"].includes((r.config?.method || "get").toLowerCase())) clearAdminCache();
+    return r;
+  },
+  (err) => {
+    if (!["get", "head", "options"].includes((err.config?.method || "get").toLowerCase())) clearAdminCache();
+    return Promise.reject(err);
+  },
+);
+window.addEventListener("solix:admin-logout", clearAdminCache);
 
 export const formatApiError = (err) => {
   const detail = err?.response?.data?.detail;
@@ -31,7 +72,7 @@ export const formatApiError = (err) => {
 };
 
 export const adminLogin = (email, password) => adminApi.post("/auth/login", { email, password }).then((r) => r.data);
-export const adminMe = () => adminApi.get("/auth/me").then((r) => r.data);
+export const adminMe = () => adminApi.get("/auth/me", { fresh: true }).then((r) => r.data);
 export const fetchStats = () => adminApi.get("/admin/stats").then((r) => r.data);
 export const fetchLeads = (params) => adminApi.get("/admin/submissions", { params }).then((r) => r.data);
 export const deleteLead = (id) => adminApi.delete(`/admin/submissions/${id}`);
@@ -40,7 +81,7 @@ export const fetchTeam = () => adminApi.get("/admin/team").then((r) => r.data);
 export const saveTeam = (members) => adminApi.put("/admin/team", { members }).then((r) => r.data);
 export const fetchSettings = () => adminApi.get("/admin/settings").then((r) => r.data);
 export const saveSettings = (body) => adminApi.put("/admin/settings", body).then((r) => r.data);
-export const fetchNotifications = () => adminApi.get("/admin/notifications").then((r) => r.data);
+export const fetchNotifications = () => adminApi.get("/admin/notifications", { fresh: true }).then((r) => r.data);
 
 // --- Leads, reports, views, scoring, users ---------------------------------
 const clean = (params) => Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== "all"));
@@ -121,8 +162,8 @@ export async function exportRegistrations(slug, params, format) {
 export const importBuiltin = (items, on_conflict = "skip") => adminApi.post("/admin/content/import-builtin", { items, on_conflict }, { timeout: 120000 }).then((r) => r.data);
 export const previewMigration = (body) => adminApi.post("/admin/migrations/preview", body, { timeout: 180000 }).then((r) => r.data);
 export const startMigration = (body) => adminApi.post("/admin/migrations", body, { timeout: 60000 }).then((r) => r.data);
-export const fetchMigrations = () => adminApi.get("/admin/migrations").then((r) => r.data);
-export const fetchMigration = (id) => adminApi.get(`/admin/migrations/${id}`).then((r) => r.data);
+export const fetchMigrations = () => adminApi.get("/admin/migrations", { fresh: true }).then((r) => r.data);
+export const fetchMigration = (id) => adminApi.get(`/admin/migrations/${id}`, { fresh: true }).then((r) => r.data);
 export const cancelMigration = (id) => adminApi.post(`/admin/migrations/${id}/cancel`).then((r) => r.data);
 export async function downloadRedirects(format) {
   const res = await adminApi.get("/admin/migrations/redirects", { params: { format }, responseType: "blob" });

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchLeadsMeta, fetchOverview, formatApiError } from "@/lib/adminApi";
+import { clearAdminCache, fetchLeadsMeta, fetchOverview, formatApiError } from "@/lib/adminApi";
 import { CHANNEL_LABELS, LINE_SHORT, Panel, SERIES, STAGE_LABELS, StatTile, productName, selectCls } from "@/components/admin/kit";
 import { cn } from "@/lib/utils";
 
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
           <option value="all">All product lines</option>
           {(meta?.lines || []).map((l) => <option key={l.key} value={l.key}>{l.label}</option>)}
         </select>
-        <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setTick((t) => t + 1)} aria-label="Refresh">{loading ? <Loader2 className="animate-spin" /> : <RefreshCw />}</Button>
+        <Button variant="ghost" size="sm" className="ml-auto" onClick={() => { clearAdminCache(); setTick((t) => t + 1); }} aria-label="Refresh">{loading ? <Loader2 className="animate-spin" /> : <RefreshCw />}</Button>
       </div>
 
       {!data ? (

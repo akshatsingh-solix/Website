@@ -4,6 +4,7 @@ import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
+import { Picture } from "@/components/shared/Picture";
 
 const ERAS = [
   { icon: Database, era: "Active", title: "Live systems", desc: "ERP, CRM, SaaS and files in daily use.", to: "/products/common-data-platform", tone: "text-teal" },
@@ -34,7 +35,7 @@ export const DataEras = () => {
         </div>
         <Reveal delay={0.1} className="lg:col-span-7">
           <figure className="dark relative overflow-hidden rounded-3xl border border-line/10 bg-background shadow-[0_40px_90px_-45px_rgba(13,25,45,0.55)]">
-            <img src="/Website/images/data-eras-ribbon.jpg" alt={tx("Data moving from tape archives through servers into an AI core")} className="aspect-[16/9] w-full object-cover" loading="lazy" />
+            <Picture src="/Website/images/data-eras-ribbon.jpg" sizes="(min-width: 1024px) 50vw, 100vw" alt={tx("Data moving from tape archives through servers into an AI core")} className="aspect-[16/9] w-full object-cover" />
             <figcaption className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 bg-gradient-to-t from-background/90 to-transparent px-5 pb-4 pt-12 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/85 sm:px-6">
               <span>{tx("Tape")}</span><span className="h-px flex-1 bg-gradient-to-r from-teal/70 to-transparent" />
               <span>{tx("Servers")}</span><span className="h-px flex-1 bg-gradient-to-r from-teal/70 to-primary/70" />

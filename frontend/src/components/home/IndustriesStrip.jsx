@@ -7,6 +7,10 @@ import { INDUSTRIES } from "@/data/site";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal } from "@/components/shared/Reveal";
 import { useTx } from "@/i18n/tx";
+import { Picture, webpSrcSet } from "@/components/shared/Picture";
+import { slowConnection } from "@/lib/net";
+
+const SIZES = "(min-width: 1024px) 50vw, 100vw";
 
 export const IndustriesStrip = () => {
   const tx = useTx();
@@ -16,8 +20,16 @@ export const IndustriesStrip = () => {
 
   // Warm the cache for every industry render once the page is idle, so
   // hovering down the list swaps images instantly instead of popping in.
+  // Skipped on slow or data-saver connections, where it would compete with
+  // what the visitor is actually looking at.
   useEffect(() => {
-    const warm = () => INDUSTRIES.forEach((ind) => { const img = new Image(); img.src = ind.image; });
+    if (slowConnection()) return undefined;
+    const warm = () => INDUSTRIES.forEach((ind) => {
+      const img = new Image();
+      const set = webpSrcSet(ind.image);
+      if (set) { img.sizes = SIZES; img.srcset = set; }
+      img.src = ind.image;
+    });
     const id = "requestIdleCallback" in window ? window.requestIdleCallback(warm) : setTimeout(warm, 1500);
     return () => ("cancelIdleCallback" in window ? window.cancelIdleCallback(id) : clearTimeout(id));
   }, []);
@@ -68,7 +80,7 @@ export const IndustriesStrip = () => {
                 data-testid="industry-detail-panel"
               >
                 <div className="dark relative h-52 shrink-0 overflow-hidden bg-background sm:h-60">
-                  <img src={current.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <Picture src={current.image} loading="eager" sizes={SIZES} className="absolute inset-0 h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent" />
                   <div className="absolute bottom-5 left-6 right-6 flex items-end gap-4 sm:left-8">
                     <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lift">

@@ -6,6 +6,7 @@ import { Section } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { useTx } from "@/i18n/tx";
+import { Picture } from "@/components/shared/Picture";
 
 export default function Industries() {
   const tx = useTx();
@@ -29,7 +30,7 @@ export default function Industries() {
                   className="group relative flex w-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-card shadow-soft card-hover"
                 >
                   <div className="dark relative h-48 overflow-hidden bg-background">
-                    <img src={ind.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <Picture src={ind.image} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background/60 to-transparent" />
                     <span className="absolute bottom-4 left-5 grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lift">
                       <ind.icon className="h-5 w-5" strokeWidth={1.5} />

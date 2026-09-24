@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
 import { usePressReleases } from "@/lib/press";
 import { Button } from "@/components/ui/button";
+import { Picture } from "@/components/shared/Picture";
 
 const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
 // i18n: filter labels are translated at render; values stay English.
@@ -56,7 +57,7 @@ export default function Newsroom() {
               <div className="absolute inset-0 grid-lines opacity-60" />
               <div className="relative grid lg:grid-cols-12">
                 <div className="relative min-h-[240px] overflow-hidden lg:order-2 lg:col-span-5 lg:min-h-full">
-                  <img src={featured.image || "/Website/images/hero-architecture.jpg"} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                  <Picture src={featured.image || "/Website/images/hero-architecture.jpg"} loading="eager" sizes="(min-width: 1024px) 60vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent lg:bg-gradient-to-r lg:from-background lg:via-background/10 lg:to-transparent" />
                 </div>
                 <div className="p-8 sm:p-12 lg:col-span-7">

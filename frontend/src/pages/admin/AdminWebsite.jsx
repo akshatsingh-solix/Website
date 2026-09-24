@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { fetchDeliveries, fetchDelivery, fetchSite, formatApiError, resendDelivery, saveDelivery, saveSite, testDelivery } from "@/lib/adminApi";
+import { clearAdminCache, fetchDeliveries, fetchDelivery, fetchSite, formatApiError, resendDelivery, saveDelivery, saveSite, testDelivery } from "@/lib/adminApi";
 import { Badge, Panel, ago, fmtDateTime, inputCls, useCan } from "@/components/admin/kit";
 import { useAdmin } from "@/components/admin/AdminAuth";
 
@@ -186,7 +186,7 @@ function DeliveryLog({ tick }) {
           <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-8 rounded-lg border border-line/15 bg-background px-2 text-xs" aria-label="Status">
             <option value="">All</option><option value="sent">Sent</option><option value="failed">Failed</option><option value="skipped">Skipped</option>
           </select>
-          <Button size="sm" variant="ghost" onClick={load} aria-label="Refresh"><RefreshCw /></Button>
+          <Button size="sm" variant="ghost" onClick={() => { clearAdminCache(); load(); }} aria-label="Refresh"><RefreshCw /></Button>
         </span>
       )}
       testId="delivery-log"
