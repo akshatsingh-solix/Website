@@ -61,11 +61,18 @@ export const LeadForm = ({
   const slowTimer = useRef(null);
   const known = INTERESTS.some((i) => i.value === defaultInterest);
   const {
-    register, handleSubmit, control, getValues, formState: { errors, isSubmitting },
+    register, handleSubmit, control, getValues, setValue, formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema), defaultValues: { interest: known ? defaultInterest : "", name: "", email: "", company: "", phone: "", job_title: "", message: "" } });
 
   // Wake the backend while the visitor is still typing (it may be asleep).
   useEffect(() => { warmBackend(); return () => clearTimeout(slowTimer.current); }, []);
+  // Interactive explorers on the page can hand over what the visitor tried.
+  useEffect(() => {
+    if (!showMessage) return undefined;
+    const onPrefill = (e) => e.detail?.message && setValue("message", e.detail.message.slice(0, 2000));
+    window.addEventListener("solix:prefill-lead", onPrefill);
+    return () => window.removeEventListener("solix:prefill-lead", onPrefill);
+  }, [showMessage, setValue]);
 
   const groups = useMemo(() => {
     const out = [];

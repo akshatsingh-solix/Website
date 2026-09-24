@@ -6,6 +6,7 @@ import { Section, SectionHeading } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { ProductCard } from "@/components/home/PlatformBento";
 import { ArchitectureStack } from "@/components/products/ArchitectureStack";
+import { ProductFinder } from "@/components/explorers/ProductFinder";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
@@ -25,6 +26,13 @@ export default function Products() {
           <Link to="/contact">{tx("Request a demo")} <ArrowRight /></Link>
         </Button>
       </PageHero>
+
+      <Section id="finder">
+        <div className="container">
+          <SectionHeading eyebrow="Not sure where to start?" title="Find your product in three questions." description="Answer three quick questions and we'll point you to the products that fit, each with a hands-on explorer." />
+          <div className="mt-10"><ProductFinder /></div>
+        </div>
+      </Section>
 
       <Section className="dark overflow-hidden bg-background text-foreground">
         <div className="absolute inset-0 grid-lines grid-fade" />
