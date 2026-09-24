@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, CalendarCheck, MessageSquare, RotateCcw, Send, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CHAT_SUGGESTIONS } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { clearChatHistory, fetchChatHistory, streamChat } from "@/lib/api";
+import { createLocalConcierge } from "@/lib/localConcierge";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
 
@@ -19,10 +21,24 @@ const getSession = () => {
   return id;
 };
 
+// no-i18n
+const linkCls = "font-medium text-teal underline underline-offset-2 hover:text-foreground";
+
+// **bold** and [label](/path) - internal paths use the router, others open in a new tab.
 const renderInline = (text) =>
-  text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith("**") && part.endsWith("**") ? <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong> : part
-  );
+  text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)\s]+\))/g).map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>;
+    const link = /^\[([^\]]+)\]\(([^)\s]+)\)$/.exec(part);
+    if (link) {
+      const [, label, href] = link;
+      return href.startsWith("/") ? (
+        <Link key={i} to={href} className={linkCls}>{label}</Link>
+      ) : (
+        <a key={i} href={href} target="_blank" rel="noreferrer" className={linkCls}>{label}</a>
+      );
+    }
+    return part;
+  });
 
 const Markdown = ({ text }) => {
   const lines = text.split("\n");
@@ -85,6 +101,11 @@ export const ConciergeWidget = () => {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [sessionId, setSessionId] = useState(getSession);
+  // "ai" until the backend turns out to have no model (or is unreachable);
+  // after that the built-in concierge answers for the rest of the session.
+  const [mode, setMode] = useState("ai");
+  const local = useRef(null);
+  if (!local.current) local.current = createLocalConcierge();
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -96,7 +117,7 @@ export const ConciergeWidget = () => {
 
   useEffect(() => {
     if (!open) return;
-    fetchChatHistory(sessionId).then((h) => setMessages(h.map((m) => ({ role: m.role, content: m.content })))).catch(() => {});
+    fetchChatHistory(sessionId).then((h) => h.length && setMessages(h.map((m) => ({ role: m.role, content: m.content })))).catch(() => {});
     setTimeout(() => inputRef.current?.focus(), 250);
   }, [open, sessionId]);
 
@@ -118,8 +139,29 @@ export const ConciergeWidget = () => {
         next[next.length - 1] = last;
         return next;
       });
+    const answerLocally = async () => {
+      const { text: reply, booking } = await local.current.reply(message, i18n.language);
+      if (booking) {
+        setMessages((m) => {
+          const next = [...m];
+          const last = next.pop();
+          return [...next, { role: "booking", ...booking }, last];
+        });
+      }
+      // Type the reply out in small chunks so it reads like the AI version.
+      const chunks = reply.match(/\S+\s*/g) || [reply];
+      for (let i = 0; i < chunks.length; i += 3) {
+        append(chunks.slice(i, i + 3).join(""));
+        await new Promise((r) => setTimeout(r, 24));
+      }
+    };
     try {
-      await streamChat({
+      if (mode === "local") {
+        await new Promise((r) => setTimeout(r, 350));
+        await answerLocally();
+        return;
+      }
+      const status = await streamChat({
         sessionId,
         message,
         language: i18n.language,
@@ -135,6 +177,10 @@ export const ConciergeWidget = () => {
         },
         onError: (err) => append(tx(err)),
       });
+      if (status === "unavailable") {
+        setMode("local");
+        await answerLocally();
+      }
     } catch {
       append(tx("The concierge is unavailable right now. Please try again shortly."));
     } finally {
@@ -148,6 +194,7 @@ export const ConciergeWidget = () => {
     const fresh = crypto.randomUUID();
     localStorage.setItem(SESSION_KEY, fresh);
     setSessionId(fresh);
+    local.current.reset();
     setMessages([]);
   };
 
@@ -172,7 +219,7 @@ export const ConciergeWidget = () => {
                 <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-teal" />
               </span>
               <div className="flex-1">
-                <p className="font-display text-sm font-semibold">{tx("Sol · Solix AI Concierge")}</p>
+                <p className="font-display text-sm font-semibold">{mode === "local" ? tx("Sol · Solix Concierge") : tx("Sol · Solix AI Concierge")}</p>
                 <p className="text-[11px] text-muted-foreground">{tx("Answers about products, solutions and next steps")}</p>
               </div>
               <button onClick={reset} aria-label={tx("New conversation")} data-testid="chat-reset-button" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-line/5 hover:text-foreground">
