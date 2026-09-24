@@ -1,5 +1,5 @@
 {
-  "_about": "Visuals generated with OpenArt (Wan 2.7 Image, 2K) in the Solix palette: navy #0D192D, red #EE2424, blue #0088CF. scripts/vendor-media.js copies each `url` to public/media/openart/<file> (run on deploy, or locally before committing), so pages serve them from this site. `video` is an optional looping clip (mp4/webm under public/media/openart/) that replaces the animated still when present.",
+  "_about": "Visuals generated with OpenArt (Wan 2.7 Image, 2K) in the Solix palette: navy #0D192D, red #EE2424, blue #0088CF. scripts/vendor-media.js copies each `url` to public/media/openart/<file> (run on deploy, or locally before committing), so pages serve them from this site. `video` is an optional looping clip (mp4/webm under public/media/openart/) that replaces the animated still when present. Assets marked `watermarked` are free-plan previews: the site does not load them and shows `fallback` instead. After exporting clean originals from a paid OpenArt plan, replace `url` and set `watermarked` to false.",
   "assets": {
     "archiving": {
       "file": "family-archiving.webp",
@@ -8,8 +8,12 @@
       "video": null,
       "width": 2352,
       "height": 1760,
-      "openart": { "historyId": "GNMDrI616nbFTQPEg5bN", "model": "wan2-7-image" },
-      "prompt": "Abstract 3D render: glowing blue data strands flowing from the left and compressing into stacked translucent glass archive tiers on the right, a thin red light line tracing the tiers, deep navy space, fine grid floor."
+      "openart": {
+        "historyId": "GNMDrI616nbFTQPEg5bN",
+        "model": "wan2-7-image"
+      },
+      "prompt": "Abstract 3D render: glowing blue data strands flowing from the left and compressing into stacked translucent glass archive tiers on the right, a thin red light line tracing the tiers, deep navy space, fine grid floor.",
+      "watermarked": true
     },
     "ai": {
       "file": "family-ai.webp",
@@ -18,8 +22,12 @@
       "video": null,
       "width": 2352,
       "height": 1760,
-      "openart": { "historyId": "3UYSbBl0NAIjWFCNrith", "model": "wan2-7-image" },
-      "prompt": "Abstract 3D render: a luminous knowledge-graph constellation of blue nodes and filaments with a few red key nodes around a bright core, orbit rings and haze on deep navy."
+      "openart": {
+        "historyId": "3UYSbBl0NAIjWFCNrith",
+        "model": "wan2-7-image"
+      },
+      "prompt": "Abstract 3D render: a luminous knowledge-graph constellation of blue nodes and filaments with a few red key nodes around a bright core, orbit rings and haze on deep navy.",
+      "watermarked": true
     },
     "governance": {
       "file": "family-governance.webp",
@@ -28,8 +36,12 @@
       "video": null,
       "width": 2352,
       "height": 1760,
-      "openart": { "historyId": "ioq8xczeOHBdWf513Zrf", "model": "wan2-7-image" },
-      "prompt": "Abstract 3D render: stacked frosted-glass panes of data cells, some masked and tokenised, wrapped by a blue light shield arc with a red scanning line, hexagonal lattice on deep navy."
+      "openart": {
+        "historyId": "ioq8xczeOHBdWf513Zrf",
+        "model": "wan2-7-image"
+      },
+      "prompt": "Abstract 3D render: stacked frosted-glass panes of data cells, some masked and tokenised, wrapped by a blue light shield arc with a red scanning line, hexagonal lattice on deep navy.",
+      "watermarked": true
     },
     "platform": {
       "file": "family-platform.webp",
@@ -38,8 +50,12 @@
       "video": null,
       "width": 2352,
       "height": 1760,
-      "openart": { "historyId": "jp6ym0NsMl803xNmTDEX", "model": "wan2-7-image" },
-      "prompt": "Isometric 3D render: a modular stack of glass-and-metal platform slabs joined by blue data conduits, satellite region nodes linked by light arcs, one layer edged in red, grid ground plane on deep navy."
+      "openart": {
+        "historyId": "jp6ym0NsMl803xNmTDEX",
+        "model": "wan2-7-image"
+      },
+      "prompt": "Isometric 3D render: a modular stack of glass-and-metal platform slabs joined by blue data conduits, satellite region nodes linked by light arcs, one layer edged in red, grid ground plane on deep navy.",
+      "watermarked": true
     },
     "content": {
       "file": "family-content.webp",
@@ -48,8 +64,12 @@
       "video": null,
       "width": 2352,
       "height": 1760,
-      "openart": { "historyId": "gIS02xphQC57AiAkDdCX", "model": "wan2-7-image" },
-      "prompt": "Abstract 3D render: an arc of translucent documents and emails fanning out of a stack, swept by a blue scanning beam that leaves highlight markers, a few documents lifted out and outlined in red, deep navy."
+      "openart": {
+        "historyId": "gIS02xphQC57AiAkDdCX",
+        "model": "wan2-7-image"
+      },
+      "prompt": "Abstract 3D render: an arc of translucent documents and emails fanning out of a stack, swept by a blue scanning beam that leaves highlight markers, a few documents lifted out and outlined in red, deep navy.",
+      "watermarked": true
     },
     "empower": {
       "file": "empower-stage.webp",
@@ -58,8 +78,12 @@
       "video": null,
       "width": 2712,
       "height": 1528,
-      "openart": { "historyId": "ml9Jqsfw3wcCUc8woiyf", "model": "wan2-7-image" },
-      "prompt": "Cinematic keynote stage for 'The Agentic Enterprise': audience silhouettes from behind facing a curved LED wall of glowing AI-agent networks, red and blue beams through haze, navy palette."
+      "openart": {
+        "historyId": "ml9Jqsfw3wcCUc8woiyf",
+        "model": "wan2-7-image"
+      },
+      "prompt": "Cinematic keynote stage for 'The Agentic Enterprise': audience silhouettes from behind facing a curved LED wall of glowing AI-agent networks, red and blue beams through haze, navy palette.",
+      "watermarked": true
     }
   }
 }

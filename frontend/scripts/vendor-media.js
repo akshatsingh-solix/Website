@@ -33,6 +33,7 @@ const fetchTo = async (url, dest) => {
   fs.mkdirSync(OUT, { recursive: true });
   let ok = 0;
   for (const [name, a] of Object.entries(assets)) {
+    if (a.watermarked) { console.log(`  ${name}: skipped (watermarked preview; export a clean original first)`); continue; }
     const dest = path.join(OUT, a.file);
     if (!FORCE && fs.existsSync(dest) && fs.statSync(dest).size > 0) { ok++; continue; }
     try {
@@ -43,5 +44,6 @@ const fetchTo = async (url, dest) => {
       console.warn(`  ${name}: could not fetch (${e.message}); pages will use the CDN or fallback image`);
     }
   }
-  console.log(`OpenArt media: ${ok}/${Object.keys(assets).length} available locally`);
+  const clean = Object.values(assets).filter((a) => !a.watermarked).length;
+  console.log(`OpenArt media: ${ok}/${clean} clean assets available locally`);
 })();

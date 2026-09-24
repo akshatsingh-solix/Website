@@ -9,7 +9,10 @@ const LOCAL = `${process.env.PUBLIC_URL || "/Website"}/media/openart/`;
  */
 export const mediaSources = (key) => {
   const a = MEDIA.assets[key];
-  return a ? [LOCAL + a.file, a.url, a.fallback].filter(Boolean) : [];
+  if (!a) return [];
+  // Watermarked free-plan previews are never shown; the older photo stands in.
+  if (a.watermarked) return [a.fallback].filter(Boolean);
+  return [LOCAL + a.file, a.url, a.fallback].filter(Boolean);
 };
 
 /** Optional looping clip for a visual (null until one is added to the manifest). */
