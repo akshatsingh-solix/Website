@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, FileText, Download } from "lucide-react";
+import { ArrowRight, Check, FileText, Download, Lock, RotateCcw } from "lucide-react";
 import { Reveal } from "../ui";
-import { money, useEvent } from "@/lib/useEvent";
+import { fmtDate, money, useEvent } from "@/lib/useEvent";
 import { EVENT, INCLUDED, LINKS } from "@/data/event";
 
 export default function Pass() {
@@ -39,12 +39,23 @@ export default function Pass() {
                     <p className="font-display text-3xl font-semibold text-white">{money(t.price, t.currency)}</p>
                     {t.seats_left != null && !t.sold_out && <p className="mt-1 text-xs text-amber-300">Only {t.seats_left} left</p>}
                     {t.sold_out && <p className="mt-1 text-xs text-amber-300">Sold out · join the waitlist</p>}
+                    {t.sales_end_at && !t.sales_ended && <p className="mt-1 text-xs text-white/50">Sales end {fmtDate(t.sales_end_at)}</p>}
                   </div>
                 </div>
                 {t.description && <p className="mt-4 leading-relaxed text-white/70">{t.description}</p>}
-                <Link to={`/register?pass=${t.id}`} className="btn-primary btn-lg mt-7 w-full" data-testid={`pass-cta-${t.id}`}>
-                  {data.waitlist || t.sold_out ? "Join the waitlist" : t.price ? "Register & pay" : "Register free"} <ArrowRight className="h-4 w-4" />
-                </Link>
+                {t.sales_ended ? (
+                  <p className="mt-7 rounded-xl border border-white/10 p-3 text-center text-sm text-white/70">Sales for this pass have ended. Questions? {EVENT.email}</p>
+                ) : (
+                  <Link to={`/register?pass=${t.id}`} className="btn-primary btn-lg mt-7 w-full" data-testid={`pass-cta-${t.id}`}>
+                    {data.waitlist || t.sold_out ? "Join the waitlist" : t.price ? `Get your pass · ${money(t.price, t.currency)}` : "Register free"} <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
+                {t.price > 0 && (
+                  <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1 text-xs text-white/50">
+                    <span className="inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" />{t.provider === "eventbrite" ? "Secure checkout by Eventbrite" : t.provider === "stripe_link" ? "Secure checkout by Stripe" : "Invoice / PO accepted"}</span>
+                    {data.refund_policy && <span className="inline-flex items-center gap-1.5"><RotateCcw className="h-3.5 w-3.5" />{data.refund_policy}</span>}
+                  </div>
+                )}
               </div>
             </Reveal>
           ))}

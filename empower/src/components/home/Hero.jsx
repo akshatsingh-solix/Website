@@ -4,7 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight, CalendarDays, MapPin, Ticket } from "lucide-react";
 import { SmartImage } from "../ui";
 import { useCountdown } from "@/lib/useCountdown";
-import { money, useEvent } from "@/lib/useEvent";
+import { fmtDate, mainTicket, money, useEvent } from "@/lib/useEvent";
 import { EVENT } from "@/data/event";
 
 function Countdown() {
@@ -26,7 +26,7 @@ function Countdown() {
 // The pass itself, as an object you want to hold: tilts toward the cursor.
 function PassCard() {
   const { data } = useEvent();
-  const ticket = data.tickets?.[0];
+  const ticket = mainTicket(data);
   const ref = useRef(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -64,7 +64,9 @@ function PassCard() {
             <div><p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Price</p><p className="mt-1 font-display text-xl font-semibold text-white">{money(ticket?.price, ticket?.currency)}</p></div>
           </div>
           <Link to="/register" className="btn-primary btn-lg mt-7 w-full" data-testid="hero-pass-register">Claim your pass <ArrowRight className="h-4 w-4" /></Link>
-          <p className="mt-3 text-center text-xs text-white/50">{data.seats_left != null ? `${data.seats_left} seats left` : "Limited seats · registration required"}</p>
+          <p className="mt-3 text-center text-xs text-white/50">
+            {ticket?.sales_ended ? "Pass sales have ended" : `${data.seats_left != null ? `${data.seats_left} seats left` : "Limited seats"}${ticket?.sales_end_at ? ` · sales end ${fmtDate(ticket.sales_end_at)}` : ""}`}
+          </p>
         </div>
       </div>
     </motion.div>
@@ -96,7 +98,7 @@ export default function Hero() {
             <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />{EVENT.venue}, UC San Diego</li>
           </motion.ul>
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38 }} className="mt-9 flex flex-wrap items-center gap-3">
-            <Link to="/register" className="btn-primary btn-lg" data-testid="hero-register">Register free <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/register" className="btn-primary btn-lg" data-testid="hero-register">Register now <ArrowRight className="h-4 w-4" /></Link>
             <Link to="/#agenda" className="btn-ghost btn-lg border-white/20 bg-white/5 text-white hover:bg-white/10">Explore the agenda</Link>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-10"><Countdown /></motion.div>

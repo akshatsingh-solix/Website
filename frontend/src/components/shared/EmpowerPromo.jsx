@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, CalendarDays, MapPin, X } from "lucide-react";
+import { ArrowUpRight, CalendarDays, MapPin, Ticket, X } from "lucide-react";
 import { getConsent, privacySignal, track } from "@/lib/intent";
 import { EMPOWER, empowerIsLive, empowerLink } from "@/lib/empower";
 import { useTx } from "@/i18n/tx";
@@ -114,6 +114,7 @@ export const EmpowerPromo = () => {
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/80">
               <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5 text-[#FF4D4D]" />{EMPOWER.dates}</span>
               <span className="inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-[#FF4D4D]" />{EMPOWER.place}</span>
+              <span className="inline-flex items-center gap-1.5"><Ticket className="h-3.5 w-3.5 text-[#FF4D4D]" />{tx("Full pass {{price}}", { price: EMPOWER.price })}</span>
             </div>
             <div className="mt-3 flex items-center gap-2.5">
               <span className="flex">{EMPOWER.faces.map((f, i) => <Face key={f.name} {...f} i={i} />)}</span>
@@ -121,7 +122,7 @@ export const EmpowerPromo = () => {
             </div>
             <div className="mt-4 flex gap-2">
               <a href={empowerLink("promo_card", "register")} data-intent="empower_register" className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-[#EE2424] px-4 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(238,36,36,0.8)] transition hover:bg-[#B91C1C]" data-testid="empower-promo-register">
-                {tx("Register free")} <ArrowUpRight className="h-4 w-4" />
+                {tx("Get your pass")} <ArrowUpRight className="h-4 w-4" />
               </a>
               <a href={empowerLink("promo_card")} data-intent="empower_explore" className="inline-flex h-10 items-center justify-center rounded-full border border-white/15 px-4 text-sm font-medium text-white/90 transition hover:bg-white/10">
                 {tx("Explore")}

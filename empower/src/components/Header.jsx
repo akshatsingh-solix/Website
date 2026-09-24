@@ -41,7 +41,7 @@ export default function Header() {
           <a href={LINKS.mainSite} className="hidden items-center gap-1 rounded-full px-3 py-2 text-xs font-medium text-foreground/60 transition hover:text-foreground xl:inline-flex">
             solix.com <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
-          <Link to="/register" className="btn-primary h-10 px-4 sm:px-5" data-testid="header-register"><span className="sm:hidden">Register</span><span className="hidden sm:inline">Register free</span></Link>
+          <Link to="/register" className="btn-primary h-10 px-4 sm:px-5" data-testid="header-register"><span className="sm:hidden">Register</span><span className="hidden sm:inline">Get your pass</span></Link>
           <button type="button" className="grid h-10 w-10 place-items-center rounded-full border border-line/15 lg:hidden" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>

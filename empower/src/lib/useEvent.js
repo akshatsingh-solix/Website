@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { getEvent } from "./api";
+import { PASS } from "@/data/event";
 
 // Live event settings (passes, prices, seats, registration open). Falls back to
-// the complimentary pass so the page still renders if the API is waking up.
+// the published pass so the page still renders if the API is waking up.
 const FALLBACK = {
   registration_open: true,
   waitlist: false,
   seats_left: null,
-  tickets: [{ id: "full-pass", name: "Full event pass", price: 0, currency: "USD", provider: "free", seats_left: null, sold_out: false,
+  refund_policy: PASS.refundPolicy,
+  tickets: [{ id: PASS.id, name: PASS.name, price: PASS.price, currency: PASS.currency, provider: PASS.provider, eventbrite_event_id: PASS.eventbriteEventId,
+    sales_end_at: PASS.salesEnd, sales_ended: false, seats_left: null, sold_out: false,
     description: "All three days, Oct 28-30: keynotes, panels, hands-on workshops, the hackathon finals, networking meals and evening receptions." }],
   interests: [
     { key: "enterprise-ai", label: "Enterprise AI & agents" },
@@ -38,6 +41,11 @@ export function useEvent() {
   }, []);
   return state;
 }
+
+export const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/Los_Angeles" }) : null);
+
+/** The pass people are most likely to buy: the first one still on sale. */
+export const mainTicket = (data) => (data.tickets || []).find((t) => !t.sales_ended && !t.sold_out) || (data.tickets || [])[0];
 
 /** Prices from the API are in cents. */
 export function money(cents, currency = "USD") {

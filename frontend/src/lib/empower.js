@@ -7,6 +7,7 @@ export const EMPOWER = {
   theme: "The Agentic Enterprise",
   dates: "Oct 28-30, 2026",
   place: "UC San Diego",
+  price: "$299",
   start: "2026-10-28T07:30:00-07:00",
   end: "2026-10-30T13:30:00-07:00",
   image: "https://empower.solix.com/wp-content/uploads/2026/04/solixempower-2026-popup-new2.jpg",
