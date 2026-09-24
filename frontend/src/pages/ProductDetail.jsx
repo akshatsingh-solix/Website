@@ -4,10 +4,10 @@ import { PRODUCTS, SOLUTIONS } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
-import { CTABand } from "@/components/shared/CTABand";
 import { ProductCard } from "@/components/home/PlatformBento";
 import { OutcomeChart } from "@/components/shared/OutcomeChart";
 import { Button } from "@/components/ui/button";
+import { InlineLeadSection } from "@/components/forms/InlineLeadSection";
 import { useTx } from "@/i18n/tx";
 
 export default function ProductDetail() {
@@ -31,7 +31,7 @@ export default function ProductDetail() {
       >
         <div className="flex flex-wrap gap-3">
           <Button asChild size="lg" data-testid="product-demo-button">
-            <Link to={`/contact?interest=${product.slug}`}>{tx("Request a demo")} <ArrowRight /></Link>
+            <a href="#talk-to-us" onClick={(e) => { e.preventDefault(); document.getElementById("talk-to-us")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{tx("Request a demo")} <ArrowRight /></a>
           </Button>
           <Button asChild size="lg" variant="outline" data-testid="product-whitepaper-button">
             <Link to="/resources?type=whitepaper">{tx("Download white paper")}</Link>
@@ -121,7 +121,12 @@ export default function ProductDetail() {
         </div>
       </Section>
 
-      <CTABand title={tx("See {{name}} on your data.", { name: product.name })} primary={{ label: "Request a demo", to: `/contact?interest=${product.slug}` }} />
+      <InlineLeadSection
+        key={product.slug}
+        interest={product.slug}
+        title={tx("See {{name}} on your data.", { name: product.name })}
+        description={tx("Tell us about the systems and outcomes you care about, and a {{name}} specialist will set up a working session.", { name: product.name })}
+      />
     </div>
   );
 }

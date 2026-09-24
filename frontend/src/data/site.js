@@ -1068,25 +1068,12 @@ const PARTNER_BENEFITS_EN = [
   { title: "Dedicated partner team", desc: "Named managers from onboarding to renewal." },
 ];
 
+// Every product (grouped by its catalog category) plus services, so a visitor
+// arriving from any product or service page sees it preselected in the form.
 const INTERESTS_EN = [
-  { value: "enterprise-edition", label: "Solix Enterprise Edition" },
-  { value: "common-data-platform", label: "Common Data Platform" },
-  { value: "enterprise-archiving", label: "Enterprise Archiving" },
-  { value: "enterprise-data-lake", label: "Enterprise Data Lake" },
-  { value: "application-retirement", label: "Application Retirement" },
-  { value: "ediscovery", label: "eDiscovery" },
-  { value: "consumer-data-privacy", label: "Consumer Data Privacy" },
-  { value: "enterprise-ai", label: "Enterprise AI" },
-  { value: "data-sense", label: "Data Sense" },
-  { value: "data-ask", label: "Data Ask" },
-  { value: "ai-warehouse", label: "AI Warehouse" },
-  { value: "agentic", label: "Agentic" },
-  { value: "ai-governance", label: "AI Governance" },
-  { value: "eai-pharma", label: "Enterprise AI for Pharma" },
-  { value: "sap-archiving", label: "SAP Archiving" },
-  { value: "enterprise-data-governance", label: "Enterprise Data Governance" },
-  { value: "enterprise-content-services", label: "Enterprise Content Services" },
-  { value: "other", label: "Something else" },
+  ...PRODUCTS_EN.map((p) => ({ value: p.slug, label: p.name, group: p.category })),
+  { value: "services", label: "Professional & Managed Services", group: "Services" },
+  { value: "other", label: "Something else", group: "Other" },
 ];
 
 const CHAT_SUGGESTIONS_EN = [
