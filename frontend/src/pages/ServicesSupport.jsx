@@ -16,6 +16,7 @@ export default function ServicesSupport() {
         crumbs={[{ label: "Services & Support" }]}
         title="Delivery, engineering and support who've done this hundreds of times."
         description="Every Solix program is backed by the same team that builds the platform, an outcomes-based methodology, and a support portal that doesn't leave you guessing."
+        image="/Website/images/art/services-blueprint.svg"
       >
         <Button asChild size="lg" data-testid="services-hero-contact">
           <a href="#talk-to-us" onClick={(e) => { e.preventDefault(); document.getElementById("talk-to-us")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{tx("Talk to services")} <ArrowRight /></a>

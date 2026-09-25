@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
-import { PRODUCTS, SOLUTIONS } from "@/data/site";
+import { ArrowRight } from "lucide-react";
+import { PRODUCTS, SOLUTIONS, SOURCE } from "@/data/site";
+import { featureIcon } from "@/lib/featureIcon";
 import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
@@ -35,6 +36,8 @@ export default function ProductDetail() {
   const Icon = product.icon;
   const Explorer = explorerFor(slug);
   const family = familyOf(slug);
+  // Icons are chosen from the English titles so every language gets the same one.
+  const sourceFeatures = SOURCE.PRODUCTS.find((p) => p.slug === slug)?.features || [];
 
   return (
     <div data-testid={`product-detail-${slug}`}>
@@ -100,13 +103,16 @@ export default function ProductDetail() {
         <div className="container">
           <SectionHeading eyebrow="Capabilities" title={tx("What {{name}} does for you.", { name: product.name })} />
           <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {product.features.map((f) => (
+            {product.features.map((f, i) => {
+              const FeatureIcon = featureIcon(sourceFeatures[i]?.title || f.title);
+              return (
               <Item key={f.title} className="rounded-2xl border border-line/10 bg-card p-6 card-hover">
-                <span className={`grid h-9 w-9 place-items-center rounded-lg border border-line/10 bg-accent/50 ${product.accent === "teal" ? "text-teal" : "text-primary-ink"}`}><Check className="h-4 w-4" /></span>
+                <span className={`grid h-9 w-9 place-items-center rounded-lg border border-line/10 bg-accent/50 ${product.accent === "teal" ? "text-teal" : "text-primary-ink"}`}><FeatureIcon className="h-4 w-4" strokeWidth={1.75} /></span>
                 <h3 className="mt-5 font-display text-lg font-medium">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
               </Item>
-            ))}
+              );
+            })}
           </Stagger>
         </div>
       </Section>

@@ -13,6 +13,7 @@ import { useTx } from "@/i18n/tx";
 import { usePressReleases } from "@/lib/press";
 import { Button } from "@/components/ui/button";
 import { Picture } from "@/components/shared/Picture";
+import { pressArt } from "@/lib/art";
 
 const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
 // i18n: filter labels are translated at render; values stay English.
@@ -91,7 +92,10 @@ export default function Newsroom() {
               <Item key={p.id}>
                 <Link to={`/newsroom/${p.id}`} className="group grid gap-3 py-6 sm:grid-cols-12 sm:items-start" data-testid={`release-${p.id}`}>
                   <div className="font-mono text-xs text-muted-foreground sm:col-span-2">{fmt(p.date, lng)}</div>
-                  <div className="sm:col-span-8">
+                  <div className="dark relative hidden aspect-[4/3] overflow-hidden rounded-xl border border-line/10 bg-background sm:col-span-2 sm:block">
+                    <Picture src={p.image || pressArt(p.category)} sizes="200px" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                  <div className="sm:col-span-6">
                     <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{tx(p.category)}</span>
                     <h3 className="mt-1.5 font-display text-xl font-medium tracking-tight transition-colors group-hover:text-primary-ink sm:text-2xl">{p.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{p.summary}</p>

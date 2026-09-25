@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
+import { pressArt } from "@/lib/art";
 
 const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
 
@@ -68,7 +69,7 @@ export default function PressRelease() {
         crumbs={[{ label: "Company", to: "/company" }, { label: "Newsroom", to: "/newsroom" }, { label: pr.category }]}
         title={pr.title}
         description={pr.summary}
-        image={pr.image}
+        image={pr.image || pressArt(pr.category)}
         compact
       >
         <div className="inline-flex flex-wrap items-center gap-4 rounded-2xl border border-line/10 bg-card/80 p-4 text-sm shadow-soft backdrop-blur">
@@ -89,7 +90,7 @@ export default function PressRelease() {
         <div className="container grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <Reveal className="mb-8 overflow-hidden rounded-3xl border border-line/10">
-              <Picture src={pr.image} loading="eager" className="aspect-[21/9] w-full object-cover" data-testid="press-hero-image" />
+              <Picture src={pr.image || pressArt(pr.category)} loading="eager" className="aspect-[21/9] w-full object-cover" data-testid="press-hero-image" />
             </Reveal>
             <ArticleBody blocks={pr.body} />
             <div className="mt-12 rounded-2xl border border-line/10 bg-card p-6" data-testid="press-boilerplate">

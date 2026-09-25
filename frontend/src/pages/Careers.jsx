@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { ArrowRight, Briefcase, Check, MapPin } from "lucide-react";
+import { ArrowRight, Baby, Briefcase, GraduationCap, HandHeart, HeartPulse, House, MapPin, Mountain, PiggyBank, Wallet } from "lucide-react";
+
+// One icon per perk, in the order PERKS lists them.
+const PERK_ICONS = [Wallet, HeartPulse, PiggyBank, House, GraduationCap, Baby, Mountain, HandHeart];
 import { JOBS, PERKS } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
@@ -36,7 +39,7 @@ export default function Careers() {
                   className="group grid w-full gap-4 rounded-2xl border border-line/10 bg-card p-6 text-left card-hover sm:grid-cols-12 sm:items-center"
                 >
                   <div className="sm:col-span-7">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary-ink">{j.team}</p>
+                    <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary-ink">{j.icon && <span className="grid h-6 w-6 place-items-center rounded-md bg-primary/10"><j.icon className="h-3.5 w-3.5" strokeWidth={1.75} /></span>}{j.team}</p>
                     <h3 className="mt-1.5 font-display text-xl font-medium">{j.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{j.desc}</p>
                   </div>
@@ -60,11 +63,14 @@ export default function Careers() {
             <SectionHeading eyebrow="Benefits" title="Taken care of, so you can take care of the work." />
           </div>
           <Reveal delay={0.1} className="grid gap-3 sm:grid-cols-2 lg:col-span-7">
-            {PERKS.map((p) => (
-              <div key={p} className="flex items-center gap-3 rounded-xl border border-line/10 bg-card px-4 py-3 text-sm">
-                <Check className="h-4 w-4 shrink-0 text-teal" /> {p}
-              </div>
-            ))}
+            {PERKS.map((p, i) => {
+              const PerkIcon = PERK_ICONS[i] || HandHeart;
+              return (
+                <div key={p} className="flex items-center gap-3 rounded-xl border border-line/10 bg-card px-4 py-3 text-sm">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-teal/10 text-teal"><PerkIcon className="h-4 w-4" strokeWidth={1.75} /></span> {p}
+                </div>
+              );
+            })}
           </Reveal>
         </div>
       </Section>
