@@ -252,3 +252,46 @@ def test_admin_lists_conversations_with_leads(monkeypatch):
     s1 = listing["items"][1]
     assert s1["first_question"] == "Retire SAP?" and s1["lead"] == "demo" and s1["models"] == ["gemini-2.5-flash"] and s1["messages"] == 2
     assert [m["role"] for m in transcript] == ["user", "assistant"]
+
+
+# ---------- token budget (free-tier per-minute caps) ----------
+def test_fit_history_keeps_newest_turns_within_budget():
+    import chat
+    history = [{"role": "user" if i % 2 == 0 else "assistant", "content": f"turn {i} " + "x" * 400} for i in range(16)]
+    kept = chat._fit_history(history, 500)
+    assert kept and sum(chat._tokens(m["content"]) for m in kept) <= 500
+    assert kept[-1]["content"].startswith("turn 15")
+    assert kept[0]["role"] == "user"
+
+
+def test_fit_history_with_no_room_is_empty():
+    import chat
+    assert chat._fit_history([{"role": "user", "content": "hi"}], 0) == []
+
+
+def test_long_conversation_request_stays_under_budget(chat_app, monkeypatch):
+    from fastapi.testclient import TestClient
+    chat, app, fake_db = chat_app
+    sent = []
+
+    async def capture(messages, tools=None, **kw):
+        sent.append((messages, tools, kw))
+        yield {"type": "text", "text": "ok"}
+
+    monkeypatch.setattr(chat, "stream_completion", capture)
+
+    async def seed():
+        await fake_db.chat_messages.insert_many([
+            {"id": str(i), "session_id": "sess-long", "role": "user" if i % 2 == 0 else "assistant",
+             "content": f"message {i} " + "archiving retirement governance " * 45, "created_at": f"2026-09-01T10:{i:02d}:00"}
+            for i in range(16)])
+    run_sync(seed())
+
+    TestClient(app).post("/api/chat/stream", json={"session_id": "sess-long", "message": "What about SAP ECC retirement for manufacturing?", "page": "/products/sap-archiving"})
+    messages, tools, kw = sent[0]
+    total = sum(chat._tokens(m["content"]) for m in messages) + chat._tokens(json.dumps(tools))
+    assert total <= chat.INPUT_TOKEN_BUDGET
+    assert kw["max_tokens"] == chat.MAX_OUTPUT_TOKENS
+    # Newest history survives, oldest is dropped, and the latest question is last.
+    assert "message 15" in messages[-2]["content"] and not any("message 0 " in m["content"] for m in messages)
+    assert messages[-1]["content"].startswith("What about SAP ECC")

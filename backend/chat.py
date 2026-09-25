@@ -1,3 +1,4 @@
+import os
 import re
 import json
 import time
@@ -22,6 +23,12 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 HISTORY_LIMIT = 16
 HISTORY_CHARS = 1500
+# Everything sent per request (instructions, tools, site knowledge, history) is
+# kept under this many tokens, so one message fits well inside free tiers'
+# per-minute caps (Groq: 8K tokens/min) and each day's quota stretches further.
+INPUT_TOKEN_BUDGET = int(os.environ.get("SOL_INPUT_TOKEN_BUDGET", "4500"))
+MAX_OUTPUT_TOKENS = int(os.environ.get("SOL_MAX_OUTPUT_TOKENS", "700"))
+CONTEXT_CHARS = 4000
 MAX_TOOL_ROUNDS = 4
 EMAIL_RX = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 
@@ -165,6 +172,26 @@ async def request_expert_contact(session_id: str, args: dict) -> dict:
     return {"ok": True, "submission_id": doc["id"], "message": "Question passed to a Solix expert, who will reply by email within one business day."}
 
 
+def _tokens(text: str) -> int:
+    """Rough token count (about 4 characters per token for English)."""
+    return len(text) // 4 + 4
+
+
+def _fit_history(history: List[dict], room: int) -> List[dict]:
+    """The most recent turns that fit in `room` tokens, oldest first."""
+    kept = []
+    for m in reversed(history):
+        room -= _tokens(m["content"])
+        if room < 0:
+            break
+        kept.append(m)
+    kept.reverse()
+    # Start on a visitor turn; some providers reject a leading assistant message.
+    while kept and kept[0]["role"] != "user":
+        kept.pop(0)
+    return kept
+
+
 def _retrieve(message: str, history: List[dict], page: Optional[str]) -> List[dict]:
     """Top excerpts for this turn, plus the page the visitor is reading."""
     last_user = next((m["content"] for m in reversed(history) if m["role"] == "user"), "")
@@ -227,14 +254,16 @@ async def chat_stream(req: ChatRequest, request: Request):
     history = [{"role": m["role"], "content": m["content"][:HISTORY_CHARS]} for m in reversed(recent)]
 
     lang = LANGUAGE_NAMES.get(req.language.split("-")[0].lower(), "English")
-    context = sol_search.format_context(_retrieve(req.message, history, req.page))
+    context = sol_search.format_context(_retrieve(req.message, history, req.page), max_chars=CONTEXT_CHARS)
     visitor = f"The visitor is on page {req.page}" + (f' ("{req.page_title}")' if req.page_title else "") + "." if req.page else "Page unknown."
     turn_system = (
         f"{visitor} Reply in {lang}; keep product names and page paths as they are.\n\n"
         f"Site knowledge for this turn:\n{context or '(no matching pages; use search_site or offer an expert)'}"
     )
     # One leading system message: some providers reject system turns mid-conversation.
-    messages = [{"role": "system", "content": f"{CONCIERGE_SYSTEM_PROMPT}\n\n## This turn\n{turn_system}"}, *history, {"role": "user", "content": req.message}]
+    system = f"{CONCIERGE_SYSTEM_PROMPT}\n\n## This turn\n{turn_system}"
+    history = _fit_history(history, INPUT_TOKEN_BUDGET - _tokens(system) - _tokens(json.dumps(TOOLS)) - _tokens(req.message))
+    messages = [{"role": "system", "content": system}, *history, {"role": "user", "content": req.message}]
 
     async def generate():
         await save_message(req.session_id, "user", req.message, page=req.page, language=req.language)
@@ -243,7 +272,7 @@ async def chat_stream(req: ChatRequest, request: Request):
             for round_no in range(MAX_TOOL_ROUNDS):
                 text, calls = "", []
                 # The last round gets no tools so the model must answer.
-                async for event in stream_completion(messages, TOOLS if round_no < MAX_TOOL_ROUNDS - 1 else None):
+                async for event in stream_completion(messages, TOOLS if round_no < MAX_TOOL_ROUNDS - 1 else None, max_tokens=MAX_OUTPUT_TOKENS):
                     if event["type"] == "text":
                         text += event["text"]
                         yield sse({"delta": event["text"]})
@@ -259,8 +288,8 @@ async def chat_stream(req: ChatRequest, request: Request):
                 for c in calls:
                     tools_used.append(c["name"])
                     if c["name"] == "search_site":
-                        hits = sol_search.search(str(c["arguments"].get("query", "")), 5)
-                        outcome = {"results": [{"title": h["title"], "page": h["url"], "text": h["text"][:1200]} for h in hits]} if hits else {"results": [], "note": "Nothing on the site matches."}
+                        hits = sol_search.search(str(c["arguments"].get("query", "")), 4)
+                        outcome = {"results": [{"title": h["title"], "page": h["url"], "text": h["text"][:800]} for h in hits]} if hits else {"results": [], "note": "Nothing on the site matches."}
                     elif c["name"] == "create_demo_request":
                         outcome = await create_demo_request(req.session_id, c["arguments"])
                         if outcome.get("ok"):

@@ -21,7 +21,8 @@ services:
         value: https://akshatsingh-solix.github.io
       # Sol, the AI concierge: add at least one free key. Providers are tried
       # in SOL_PROVIDER_ORDER and Sol fails over when one is rate limited.
-      # OPENROUTER_API_KEY below also works for Sol. See README "Sol".
+      # OPENROUTER_API_KEY below also works for Sol. GROQ_API_KEY alone is
+      # enough to run it. See README "Sol".
       - key: GEMINI_API_KEY
         sync: false
       - key: GROQ_API_KEY

@@ -65,6 +65,11 @@ and is built like a production assistant:
   limited or down is skipped (and rested for a minute) so free-tier limits
   never reach the visitor. If all fail, the widget falls back to its
   built-in scripted concierge.
+- **Token budget.** Each request is kept under `SOL_INPUT_TOKEN_BUDGET`
+  (default 4500) input tokens by dropping the oldest conversation turns
+  first, and replies are capped at `SOL_MAX_OUTPUT_TOKENS` (default 700). A
+  request is ~3K tokens for a first message and never more than ~4.7K in a
+  long chat, so it always fits Groq's free 8K tokens-per-minute cap.
 - **Guardrails.** Prompt-injection resistant system prompt, no invented
   pricing or customers, per-session (20 per 5 min) and per-IP (60 per hour)
   rate limits.
@@ -80,6 +85,13 @@ Set at least one key on the backend (all free, no card needed):
 | Mistral (Experiment plan) | `MISTRAL_API_KEY` | https://console.mistral.ai | `mistral-small-latest` |
 | OpenRouter | `OPENROUTER_API_KEY` (shared with SEO) | https://openrouter.ai/keys | `SOL_OPENROUTER_MODELS`, else `OPENROUTER_MODELS` |
 | Any OpenAI-compatible server | `SOL_CUSTOM_BASE_URL`, `SOL_CUSTOM_API_KEY`, `SOL_CUSTOM_MODELS` | e.g. a model you host, Together, Cerebras | — |
+
+**Groq only is enough to run Sol.** With just `GROQ_API_KEY`, Sol uses
+`openai/gpt-oss-120b` and falls back to `openai/gpt-oss-20b`. Each has its own
+free allowance (30 requests/min, 1,000/day, 8K tokens/min, 200K tokens/day),
+which works out to roughly 100+ visitor messages a day and about 4 a minute
+site-wide. Beyond that, visitors get the built-in scripted concierge until
+the limit resets. Add another provider's key later for more headroom.
 
 `SOL_PROVIDER_ORDER` (default `gemini,groq,mistral,openrouter,custom`) sets
 the order. Setting two or three keys is recommended: Gemini for quality,
