@@ -73,8 +73,8 @@ export const formatApiError = (err) => {
 
 export const adminLogin = (email, password) => adminApi.post("/auth/login", { email, password }).then((r) => r.data);
 export const adminMe = () => adminApi.get("/auth/me", { fresh: true }).then((r) => r.data);
-export const fetchStats = () => adminApi.get("/admin/stats").then((r) => r.data);
-export const fetchLeads = (params) => adminApi.get("/admin/submissions", { params }).then((r) => r.data);
+export const fetchStats = (opts = {}) => adminApi.get("/admin/stats", opts).then((r) => r.data);
+export const fetchLeads = (params, opts = {}) => adminApi.get("/admin/submissions", { params, ...opts }).then((r) => r.data);
 export const deleteLead = (id) => adminApi.delete(`/admin/submissions/${id}`);
 export const updateLead = (id, body) => adminApi.patch(`/admin/submissions/${id}`, body).then((r) => r.data);
 export const fetchTeam = () => adminApi.get("/admin/team").then((r) => r.data);
@@ -82,19 +82,19 @@ export const saveTeam = (members) => adminApi.put("/admin/team", { members }).th
 export const fetchSettings = () => adminApi.get("/admin/settings").then((r) => r.data);
 export const saveSettings = (body) => adminApi.put("/admin/settings", body).then((r) => r.data);
 export const fetchNotifications = () => adminApi.get("/admin/notifications", { fresh: true }).then((r) => r.data);
-export const fetchChats = (params) => adminApi.get("/admin/chats", { params }).then((r) => r.data);
+export const fetchChats = (params, opts = {}) => adminApi.get("/admin/chats", { params, ...opts }).then((r) => r.data);
 export const fetchChat = (sessionId) => adminApi.get(`/admin/chats/${sessionId}`).then((r) => r.data);
 export const fetchSolStatus = () => adminApi.get("/chat/status").then((r) => r.data);
 
 // --- Leads, reports, views, scoring, users ---------------------------------
 const clean = (params) => Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== "all"));
-export const fetchPeople = (params) => adminApi.get("/admin/leads", { params: clean(params) }).then((r) => r.data);
+export const fetchPeople = (params, opts = {}) => adminApi.get("/admin/leads", { params: clean(params), ...opts }).then((r) => r.data);
 export const fetchLeadsMeta = () => adminApi.get("/admin/leads/meta").then((r) => r.data);
 export const fetchLead = (id) => adminApi.get(`/admin/leads/${id}`).then((r) => r.data);
 export const patchLead = (id, body) => adminApi.patch(`/admin/leads/${id}`, body).then((r) => r.data);
 export const bulkPatchLeads = (body) => adminApi.post("/admin/leads/bulk", body).then((r) => r.data);
 export const rescoreLead = (id) => adminApi.post(`/admin/leads/${id}/rescore`).then((r) => r.data);
-export const fetchOverview = (params) => adminApi.get("/admin/reports/overview", { params: clean(params) }).then((r) => r.data);
+export const fetchOverview = (params, opts = {}) => adminApi.get("/admin/reports/overview", { params: clean(params), ...opts }).then((r) => r.data);
 export const fetchViews = () => adminApi.get("/admin/views").then((r) => r.data);
 export const createView = (body) => adminApi.post("/admin/views", body).then((r) => r.data);
 export const deleteView = (id) => adminApi.delete(`/admin/views/${id}`);

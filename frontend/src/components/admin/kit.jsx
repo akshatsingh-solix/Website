@@ -1,4 +1,5 @@
 // Shared admin building blocks: labels, badges, score bars, tiles, role checks.
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useAdmin } from "@/components/admin/AdminAuth";
 
@@ -104,3 +105,21 @@ export const useCan = () => {
 };
 
 export const ROLE_LABELS = { admin: "Admin", sales: "Sales", editor: "Content editor", viewer: "Leadership (read-only)" };
+
+// Re-runs `refresh` every `ms` while this admin tab is visible, and as soon as
+// it becomes visible again, so new leads (e.g. from Sol chats) appear without
+// reloading. `refresh` should update data silently (no loading state).
+export const LIVE_REFRESH_MS = 15000;
+export const useLiveRefresh = (refresh, ms = LIVE_REFRESH_MS) => {
+  const ref = useRef(refresh);
+  ref.current = refresh;
+  useEffect(() => {
+    const run = () => document.visibilityState === "visible" && Promise.resolve(ref.current()).catch(() => {});
+    const id = setInterval(run, ms);
+    document.addEventListener("visibilitychange", run);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", run);
+    };
+  }, [ms]);
+};

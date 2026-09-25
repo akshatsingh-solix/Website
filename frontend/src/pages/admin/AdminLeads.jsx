@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { bulkPatchLeads, createView, deleteView, exportPeople, fetchLeadsMeta, fetchPeople, fetchViews, formatApiError } from "@/lib/adminApi";
-import { CHANNEL_LABELS, LineBadge, ScoreBar, STAGE_LABELS, StageBadge, ago, productName, selectCls, useCan } from "@/components/admin/kit";
+import { CHANNEL_LABELS, LineBadge, ScoreBar, STAGE_LABELS, StageBadge, ago, productName, selectCls, useCan, useLiveRefresh } from "@/components/admin/kit";
 import { LeadDrawer } from "@/components/admin/LeadDrawer";
 
 const PAGE_SIZE = 25;
@@ -65,16 +65,18 @@ export default function AdminLeads() {
     return () => clearTimeout(t);
   }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  // `silent`: a background refresh - no spinner, no error toasts, fresh from the server.
+  const load = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
-      setData(await fetchPeople({ ...filters, sort, page, page_size: PAGE_SIZE }));
+      setData(await fetchPeople({ ...filters, sort, page, page_size: PAGE_SIZE }, { fresh: silent }));
     } catch (e) {
-      toast.error(formatApiError(e));
+      if (!silent) toast.error(formatApiError(e));
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [filters, sort, page]);
+  useLiveRefresh(() => load({ silent: true }));
 
   useEffect(() => {
     load();
