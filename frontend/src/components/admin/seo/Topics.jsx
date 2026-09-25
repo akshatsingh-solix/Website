@@ -1,7 +1,7 @@
 // Hot topics: what the press, practitioners and communities are discussing
 // in the category, how fast each topic is moving, whether you already cover
 // it, and the angle to take.
-import { ExternalLink, Flame, Loader2, RefreshCw } from "lucide-react";
+import { ExternalLink, Flame, Loader2, RefreshCw, Telescope } from "lucide-react";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { useDrill } from "@/components/admin/seo/Drill";
@@ -31,14 +31,14 @@ function angleFor(t, cov) {
   return `${t.topic} ${pace}.${terms}${cover}`;
 }
 
-export default function Topics({ snap, data, live, refreshing, onRefresh, titles }) {
+export default function Topics({ snap, data, live, refreshing, onRefresh, titles, canDeep }) {
   const drill = useDrill();
   const topics = (data?.topics || []).map((t) => ({ ...t, cov: coverage(t.topic, snap, titles) }));
   return (
     <div className="space-y-6" data-testid="seo-topics">
       <Panel
         title="Hot topics in the industry"
-        sub={live ? `Live from Google News, Hacker News and Reddit · updated ${new Date(data.fetched_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}` : `Research snapshot from ${new Date(data.fetched_at).toLocaleDateString(undefined, { dateStyle: "long" })}. The live radar takes over when the backend's SEO module is deployed.`}
+        sub={live ? `Live from Google News, Hacker News, Reddit and NewsMCP (when its key is set) · updated ${new Date(data.fetched_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}` : `Research snapshot from ${new Date(data.fetched_at).toLocaleDateString(undefined, { dateStyle: "long" })}. The live radar takes over when the backend's SEO module is deployed.`}
         action={live && <Button size="sm" variant="outline" onClick={onRefresh} disabled={refreshing}>{refreshing ? <Loader2 className="animate-spin" /> : <RefreshCw />} Refresh</Button>}
       >
         <div className="grid gap-4 lg:grid-cols-2">
@@ -66,13 +66,19 @@ export default function Topics({ snap, data, live, refreshing, onRefresh, titles
                     <li key={it.url}><a href={it.url} target="_blank" rel="noreferrer" className="line-clamp-2 hover:underline">{it.title} <ExternalLink className="inline h-3 w-3 opacity-60" /></a><span className="text-xs text-muted-foreground">{it.source}</span></li>
                   ))}
                 </ul>
+                {t.brands_in_news?.length > 0 && (
+                  <p className="mt-3 text-xs text-muted-foreground">In the news: {t.brands_in_news.slice(0, 5).map((b) => `${b.brand} (${b.mentions})`).join(" · ")}</p>
+                )}
                 <div className="mt-3 rounded-lg border border-teal/25 bg-teal/5 p-3 text-xs leading-relaxed">
                   <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.14em] text-teal">Recommendation</p>
                   {angleFor(t, cov)}
                 </div>
                 <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
                   <span>{cov.keywords.length ? `You rank for ${cov.keywords.length} related keyword${cov.keywords.length > 1 ? "s" : ""}` : "No ranking coverage yet"}{titles.length ? ` · ${cov.pieces} CMS piece${cov.pieces === 1 ? "" : "s"}` : ""}</span>
-                  <button type="button" onClick={() => drill({ type: "topic", data: t })} className="text-teal hover:underline">All {t.top.length} sources →</button>
+                  <span className="flex items-center gap-3">
+                    {live && canDeep && <button type="button" onClick={() => drill({ type: "deep", data: t })} className="inline-flex items-center gap-1 text-teal hover:underline" data-testid="seo-deep-dive"><Telescope className="h-3 w-3" /> Deep dive</button>}
+                    <button type="button" onClick={() => drill({ type: "topic", data: t })} className="text-teal hover:underline">All {t.top.length} sources →</button>
+                  </span>
                 </div>
               </article>
             );

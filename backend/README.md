@@ -54,6 +54,8 @@ one is connected the dashboard shows clearly labelled sample data for it.
 | OpenRouter (free models) | `OPENROUTER_API_KEY`, optional `OPENROUTER_MODELS`, `OPENROUTER_WEB` | GEO check: asks your buyer questions to an AI model and records which brands it names. Default model `nvidia/nemotron-3.5-lightning:free` (free; 50 requests/day across all free models). Comma-separate several models to average across assistants. `OPENROUTER_WEB=1` adds web search and citations, which OpenRouter bills even on free models |
 | Claude with web search (alternative) | `ANTHROPIC_API_KEY` | Same check with live web search and citations; used only when `OPENROUTER_API_KEY` is not set |
 | Google News, Hacker News, Reddit | none | Hot-topic radar (cached 6 hours) |
+| NewsMCP | `NEWSMCP_API_KEY` (free key; keyless calls are blocked from cloud servers) | Adds news clustered into stories with independent-newsroom counts and named companies, so topics flag competitors in the news |
+| Parallel Search + Extract | `PARALLEL_API_KEY` ($5 free credits a month) | Topic **Deep dive**: finds expert and analyst coverage and reads the full articles, including JavaScript-heavy pages; the AI model then summarises expert views, quoted numbers, debates, buyer questions, competitor moves and content angles, each cited. Without the key, deep dives read the radar's own articles with a plain fetch. Cached 24 hours |
 
 - **Semrush units:** a sync pulls one country (about 300 keywords, 100 pages,
   and up to 20 competitors with 12-month history). Snapshots are stored in
