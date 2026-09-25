@@ -49,6 +49,7 @@ export default function Resources() {
         crumbs={[{ label: "Resources" }]}
         title="Insights for people who run enterprise data."
         description="White papers, webinars, case studies and field notes from two decades of archiving, retirement, privacy and AI programs."
+        image="/Website/images/art/resources-library.svg"
         compact
       />
 

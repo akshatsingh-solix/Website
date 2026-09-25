@@ -1,0 +1,53 @@
+import {
+  Activity, Archive, BadgeCheck, Bot, Boxes, Cable, Check, Cloud, Cpu, Database, EyeOff, FileSearch, FileText,
+  Gauge, GitBranch, Gavel, HardDrive, HeartPulse, Layers, Lock, Map, MessageSquareText, Network, PiggyBank, Rocket, Scale, ScanSearch, Search,
+  ShieldCheck, Sparkles, Tags, Timer, Trash2, UserCheck, Users, Wand2,
+} from "lucide-react";
+
+// First match wins, so the specific patterns come before the broad ones.
+const RULES = [
+  [/legal hold|litigation|case assessment|defensib/i, Gavel],
+  [/delet|disposition|forgotten|decommission|retire/i, Trash2],
+  [/retention|retain|preserv|archiv|journaling|tiering/i, Archive],
+  [/consent|dsar|privacy|pii|phi|mask|access-aware/i, EyeOff],
+  [/audit|evidence|regulat|compliance|gxp|hipaa|prove|report/i, BadgeCheck],
+  [/lineage|chain of custody|referential|context/i, GitBranch],
+  [/storage|worm/i, HardDrive],
+  [/cost|reclaim|reduc|saving|mips/i, PiggyBank],
+  [/secur|guard|fine-grained|protect/i, Lock],
+  [/govern|policy|enforce|trust/i, ShieldCheck],
+  [/classif|tag|label|discover|profil|scan|identify/i, Tags],
+  [/search|index|query|find|retriev/i, Search],
+  [/\brag\b|answer|natural language|\bask|cites|conversation/i, MessageSquareText],
+  [/agent|studio|builder|compose|human in the loop/i, Bot],
+  [/model|evaluat|ai\b|intelligen/i, Sparkles],
+  [/graph|map|knowledge/i, Network],
+  [/connect|connector|integrat|source|ingest|capture|any /i, Cable],
+  [/cloud|deploy|elastic|scale|hybrid/i, Cloud],
+  [/quality|scorecard|monitor|telemetry|observab/i, Activity],
+  [/speed|fast|second|real-time|refresh/i, Timer],
+  [/perform|optimi|growth/i, Gauge],
+  [/metadata|catalog|inventory|register/i, Map],
+  [/open format|table format|extensib|extend/i, Layers],
+  [/data|database|warehouse|lake/i, Database],
+  [/document|content|file|email/i, FileText],
+  [/review|produce/i, FileSearch],
+  [/self-service|business|user|team/i, Users],
+  [/role|identity|permission/i, UserCheck],
+  [/automat|template|factory/i, Wand2],
+  [/compute|engine/i, Cpu],
+  [/risk/i, Scale],
+  [/visib|inspect/i, ScanSearch],
+  [/platform|product|suite|erp|pre-built/i, Boxes],
+  [/vector/i, Layers],
+  [/\bera/i, Archive],
+  [/transparent/i, UserCheck],
+  [/tool|composition/i, Boxes],
+  [/history|logging/i, Activity],
+  [/clinical/i, HeartPulse],
+  [/migration|upgrade/i, Rocket],
+  [/certified/i, BadgeCheck],
+];
+
+/** A lucide icon that fits a capability title, or a check mark when nothing matches. */
+export const featureIcon = (title = "") => RULES.find(([re]) => re.test(title))?.[1] || Check;
