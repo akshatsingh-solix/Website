@@ -55,6 +55,12 @@ export const fetchChatHistory = (sessionId) => api.get(`/chat/${sessionId}`).the
 
 export const clearChatHistory = (sessionId) => api.delete(`/chat/${sessionId}`);
 
+/** Saves any contact details in a message when the offline concierge is answering. Resolves to the saved field names. */
+export const captureChat = ({ sessionId, message, language, page, visitorId }) =>
+  BACKEND_URL
+    ? api.post("/chat/capture", { session_id: sessionId, message, language, page, visitor_id: visitorId || undefined }).then((r) => r.data.fields || []).catch(() => [])
+    : Promise.resolve([]);
+
 /**
  * Streams an AI concierge reply. Resolves to "ok"; "rate_limited" when the
  * visitor is sending too fast; or "unavailable" when the backend has no model
@@ -62,7 +68,7 @@ export const clearChatHistory = (sessionId) => api.delete(`/chat/${sessionId}`);
  * the caller then answers with the built-in concierge instead. `page` and
  * `pageTitle` tell Sol what the visitor is looking at.
  */
-export async function streamChat({ sessionId, message, language = "en", page, pageTitle, onDelta, onEvent, onError, timeoutMs = 8000 }) {
+export async function streamChat({ sessionId, message, language = "en", page, pageTitle, visitorId, onDelta, onEvent, onError, timeoutMs = 8000 }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res;
@@ -70,7 +76,7 @@ export async function streamChat({ sessionId, message, language = "en", page, pa
     res = await fetch(`${API}/chat/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, message, language, page, page_title: pageTitle }),
+      body: JSON.stringify({ session_id: sessionId, message, language, page, page_title: pageTitle, visitor_id: visitorId || undefined }),
       signal: controller.signal,
     });
   } catch {

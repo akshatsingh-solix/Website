@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Bot, CalendarCheck, MailCheck, MessageSquare, RotateCcw, Send, Sparkles, X } from "lucide-react";
+import { ArrowUpRight, Bot, CalendarCheck, Check, MailCheck, MessageSquare, RotateCcw, Send, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CHAT_SUGGESTIONS } from "@/data/site";
 import { Button } from "@/components/ui/button";
-import { clearChatHistory, fetchChatHistory, streamChat } from "@/lib/api";
+import { captureChat, clearChatHistory, fetchChatHistory, streamChat } from "@/lib/api";
 import { createLocalConcierge, detectTopics, isPricingQuestion } from "@/lib/localConcierge";
-import { pageTopics, track } from "@/lib/intent";
+import { pageTopics, track, visitorId } from "@/lib/intent";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
 
@@ -79,6 +79,18 @@ const BookingCard = ({ kind = "demo", name, email, company }) => {
       <p className="mt-2 text-[11px] text-muted-foreground">{tx("A Solix expert will reach out within one business day.")}</p>
     </div>
   </div>
+  );
+};
+
+// A quiet confirmation when the visitor shares contact details, so saving them is never hidden.
+const SavedNotice = ({ fields }) => {
+  const tx = useTx();
+  const labels = { email: tx("email"), phone: tx("phone number"), name: tx("name"), company: tx("company"), job_title: tx("role") };
+  const what = fields.map((f) => labels[f] || f).join(", ");
+  return (
+    <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground" data-testid="chat-saved-notice">
+      <Check className="h-3 w-3 shrink-0 text-teal" /> {tx("Saved your {{what}} so a Solix expert can follow up.", { what })}
+    </p>
   );
 };
 
@@ -164,7 +176,16 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
         next[next.length - 1] = last;
         return next;
       });
+    const showSaved = (fields) =>
+      fields?.length &&
+      setMessages((m) => {
+        const next = [...m];
+        const last = next.pop();
+        return [...next, { role: "notice", fields }, last];
+      });
     const answerLocally = async () => {
+      // The offline concierge has no model, but contact details still reach the lead list.
+      captureChat({ sessionId, message, language: i18n.language, page: location.pathname, visitorId: visitorId() }).then(showSaved);
       const { text: reply, booking } = await local.current.reply(message, i18n.language);
       if (booking) {
         setMessages((m) => {
@@ -192,6 +213,7 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
         language: i18n.language,
         page: location.pathname,
         pageTitle: document.title,
+        visitorId: visitorId(),
         onDelta: append,
         onEvent: (evt) => {
           if (evt.event === "demo_booked" || evt.event === "expert_requested") {
@@ -202,6 +224,7 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
               return [...next, { role: "booking", kind, name: evt.name, email: evt.email, company: evt.company }, last];
             });
           }
+          if (evt.event === "lead_captured") showSaved(evt.fields);
           if (evt.event === "sources") {
             setMessages((m) => m.map((x, i) => (i === m.length - 1 ? { ...x, sources: evt.sources } : x)));
           }
@@ -284,7 +307,7 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
                   </div>
                 </div>
               )}
-              {messages.map((m, i) => (m.role === "booking" ? <BookingCard key={i} {...m} /> : <Bubble key={i} {...m} />))}
+              {messages.map((m, i) => (m.role === "booking" ? <BookingCard key={i} {...m} /> : m.role === "notice" ? <SavedNotice key={i} fields={m.fields} /> : <Bubble key={i} {...m} />))}
             </div>
 
             <form

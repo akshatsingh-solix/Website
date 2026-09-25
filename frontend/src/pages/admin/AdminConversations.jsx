@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge, ago, fmtDateTime, inputCls } from "@/components/admin/kit";
+import { Badge, ago, fmtDateTime, inputCls, useLiveRefresh } from "@/components/admin/kit";
 import { fetchChat, fetchChats, fetchSolStatus, formatApiError } from "@/lib/adminApi";
 
 const PAGE_SIZE = 25;
-const LEAD_LABEL = { demo: "Demo booked", contact: "Expert question" };
+const LEAD_LABEL = { demo: "Demo booked", contact: "Expert question", chat: "Contact shared" };
 
 // Sol's replies use **bold**, bullets and [label](/path) links; show them as plain text here.
 const plain = (text) => text.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, "$1 ($2)");
@@ -67,14 +67,15 @@ export default function AdminConversations() {
     return () => clearTimeout(t);
   }, [q]);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    return fetchChats({ page, page_size: PAGE_SIZE, q: query || undefined })
+  const load = useCallback(({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
+    return fetchChats({ page, page_size: PAGE_SIZE, q: query || undefined }, { fresh: silent })
       .then(setData)
-      .catch((e) => toast.error(formatApiError(e)))
-      .finally(() => setLoading(false));
+      .catch((e) => !silent && toast.error(formatApiError(e)))
+      .finally(() => !silent && setLoading(false));
   }, [page, query]);
   useEffect(() => { load(); }, [load]);
+  useLiveRefresh(() => load({ silent: true }));
   useEffect(() => { fetchSolStatus().then(setStatus).catch(() => {}); }, []);
 
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
@@ -110,6 +111,11 @@ export default function AdminConversations() {
             <button key={c.session_id} onClick={() => setOpen(c.session_id)} className="flex w-full flex-col gap-1.5 px-5 py-4 text-left transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:gap-4" data-testid="admin-chat-row">
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">{c.first_question || "(conversation)"}</span>
+                {c.contact && (
+                  <span className="mt-0.5 block truncate text-xs text-foreground" data-testid="admin-chat-contact">
+                    {[c.contact.name, c.contact.job_title, c.contact.company, c.contact.email, c.contact.phone].filter(Boolean).join(" · ")}
+                  </span>
+                )}
                 <span className="mt-0.5 block truncate text-xs text-muted-foreground">
                   {c.messages} messages{c.pages.length > 0 && <> · {c.pages.join(", ")}</>}{c.models.length > 0 && <> · {c.models.join(", ")}</>}
                 </span>

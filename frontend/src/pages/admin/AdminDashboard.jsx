@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContai
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { clearAdminCache, fetchLeadsMeta, fetchOverview, formatApiError } from "@/lib/adminApi";
-import { CHANNEL_LABELS, LINE_SHORT, Panel, SERIES, STAGE_LABELS, StatTile, productName, selectCls } from "@/components/admin/kit";
+import { CHANNEL_LABELS, LINE_SHORT, Panel, SERIES, STAGE_LABELS, StatTile, productName, selectCls, useLiveRefresh } from "@/components/admin/kit";
 import { cn } from "@/lib/utils";
 
 const RANGES = [
@@ -79,11 +79,16 @@ export default function AdminDashboard() {
     fetchLeadsMeta().then(setMeta).catch(() => {});
   }, []);
 
+  const params = useMemo(() => {
+    if (range === "custom" && (!from || !to)) return null;
+    return range === "custom" ? { date_from: from, date_to: to, line } : { days: Number(range), line };
+  }, [range, from, to, line]);
+  useLiveRefresh(() => params && fetchOverview(params, { fresh: true }).then(setData));
+
   useEffect(() => {
-    if (range === "custom" && (!from || !to)) return;
+    if (!params) return;
     let alive = true;
     setLoading(true);
-    const params = range === "custom" ? { date_from: from, date_to: to, line } : { days: Number(range), line };
     fetchOverview(params)
       .then((d) => alive && setData(d))
       .catch((e) => toast.error(formatApiError(e)))
@@ -91,7 +96,7 @@ export default function AdminDashboard() {
     return () => {
       alive = false;
     };
-  }, [range, from, to, line, tick]);
+  }, [params, tick]);
 
   const k = data?.kpis;
   const lineRows = useMemo(() => (data?.by_line || []).map((r) => ({ ...r, name: LINE_SHORT[r.key] || r.label })), [data]);
