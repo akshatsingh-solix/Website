@@ -25,6 +25,8 @@ export default function AiSearch({ snap, ai, aiSample, aiConnected, running, onR
   const leader = sov[0];
   const ok = (ai?.results || []).filter((r) => !r.error);
   const cites = sov.reduce((s, x) => s + x.citations, 0) || 1;
+  const noWeb = ai && !aiSample && ai.web === false;
+  const models = new Set((ai?.results || []).map((r) => r.model).filter(Boolean));
 
   return (
     <div className="space-y-6" data-testid="seo-ai">
@@ -32,7 +34,7 @@ export default function AiSearch({ snap, ai, aiSample, aiConnected, running, onR
         <Kpi label="Answer boxes held" value={`${Math.round(share.pct)}%`} sub={`${share.owned} of ${share.available} answer placements on your keywords`} />
         <Kpi label="AI Overviews" value={aio ? `${aio.owned} / ${aio.available}` : "—"} sub="Cited in / shown on your keywords" />
         <Kpi label="AI answer share of voice" value={me ? `${me.share}%` : "—"} sub={me ? `Named in ${me.prompts_mentioned} of ${ok.length} buyer questions` : "Not yet measured"} />
-        <Kpi label="AI citations share" value={me ? `${Math.round((100 * me.citations) / cites)}%` : "—"} sub="Of sources the AI linked to" />
+        <Kpi label="AI citations share" value={me && !noWeb ? `${Math.round((100 * me.citations) / cites)}%` : "—"} sub={noWeb ? "Needs a model with web search" : "Of sources the AI linked to"} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-5">
@@ -57,20 +59,20 @@ export default function AiSearch({ snap, ai, aiSample, aiConnected, running, onR
 
       <Panel
         title="GEO: how AI assistants answer your buyers' questions"
-        sub={ai?.ran_at && !aiSample ? `Last checked ${new Date(ai.ran_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${ai.model} with live web search` : "Each question is asked to an AI assistant with web search; we record which brands it names and cites"}
+        sub={ai?.ran_at && !aiSample ? `Last checked ${new Date(ai.ran_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${ai.model}${ai.web === false ? " · answers from the model's own knowledge (no web search)" : " · with live web search"}` : "Each buyer question is asked to an AI model; we record which brands it names (and cites, when web search is on)"}
         action={
           <div className="flex items-center gap-2">
             {aiSample && <SampleBadge reason="AI answer checks haven't run yet" />}
-            {canRun && <Button size="sm" variant="outline" onClick={onRun} disabled={running || !aiConnected} title={aiConnected ? "" : "Add ANTHROPIC_API_KEY to the backend to enable"}>{running ? <Loader2 className="animate-spin" /> : <Sparkles />} {running ? "Asking…" : "Run check now"}</Button>}
+            {canRun && <Button size="sm" variant="outline" onClick={onRun} disabled={running || !aiConnected} title={aiConnected ? "" : "Add OPENROUTER_API_KEY to the backend to enable"}>{running ? <Loader2 className="animate-spin" /> : <Sparkles />} {running ? "Asking…" : "Run check now"}</Button>}
           </div>
         }
       >
-        {!aiConnected && <p className="mb-4 rounded-lg border border-line/10 bg-line/[0.03] px-3 py-2 text-xs text-muted-foreground">AI answer tracking needs <span className="font-mono">ANTHROPIC_API_KEY</span> on the backend. Until then the numbers below are sample data. Edit the buyer questions in Settings.</p>}
+        {!aiConnected && <p className="mb-4 rounded-lg border border-line/10 bg-line/[0.03] px-3 py-2 text-xs text-muted-foreground">AI answer tracking needs <span className="font-mono">OPENROUTER_API_KEY</span> (free models available) or <span className="font-mono">ANTHROPIC_API_KEY</span> on the backend. Until then the numbers below are sample data. Edit the buyer questions in Settings.</p>}
         <div className="grid gap-6 xl:grid-cols-2">
           <div>
             <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Share of AI answers naming each brand</p>
             <BarList rows={sov.slice(0, 12)} label={(r) => (r.domain === ai.brand_domain ? `${r.brand} (you)` : r.brand)} value={(r) => r.share} format={(v, r) => `${v}% · avg #${r.avg_rank ?? "—"}`} colorFor={(r) => (r.domain === ai.brand_domain ? C.you : C.faint)} empty="No brands named yet." />
-            {me && leader && leader.domain !== me.domain && <p className="mt-4 text-sm">{leader.brand} is named in {leader.share}% of answers vs your {me.share}%. Close the gap with comparison pages, cited statistics and third-party mentions (analyst reports, review sites) that AI engines draw on.</p>}
+            {me && leader && leader.domain !== me.domain && leader.share > me.share && <p className="mt-4 text-sm">{leader.brand} is named in {leader.share}% of answers vs your {me.share}%. Close the gap with comparison pages, cited statistics and third-party mentions (analyst reports, review sites) that AI engines draw on.</p>}
           </div>
           <div>
             <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Your AI answer share over time</p>
@@ -93,13 +95,13 @@ export default function AiSearch({ snap, ai, aiSample, aiConnected, running, onR
           {(ai?.results || []).map((r) => {
             const mine = r.mentions?.find((m) => m.domain === ai.brand_domain);
             return (
-              <li key={r.prompt} className="py-3">
-                <button type="button" className="flex w-full items-start justify-between gap-4 text-left" onClick={() => setPrompt(prompt === r.prompt ? null : r.prompt)}>
-                  <span className="text-sm text-foreground">{r.prompt}</span>
+              <li key={`${r.model}|${r.prompt}`} className="py-3">
+                <button type="button" className="flex w-full items-start justify-between gap-4 text-left" onClick={() => setPrompt(prompt === `${r.model}|${r.prompt}` ? null : `${r.model}|${r.prompt}`)}>
+                  <span className="text-sm text-foreground">{r.prompt}{models.size > 1 && <span className="ml-2 font-mono text-[10px] text-muted-foreground">{r.model}</span>}</span>
                   <span className="flex shrink-0 items-center gap-1.5 text-xs">{r.error ? <span className="text-red-300">{r.error}</span> : mine ? <><Check className="h-3.5 w-3.5 text-emerald-400" /> named #{mine.rank}</> : <><Minus className="h-3.5 w-3.5 text-muted-foreground" /> not named</>}</span>
                 </button>
                 <p className="mt-1 text-xs text-muted-foreground">{(r.mentions || []).map((m) => m.brand).join(" · ") || "No tracked brand named"}</p>
-                {prompt === r.prompt && (
+                {prompt === `${r.model}|${r.prompt}` && (
                   <div className="mt-3 space-y-3 rounded-lg border border-line/10 bg-line/[0.03] p-3 text-xs">
                     {r.answer ? <p className="whitespace-pre-line text-sm text-foreground/90">{r.answer}</p> : <p className="text-muted-foreground">The full AI answer appears here after a live check.</p>}
                     {Object.keys(r.cited_domains || {}).length > 0 && <p className="text-muted-foreground">Sources cited: {Object.entries(r.cited_domains).sort((a, b) => b[1] - a[1]).map(([d, n]) => `${d} (${n})`).join(", ")}</p>}

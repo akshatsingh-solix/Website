@@ -51,7 +51,8 @@ one is connected the dashboard shows clearly labelled sample data for it.
 | Source | Env var | What it feeds |
 |---|---|---|
 | Semrush Analytics API | `SEMRUSH_API_KEY` | Organic traffic and 12-month trend, keywords, pages, 10+ competitors per country, keyword gap, category demand, per-URL rankings in the CMS editor |
-| Claude with web search | `ANTHROPIC_API_KEY` | GEO check: asks your buyer questions to an AI assistant and records which brands it names and cites |
+| OpenRouter (free models) | `OPENROUTER_API_KEY`, optional `OPENROUTER_MODELS`, `OPENROUTER_WEB` | GEO check: asks your buyer questions to an AI model and records which brands it names. Default model `nvidia/nemotron-3.5-lightning:free` (free; 50 requests/day across all free models). Comma-separate several models to average across assistants. `OPENROUTER_WEB=1` adds web search and citations, which OpenRouter bills even on free models |
+| Claude with web search (alternative) | `ANTHROPIC_API_KEY` | Same check with live web search and citations; used only when `OPENROUTER_API_KEY` is not set |
 | Google News, Hacker News, Reddit | none | Hot-topic radar (cached 6 hours) |
 
 - **Semrush units:** a sync pulls one country (about 300 keywords, 100 pages,

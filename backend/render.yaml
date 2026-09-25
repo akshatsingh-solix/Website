@@ -22,5 +22,9 @@ services:
       # Optional: live SEO data and AI answer tracking in Admin > SEO
       - key: SEMRUSH_API_KEY
         sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODELS
+        value: nvidia/nemotron-3.5-lightning:free
       - key: ANTHROPIC_API_KEY
         sync: false
