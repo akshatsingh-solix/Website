@@ -189,5 +189,6 @@ export const discoverCompetitors = (geo) => adminApi.post("/admin/seo/competitor
 export const fetchSeoUrl = (url, geo) => adminApi.get("/admin/seo/url", { params: { url, geo }, timeout: 60000 }).then((r) => r.data);
 export const fetchSeoKeyword = (phrase, geo) => adminApi.get("/admin/seo/keyword", { params: { phrase, geo }, timeout: 60000 }).then((r) => r.data);
 export const fetchSeoTopics = (refresh) => adminApi.get("/admin/seo/topics", { params: refresh ? { refresh: true } : {}, timeout: 120000, fresh: !!refresh }).then((r) => r.data);
+export const fetchDeepDive = (topic, refresh) => adminApi.post("/admin/seo/topics/deep-dive", { topic, refresh: !!refresh }, { timeout: 300000 }).then((r) => r.data);
 export const fetchAiVisibility = () => adminApi.get("/admin/seo/ai-visibility").then((r) => r.data);
 export const runAiVisibility = () => adminApi.post("/admin/seo/ai-visibility/run", null, { timeout: 600000 }).then((r) => r.data);

@@ -33,3 +33,5 @@ httpx>=0.27.0
 reportlab==5.0.1
 # SEO/GEO: AI answer visibility checks (optional; needs ANTHROPIC_API_KEY)
 anthropic>=1.8.0
+# SEO topic deep dives: article text extraction when PARALLEL_API_KEY is not set
+trafilatura>=2.0

@@ -1,11 +1,11 @@
 // One drill-down drawer for the whole SEO dashboard. Any view calls
 // drill({ type, ... }) to open the detail behind a number.
 import { createContext, useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { ExternalLink, Loader2, PenLine } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ExternalLink, FilePlus2, Loader2, PenLine, RefreshCw } from "lucide-react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { fetchSeoKeyword, formatApiError } from "@/lib/adminApi";
+import { fetchDeepDive, fetchSeoKeyword, formatApiError } from "@/lib/adminApi";
 import { ASSET_NAME, LINE_NAME, fmtMoney, fmtN, trendChange, upside } from "@/lib/seo/model";
 import { C, ChartTip, Delta, FeatureChips, IntentChip, Move, PosBadge, Table, axis, monthTick, shortUrl, GRID } from "@/components/admin/seo/ui";
 
@@ -186,6 +186,64 @@ function TopicDetail({ t }) {
   );
 }
 
+const Cite = ({ n, url }) => (url ? <a href={url} target="_blank" rel="noreferrer" className="ml-1 font-mono text-[10px] text-teal hover:underline">[{n}]</a> : null);
+
+function DeepDetail({ topic }) {
+  const navigate = useNavigate();
+  const [state, setState] = useState({ loading: true });
+  const load = (refresh) => {
+    setState((s) => ({ ...s, loading: true, error: "" }));
+    fetchDeepDive(topic, refresh).then((data) => setState({ data })).catch((e) => setState({ error: formatApiError(e) }));
+  };
+  useEffect(() => load(false), [topic]); // eslint-disable-line react-hooks/exhaustive-deps
+  const { data, loading, error } = state;
+  if (loading && !data) return <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Reading the latest expert coverage… this can take a minute.</p>;
+  if (error) return <p className="text-sm text-red-300">{error}</p>;
+  const x = data.insight;
+  const draft = (a) => navigate("/admin/content/new", { state: { prefill: {
+    title: a.title, seo_title: a.title.slice(0, 60), summary: a.angle || "",
+    body: [`Direct answer (40–60 words): ${a.angle || a.title}`, ...(x?.buyer_questions || []).map((q) => `## ${q}`), "## FAQ", "", "Sources to cite:", ...data.sources.map((s) => `- [${s.title || s.url}](${s.url})`)].join("\n\n"),
+  } } });
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+        <span>{data.model ? `Summarised by ${data.model}` : "Sources only"} · {new Date(data.generated_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>
+        <button type="button" onClick={() => load(true)} disabled={loading} className="inline-flex items-center gap-1 text-teal hover:underline">{loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />} Refresh</button>
+      </div>
+      {x?.summary && <div className="mt-3 rounded-xl border border-teal/30 bg-teal/5 p-4 text-sm"><p className="mb-1 font-mono text-[10px] uppercase tracking-[0.14em] text-teal">What the market is saying{x.sentiment ? ` · ${x.sentiment}` : ""}</p>{x.summary}</div>}
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        <Stat label="Mentions, 7 days">{data.radar.mentions_7d}</Stat>
+        <Stat label="Mentions, 30 days">{data.radar.mentions_30d}</Stat>
+        <Stat label="Sources read">{data.sources.length}</Stat>
+      </div>
+      {data.radar.brands_in_news?.length > 0 && (<><H>Brands in the conversation</H><p className="flex flex-wrap gap-1.5">{data.radar.brands_in_news.map((b) => <span key={b.domain} className="rounded-full border border-line/15 px-2 py-0.5 text-xs">{b.brand} · {b.mentions}</span>)}</p></>)}
+      {x?.expert_views?.length > 0 && (<><H>What experts and analysts say</H><ul className="space-y-2 text-sm">{x.expert_views.map((v, i) => <li key={i}><span className="font-medium">{v.who}:</span> {v.view}<Cite n={v.source} url={v.url} /></li>)}</ul></>)}
+      {x?.key_stats?.length > 0 && (<><H>Numbers being quoted</H><ul className="list-disc space-y-1 pl-5 text-sm">{x.key_stats.map((v, i) => <li key={i}>{v.stat}<Cite n={v.source} url={v.url} /></li>)}</ul></>)}
+      {x?.competitor_moves?.length > 0 && (<><H>Competitor moves</H><ul className="space-y-1 text-sm">{x.competitor_moves.map((v, i) => <li key={i}><span className="font-medium">{v.brand}:</span> {v.move}<Cite n={v.source} url={v.url} /></li>)}</ul></>)}
+      {x?.debates?.length > 0 && (<><H>Open debates</H><ul className="list-disc space-y-1 pl-5 text-sm">{x.debates.map((d, i) => <li key={i}>{d}</li>)}</ul></>)}
+      {x?.buyer_questions?.length > 0 && (<><H>Questions buyers are asking</H><ul className="list-disc space-y-1 pl-5 text-sm">{x.buyer_questions.map((d, i) => <li key={i}>{d}</li>)}</ul></>)}
+      {x?.content_angles?.length > 0 && (
+        <>
+          <H>Content to create</H>
+          <ul className="space-y-2">{x.content_angles.map((a, i) => (
+            <li key={i} className="rounded-lg border border-line/10 p-3 text-sm">
+              <p className="font-medium">{a.title} <span className="ml-1 rounded-full border border-line/15 px-1.5 text-[10px] uppercase text-muted-foreground">{a.format}</span></p>
+              <p className="mt-1 text-xs text-muted-foreground">{a.angle}</p>
+              <button type="button" onClick={() => draft(a)} className="mt-2 inline-flex items-center gap-1 text-xs text-teal hover:underline"><FilePlus2 className="h-3 w-3" /> Start draft in CMS</button>
+            </li>
+          ))}</ul>
+        </>
+      )}
+      <H>Sources ({data.sources.length})</H>
+      <ol className="space-y-2 text-sm">{data.sources.map((s) => (
+        <li key={s.n}><span className="font-mono text-xs text-muted-foreground">[{s.n}]</span> <a href={s.url} target="_blank" rel="noreferrer" className="hover:underline">{s.title || s.url}</a>
+          <span className="block text-xs text-muted-foreground">{[s.via, s.date, `${Math.round(s.chars / 1000)}K characters read`].filter(Boolean).join(" · ")}</span></li>
+      ))}</ol>
+      {data.notes?.length > 0 && <ul className="mt-4 space-y-1 text-xs text-muted-foreground">{data.notes.map((n) => <li key={n}>{n}</li>)}</ul>}
+    </>
+  );
+}
+
 const TITLES = {
   keyword: (d) => [d.keyword, "Keyword performance"],
   page: (d) => [shortUrl(d.url), "Page performance"],
@@ -193,6 +251,7 @@ const TITLES = {
   section: (d) => [d.name, "Section performance"],
   metric: (d) => [d.title, d.sub],
   topic: (d) => [d.topic, `${d.mentions_30d} mentions in 30 days`],
+  deep: (d) => [d.topic, "Deep dive: expert coverage, read in full"],
 };
 
 export function DrillProvider({ snap, sample, children }) {
@@ -208,7 +267,7 @@ export function DrillProvider({ snap, sample, children }) {
             <>
               <SheetHeader className="pr-10 text-left">
                 <SheetTitle className="font-display text-2xl font-medium">{title}</SheetTitle>
-                <SheetDescription>{sub}{sample ? " · sample data" : ""}</SheetDescription>
+                <SheetDescription>{sub}{sample && !["deep", "topic"].includes(item.type) ? " · sample data" : ""}</SheetDescription>
               </SheetHeader>
               <div className="mt-5">
                 {item.type === "keyword" && <KeywordDetail k={d} snap={snap} sample={sample} />}
@@ -217,6 +276,7 @@ export function DrillProvider({ snap, sample, children }) {
                 {item.type === "section" && <SectionDetail s={d} drill={setItem} />}
                 {item.type === "metric" && <MetricDetail m={d} />}
                 {item.type === "topic" && <TopicDetail t={d} />}
+                {item.type === "deep" && <DeepDetail topic={d.topic} />}
               </div>
             </>
           )}

@@ -136,7 +136,7 @@ export default function AdminSeo() {
               {tab === "keywords" && <View snap={snap} brand={brand} />}
               {tab === "competitors" && <View snap={snap} go={go} />}
               {tab === "ai" && <View snap={snap} ai={aiView} aiSample={!ai} aiConnected={!!status?.ai} running={aiRunning} onRun={runAi} canRun={can("editContent") || can("manage")} />}
-              {tab === "topics" && <View snap={snap} data={topicView} live={!!topics} refreshing={topicsBusy} onRefresh={refreshTopics} titles={titles} />}
+              {tab === "topics" && <View snap={snap} data={topicView} live={!!topics} refreshing={topicsBusy} onRefresh={refreshTopics} titles={titles} canDeep={can("editContent") || can("manage")} />}
               {tab === "content" && <View snap={snap} topics={topicView} />}
               {tab === "settings" && <View config={config} status={status} onSaved={setConfig} canEdit={can("manage")} />}
             </Suspense>

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "newsmcp": {
+      "type": "http",
+      "url": "https://mcp.newsmcp.com/mcp"
+    },
+    "parallel-search": {
+      "type": "http",
+      "url": "https://search.parallel.ai/mcp"
+    },
+    "duckduckgo": {
+      "command": "uvx",
+      "args": ["duckduckgo-mcp-server"]
+    }
+  }
+}

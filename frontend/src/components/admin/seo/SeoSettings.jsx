@@ -69,6 +69,8 @@ export default function SeoSettings({ config, status, onSaved, canEdit }) {
           <Conn ok={status?.semrush} label="Semrush" detail="SEMRUSH_API_KEY: traffic, keywords, pages, competitors, keyword gap and industry demand. Each sync uses API units; data is cached until you sync again." />
           <Conn ok={status?.ai} label="AI answer tracking (GEO)" detail={status?.ai ? `${status.ai_provider === "openrouter" ? "OpenRouter" : "Claude"} · ${(status.ai_models || []).join(", ")}${status.ai_web ? " · with web search" : " · answers from model knowledge (no web search)"}` : "OPENROUTER_API_KEY (free models such as nvidia/nemotron-3.5-lightning:free) or ANTHROPIC_API_KEY: asks the buyer questions below and records which brands the answer names."} />
           <Conn ok={backend} label="Hot-topic radar" detail="Google News, Hacker News and Reddit. No key needed; refreshed every 6 hours." />
+          <Conn ok={status?.newsmcp} label="NewsMCP story events" detail="NEWSMCP_API_KEY (free key at platform.newsmcp.com): news clustered into stories with independent-newsroom counts and the companies named, so the radar can flag competitors in the news." />
+          <Conn ok={status?.parallel} label="Parallel deep dives" detail="PARALLEL_API_KEY ($5 free credits every month at parallel.ai): finds expert and analyst coverage and reads full articles, including JavaScript-heavy publisher pages, for each topic's Deep dive." />
         </ul>
       </Panel>
 
