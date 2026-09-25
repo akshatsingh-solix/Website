@@ -35,3 +35,5 @@ reportlab==5.0.1
 anthropic>=1.8.0
 # SEO topic deep dives: article text extraction when PARALLEL_API_KEY is not set
 trafilatura>=2.0
+# Offline tests for the Sol concierge (tests/test_sol.py)
+mongomock-motor>=0.0.29

@@ -82,6 +82,9 @@ export const saveTeam = (members) => adminApi.put("/admin/team", { members }).th
 export const fetchSettings = () => adminApi.get("/admin/settings").then((r) => r.data);
 export const saveSettings = (body) => adminApi.put("/admin/settings", body).then((r) => r.data);
 export const fetchNotifications = () => adminApi.get("/admin/notifications", { fresh: true }).then((r) => r.data);
+export const fetchChats = (params) => adminApi.get("/admin/chats", { params }).then((r) => r.data);
+export const fetchChat = (sessionId) => adminApi.get(`/admin/chats/${sessionId}`).then((r) => r.data);
+export const fetchSolStatus = () => adminApi.get("/chat/status").then((r) => r.data);
 
 // --- Leads, reports, views, scoring, users ---------------------------------
 const clean = (params) => Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== "all"));

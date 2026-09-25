@@ -51,6 +51,10 @@ jobs:
         # committed snapshot is used.
         run: node scripts/content-snapshot.js
 
+      - name: Check Sol's knowledge base matches the site content
+        # Warns only: the backend keeps answering from the committed file.
+        run: node scripts/sol-knowledge.js --check || echo "::warning::backend/sol_knowledge.json is stale. Run 'node frontend/scripts/sol-knowledge.js' and commit it so Sol knows the latest site content."
+
       - name: Vendor OpenArt visuals into the build
         # Copies the visuals listed in src/data/openart-media.json into
         # public/media/openart/ so the site serves them itself. Never fails

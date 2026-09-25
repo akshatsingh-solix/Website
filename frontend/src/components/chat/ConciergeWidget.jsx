@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bot, CalendarCheck, MessageSquare, RotateCcw, Send, Sparkles, X } from "lucide-react";
+import { ArrowUpRight, Bot, CalendarCheck, MailCheck, MessageSquare, RotateCcw, Send, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CHAT_SUGGESTIONS } from "@/data/site";
 import { Button } from "@/components/ui/button";
@@ -63,16 +63,18 @@ const Markdown = ({ text }) => {
   return <>{out}</>;
 };
 
-const BookingCard = ({ name, email, company }) => {
+const BookingCard = ({ kind = "demo", name, email, company }) => {
   const tx = useTx();
+  const expert = kind === "expert";
+  const Icon = expert ? MailCheck : CalendarCheck;
   return (
   <div className="flex justify-start" data-testid="chat-booking-card">
     <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-teal/30 bg-teal/5 px-4 py-3 text-sm">
-      <p className="flex items-center gap-2 font-display font-medium text-teal"><CalendarCheck className="h-4 w-4" /> {tx("Demo request saved")}</p>
+      <p className="flex items-center gap-2 font-display font-medium text-teal"><Icon className="h-4 w-4" /> {expert ? tx("Question sent to a Solix expert") : tx("Demo request saved")}</p>
       <dl className="mt-2 space-y-0.5 text-xs text-muted-foreground">
         <div className="flex gap-2"><dt className="w-16 text-muted-foreground">{tx("Name")}</dt><dd>{name}</dd></div>
         <div className="flex gap-2"><dt className="w-16 text-muted-foreground">{tx("Email")}</dt><dd>{email}</dd></div>
-        <div className="flex gap-2"><dt className="w-16 text-muted-foreground">{tx("Company")}</dt><dd>{company}</dd></div>
+        {company && <div className="flex gap-2"><dt className="w-16 text-muted-foreground">{tx("Company")}</dt><dd>{company}</dd></div>}
       </dl>
       <p className="mt-2 text-[11px] text-muted-foreground">{tx("A Solix expert will reach out within one business day.")}</p>
     </div>
@@ -80,7 +82,23 @@ const BookingCard = ({ name, email, company }) => {
   );
 };
 
-const Bubble = ({ role, content, streaming }) => (
+// Pages Sol drew on, as quick links under the answer.
+const Sources = ({ sources }) => {
+  const tx = useTx();
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5 border-t border-line/10 pt-2" data-testid="chat-sources">
+      <span className="w-full text-[11px] text-muted-foreground">{tx("Related pages")}</span>
+      {sources.map((s) => (
+        <Link key={s.url} to={s.url} className="inline-flex items-center gap-1 rounded-full border border-line/15 bg-background px-2.5 py-1 text-xs text-foreground transition-colors hover:border-primary/50 hover:text-primary-ink">
+          {s.title}
+          <ArrowUpRight className="h-3 w-3" />
+        </Link>
+      ))}
+    </div>
+  );
+};
+
+const Bubble = ({ role, content, streaming, sources }) => (
   <div className={cn("flex", role === "user" ? "justify-end" : "justify-start")} data-testid={`chat-message-${role}`}>
     <div
       className={cn(
@@ -90,6 +108,7 @@ const Bubble = ({ role, content, streaming }) => (
     >
       {role === "user" ? content : <Markdown text={content} />}
       {streaming && <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 animate-blink bg-teal" />}
+      {!streaming && sources?.length > 0 && <Sources sources={sources} />}
     </div>
   </div>
 );
@@ -97,6 +116,7 @@ const Bubble = ({ role, content, streaming }) => (
 export const ConciergeWidget = ({ defaultOpen = false }) => {
   const tx = useTx();
   const { i18n } = useTranslation();
+  const location = useLocation();
   const [open, setOpen] = useState(defaultOpen);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -170,19 +190,27 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
         sessionId,
         message,
         language: i18n.language,
+        page: location.pathname,
+        pageTitle: document.title,
         onDelta: append,
         onEvent: (evt) => {
-          if (evt.event === "demo_booked") {
+          if (evt.event === "demo_booked" || evt.event === "expert_requested") {
+            const kind = evt.event === "demo_booked" ? "demo" : "expert";
             setMessages((m) => {
               const next = [...m];
               const last = next.pop();
-              return [...next, { role: "booking", name: evt.name, email: evt.email, company: evt.company }, last];
+              return [...next, { role: "booking", kind, name: evt.name, email: evt.email, company: evt.company }, last];
             });
+          }
+          if (evt.event === "sources") {
+            setMessages((m) => m.map((x, i) => (i === m.length - 1 ? { ...x, sources: evt.sources } : x)));
           }
         },
         onError: (err) => append(tx(err)),
       });
-      if (status === "unavailable") {
+      if (status === "rate_limited") {
+        append(tx("You're sending messages quickly. Please wait a moment and try again."));
+      } else if (status === "unavailable") {
         setMode("local");
         await answerLocally();
       }
