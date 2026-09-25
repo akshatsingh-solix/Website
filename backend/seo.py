@@ -7,8 +7,9 @@ stays fast and API spend stays predictable:
   competitors, keyword demand and authority, per country database.
 - Public conversation feeds (no key): Google News, Hacker News and Reddit, for
   the industry "hot topics" radar.
-- Claude with web search (ANTHROPIC_API_KEY): asks the buyer questions in the
-  config and records which brands the AI answer mentions and cites (GEO).
+- An AI model (OPENROUTER_API_KEY, free models available, or ANTHROPIC_API_KEY
+  for Claude with web search): asks the buyer questions in the config and
+  records which brands the answer mentions and cites (GEO).
 
 Without a key the matching endpoint reports what is missing and the admin UI
 falls back to clearly labelled sample data.
@@ -36,6 +37,18 @@ from database import db, now_iso
 
 logger = logging.getLogger("solix.seo")
 router = APIRouter(prefix="/api/admin/seo", tags=["seo"], dependencies=[Depends(get_current_admin)])
+
+def _roles(*roles: str):
+    """Only these staff roles may change settings or spend API quota (viewers can still read)."""
+    async def check(user: dict = Depends(get_current_admin)) -> dict:
+        if user.get("role", "admin") not in roles:
+            raise HTTPException(status_code=403, detail="You don't have permission to do this")
+        return user
+    return check
+
+
+require_manage = _roles("admin")
+require_editor = _roles("admin", "editor")
 
 SEMRUSH_URL = "https://api.semrush.com/"
 SEMRUSH_BACKLINKS_URL = "https://api.semrush.com/analytics/v1/"
@@ -372,7 +385,7 @@ async def get_config():
     return await load_config()
 
 
-@router.put("/config")
+@router.put("/config", dependencies=[Depends(require_manage)])
 async def put_config(body: SeoConfig):
     changes = {k: v for k, v in body.model_dump().items() if v is not None}
     for k in ("domain", "live_domain"):
@@ -396,7 +409,10 @@ async def status():
     ai = await db.seo_ai_runs.find_one({}, {"_id": 0, "ran_at": 1}, sort=[("ran_at", -1)])
     return {
         "semrush": bool(os.environ.get("SEMRUSH_API_KEY")),
-        "ai": bool(os.environ.get("ANTHROPIC_API_KEY")),
+        "ai": bool(ai_provider()),
+        "ai_provider": (ai_provider() or {}).get("name"),
+        "ai_models": (ai_provider() or {}).get("models", []),
+        "ai_web": (ai_provider() or {}).get("web", False),
         "synced": synced,
         "ai_last_run": (ai or {}).get("ran_at"),
     }
@@ -406,7 +422,7 @@ class SyncBody(BaseModel):
     geo: str = Field(default="us", pattern=r"^[a-z]{2}$")
 
 
-@router.post("/sync")
+@router.post("/sync", dependencies=[Depends(require_manage)])
 async def sync(body: SyncBody):
     cfg = await load_config()
     async with httpx.AsyncClient(headers=UA) as client:
@@ -427,7 +443,7 @@ async def snapshot(geo: str = Query("us", pattern=r"^[a-z]{2}$")):
     return doc
 
 
-@router.post("/competitors/discover")
+@router.post("/competitors/discover", dependencies=[Depends(require_manage)])
 async def discover(body: SyncBody):
     """The domains that share the most organic keywords with you in this country."""
     cfg = await load_config()
@@ -585,12 +601,34 @@ async def topics(refresh: bool = False):
 
 
 # --- AI answer visibility (GEO) ------------------------------------------------
+# Two providers, picked by which key is set (OpenRouter first):
+#   OPENROUTER_API_KEY  - any OpenRouter model; free ":free" models answer from
+#                         their own knowledge. OPENROUTER_WEB=1 adds OpenRouter's
+#                         web search (billed per search, even on free models).
+#   ANTHROPIC_API_KEY   - Claude with live web search and citations.
 
-AI_SYSTEM = (
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+DEFAULT_OPENROUTER_MODELS = "nvidia/nemotron-3.5-lightning:free"
+
+AI_SYSTEM_WEB = (
     "You are answering a question from an enterprise IT or data leader who is researching vendors. "
     "Search the web, then answer the way a helpful AI assistant would: name the specific vendors and products you would "
     "recommend, most relevant first, with one line on why each fits. Keep it under 300 words."
 )
+AI_SYSTEM_MEMORY = (
+    "You are answering a question from an enterprise IT or data leader who is researching vendors. "
+    "Answer from your own knowledge the way a helpful AI assistant would: name the specific vendors and products you would "
+    "recommend, most relevant first, with one line on why each fits. Keep it under 300 words."
+)
+
+
+def ai_provider() -> Optional[dict]:
+    if os.environ.get("OPENROUTER_API_KEY"):
+        models = [m.strip() for m in os.environ.get("OPENROUTER_MODELS", DEFAULT_OPENROUTER_MODELS).split(",") if m.strip()]
+        return {"name": "openrouter", "models": models, "web": os.environ.get("OPENROUTER_WEB") == "1"}
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return {"name": "anthropic", "models": [AI_MODEL], "web": True}
+    return None
 
 
 def _mentions(text: str, brands: Dict[str, str]) -> List[dict]:
@@ -613,75 +651,119 @@ def _root(url: str) -> str:
     return ".".join(parts[-3:]) if len(parts) > 2 and parts[-2] in ("co", "com") else ".".join(parts[-2:])
 
 
-async def ask_ai(client, prompt: str) -> dict:
+async def ask_openrouter(client: httpx.AsyncClient, model: str, prompt: str, web: bool) -> dict:
+    body = {
+        "model": model,
+        "messages": [{"role": "system", "content": AI_SYSTEM_WEB if web else AI_SYSTEM_MEMORY}, {"role": "user", "content": prompt}],
+        "max_tokens": 2000,
+    }
+    if web:
+        body["plugins"] = [{"id": "web", "max_results": 5}]
+    headers = {"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}", "HTTP-Referer": os.environ.get("SITE_URL", "https://www.solix.com"), "X-Title": "Solix SEO dashboard"}
+    try:
+        r = await client.post(OPENROUTER_URL, json=body, headers=headers, timeout=120)
+    except httpx.HTTPError:
+        return {"error": "Could not reach OpenRouter."}
+    if r.status_code == 429:
+        return {"error": "OpenRouter rate limit reached (free models allow 50 requests a day). Try again tomorrow."}
+    if r.status_code == 402:
+        return {"error": "OpenRouter needs credits for this request (web search is billed even on free models)."}
+    if r.status_code >= 400:
+        detail = (r.json().get("error") or {}).get("message", "") if r.headers.get("content-type", "").startswith("application/json") else ""
+        return {"error": f"OpenRouter error {r.status_code}. {detail}".strip()}
+    data = r.json()
+    if data.get("error"):
+        return {"error": f"OpenRouter: {data['error'].get('message', 'request failed')}"}
+    msg = ((data.get("choices") or [{}])[0].get("message") or {})
+    text = msg.get("content") or ""
+    cited = [a.get("url_citation", {}).get("url") for a in msg.get("annotations") or [] if a.get("type") == "url_citation"]
+    if not text.strip():
+        return {"error": "The model returned an empty answer."}
+    return {"answer": text.strip(), "sources": [], "cited": list(dict.fromkeys(u for u in cited if u))}
+
+
+async def ask_claude(client, prompt: str) -> dict:
+    import anthropic
+
     messages = [{"role": "user", "content": prompt}]
     text, sources, cited = "", [], []
-    for _ in range(3):  # continue a paused server-tool turn at most twice
-        resp = await client.beta.messages.create(
-            model=AI_MODEL,
-            max_tokens=4000,
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
-            system=AI_SYSTEM,
-            tools=[{"type": "web_search_20260209", "name": "web_search", "max_uses": 4}],
-            messages=messages,
-        )
-        for block in resp.content:
-            if block.type == "text":
-                text += block.text
-                for c in getattr(block, "citations", None) or []:
-                    if getattr(c, "url", None):
-                        cited.append(c.url)
-            elif block.type == "web_search_tool_result" and isinstance(block.content, list):
-                sources.extend(r.url for r in block.content if getattr(r, "url", None))
-        if resp.stop_reason != "pause_turn":
-            break
-        messages = [*messages, {"role": "assistant", "content": resp.content}]
+    try:
+        for _ in range(3):  # continue a paused server-tool turn at most twice
+            resp = await client.beta.messages.create(
+                model=AI_MODEL,
+                max_tokens=4000,
+                betas=["server-side-fallback-2026-07-01"],
+                fallbacks="default",
+                system=AI_SYSTEM_WEB,
+                tools=[{"type": "web_search_20260209", "name": "web_search", "max_uses": 4}],
+                messages=messages,
+            )
+            for block in resp.content:
+                if block.type == "text":
+                    text += block.text
+                    for c in getattr(block, "citations", None) or []:
+                        if getattr(c, "url", None):
+                            cited.append(c.url)
+                elif block.type == "web_search_tool_result" and isinstance(block.content, list):
+                    sources.extend(r.url for r in block.content if getattr(r, "url", None))
+            if resp.stop_reason != "pause_turn":
+                break
+            messages = [*messages, {"role": "assistant", "content": resp.content}]
+    except anthropic.RateLimitError:
+        return {"error": "Rate limited; try again in a minute."}
+    except anthropic.APIStatusError as e:
+        return {"error": f"AI request failed ({e.status_code})."}
+    except anthropic.APIConnectionError:
+        return {"error": "Could not reach the AI service."}
     if resp.stop_reason == "refusal":
         return {"error": "The model declined to answer this prompt."}
     return {"answer": text.strip(), "sources": list(dict.fromkeys(sources)), "cited": list(dict.fromkeys(cited))}
 
 
-@router.post("/ai-visibility/run")
-async def run_ai_visibility():
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(status_code=409, detail="AI answer tracking is not connected. Add ANTHROPIC_API_KEY to the backend environment.")
-    import anthropic
-
-    cfg = await load_config()
-    geo_comps = {d for ds in (cfg.get("competitors") or {}).values() for d in ds}
-    brands = {cfg["domain"]: cfg.get("brand") or brand_of(cfg["domain"], cfg), **{d: brand_of(d, cfg) for d in geo_comps}}
-    client = anthropic.AsyncAnthropic()
-    sem = asyncio.Semaphore(3)
-
-    async def one(prompt):
-        async with sem:
-            try:
-                res = await ask_ai(client, prompt)
-            except anthropic.RateLimitError:
-                return {"prompt": prompt, "error": "Rate limited; try again in a minute."}
-            except anthropic.APIStatusError as e:
-                return {"prompt": prompt, "error": f"AI request failed ({e.status_code})."}
-            except anthropic.APIConnectionError:
-                return {"prompt": prompt, "error": "Could not reach the AI service."}
-            except anthropic.APIError as e:
-                return {"prompt": prompt, "error": str(e.message)}
-        if "error" in res:
-            return {"prompt": prompt, **res}
-        cited_roots = [_root(u) for u in res["cited"] or res["sources"]]
-        return {"prompt": prompt, **res, "mentions": _mentions(res["answer"], brands), "cited_domains": dict(Counter(cited_roots))}
-
-    results = await asyncio.gather(*(one(p) for p in cfg["ai_prompts"]))
+def share_of_voice(results: List[dict], brands: Dict[str, str], own: str) -> List[dict]:
     ok = [r for r in results if "error" not in r]
     sov = []
     for domain, name in brands.items():
         hits = [m for r in ok for m in r["mentions"] if m["domain"] == domain]
         cites = sum(r["cited_domains"].get(domain, 0) for r in ok)
-        if hits or cites or domain == cfg["domain"]:
+        if hits or cites or domain == own:
             sov.append({"domain": domain, "brand": name, "prompts_mentioned": len(hits), "share": round(100 * len(hits) / max(len(ok), 1)),
                         "avg_rank": round(sum(h["rank"] for h in hits) / len(hits), 1) if hits else None, "citations": cites})
     sov.sort(key=lambda s: (-s["prompts_mentioned"], s["avg_rank"] or 99))
-    run = {"ran_at": now_iso(), "model": AI_MODEL, "brand_domain": cfg["domain"], "results": results, "share_of_voice": sov}
+    return sov
+
+
+@router.post("/ai-visibility/run", dependencies=[Depends(require_editor)])
+async def run_ai_visibility():
+    provider = ai_provider()
+    if not provider:
+        raise HTTPException(status_code=409, detail="AI answer tracking is not connected. Add OPENROUTER_API_KEY (free models available) or ANTHROPIC_API_KEY to the backend environment.")
+    cfg = await load_config()
+    geo_comps = {d for ds in (cfg.get("competitors") or {}).values() for d in ds}
+    brands = {cfg["domain"]: cfg.get("brand") or brand_of(cfg["domain"], cfg), **{d: brand_of(d, cfg) for d in geo_comps}}
+    jobs = [(p, m) for m in provider["models"] for p in cfg["ai_prompts"]]
+    # Free OpenRouter models also cap requests per minute, so go gently.
+    sem = asyncio.Semaphore(2 if provider["name"] == "openrouter" else 3)
+
+    async with httpx.AsyncClient(headers=UA) as http:
+        claude = None
+        if provider["name"] == "anthropic":
+            import anthropic
+            claude = anthropic.AsyncAnthropic()
+
+        async def one(prompt, model):
+            async with sem:
+                res = await (ask_openrouter(http, model, prompt, provider["web"]) if claude is None else ask_claude(claude, prompt))
+            if "error" in res:
+                return {"prompt": prompt, "model": model, **res}
+            cited_roots = [_root(u) for u in res["cited"] or res["sources"]]
+            return {"prompt": prompt, "model": model, **res, "mentions": _mentions(res["answer"], brands), "cited_domains": dict(Counter(cited_roots))}
+
+        results = await asyncio.gather(*(one(p, m) for p, m in jobs))
+    if all("error" in r for r in results):
+        raise HTTPException(status_code=502, detail=results[0]["error"])
+    run = {"ran_at": now_iso(), "model": ", ".join(provider["models"]), "provider": provider["name"], "web": provider["web"], "brand_domain": cfg["domain"],
+           "results": results, "share_of_voice": share_of_voice(results, brands, cfg["domain"])}
     await db.seo_ai_runs.insert_one(dict(run))
     return run
 
