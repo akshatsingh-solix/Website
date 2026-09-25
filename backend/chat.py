@@ -1,58 +1,87 @@
-import os
 import re
 import json
+import time
 import uuid
 import asyncio
 import logging
-from typing import List, Literal
+from collections import defaultdict, deque
+from typing import List, Literal, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, ConfigDict
 
 from database import db, now_iso
-from knowledge import CONCIERGE_SYSTEM_PROMPT
+from knowledge import CONCIERGE_SYSTEM_PROMPT, LANGUAGE_NAMES
 from emailer import notify_lead
+from llm import ProviderError, configured_providers, stream_completion
+import sol_search
 
 logger = logging.getLogger("solix.chat")
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
-try:
-    # Only available inside Emergent's build image. On any other host this
-    # import fails, so the concierge degrades to a 503 instead of the whole
-    # API failing to start.
-    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
-except ImportError:
-    LlmChat = UserMessage = TextDelta = StreamDone = None
-
-LLM_KEY = os.environ.get("EMERGENT_LLM_KEY") if LlmChat is not None else None
-CHAT_MODEL = ("openai", "gpt-5.4-mini")
-HISTORY_LIMIT = 24
+HISTORY_LIMIT = 16
+HISTORY_CHARS = 1500
+MAX_TOOL_ROUNDS = 4
 EMAIL_RX = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 
-DEMO_TOOL = {
-    "type": "function",
-    "function": {
-        "name": "create_demo_request",
-        "description": "Save a demo request for the visitor. Call this ONLY after the visitor has given their full name, work email and company AND confirmed they want a demo. Never invent values.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "name": {"type": "string", "description": "Visitor's full name"},
-                "email": {"type": "string", "description": "Visitor's work email address"},
-                "company": {"type": "string", "description": "Visitor's company"},
-                "interest": {"type": "string", "description": "Product or solution of interest, if mentioned"},
-                "notes": {"type": "string", "description": "One-sentence summary of what the visitor wants to see or solve"},
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_site",
+            "description": "Search the Solix website (products, solutions, industries, articles, case studies, newsroom, careers, partners, company) and return matching excerpts with their page paths.",
+            "parameters": {
+                "type": "object",
+                "properties": {"query": {"type": "string", "description": "Keywords to search for, e.g. 'SAP ECC retirement' or 'HIPAA archiving'"}},
+                "required": ["query"],
             },
-            "required": ["name", "email", "company"],
         },
     },
-}
+    {
+        "type": "function",
+        "function": {
+            "name": "create_demo_request",
+            "description": "Save a demo or pricing-conversation request. Call ONLY after the visitor gave full name, work email and company AND confirmed. Never invent values.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Visitor's full name"},
+                    "email": {"type": "string", "description": "Visitor's work email address"},
+                    "company": {"type": "string", "description": "Visitor's company"},
+                    "interest": {"type": "string", "description": "Product or solution of interest, if mentioned"},
+                    "notes": {"type": "string", "description": "One-sentence summary of what the visitor wants to see or solve"},
+                },
+                "required": ["name", "email", "company"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "request_expert_contact",
+            "description": "Pass a visitor's question to a Solix expert who will reply by email. Call ONLY after the visitor gave name, email and their question AND confirmed.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "email": {"type": "string"},
+                    "company": {"type": "string"},
+                    "question": {"type": "string", "description": "The visitor's question or request, in their words"},
+                },
+                "required": ["name", "email", "question"],
+            },
+        },
+    },
+]
 
 
 class ChatRequest(BaseModel):
     session_id: str = Field(min_length=6, max_length=80)
     message: str = Field(min_length=1, max_length=2000)
+    language: str = Field(default="en", max_length=8)
+    page: Optional[str] = Field(default=None, max_length=300)
+    page_title: Optional[str] = Field(default=None, max_length=200)
 
 
 class ChatMessage(BaseModel):
@@ -64,38 +93,115 @@ class ChatMessage(BaseModel):
     created_at: str
 
 
-async def save_message(session_id: str, role: str, content: str) -> None:
-    await db.chat_messages.insert_one({"id": str(uuid.uuid4()), "session_id": session_id, "role": role, "content": content, "created_at": now_iso()})
+# --- abuse protection: per-session and per-IP sliding windows (in memory; one instance) ---
+_hits = defaultdict(deque)
+LIMITS = {"session": (20, 300), "ip": (60, 3600)}  # (messages, seconds)
+
+
+def _rate_limited(kind: str, key: str) -> bool:
+    limit, window = LIMITS[kind]
+    q, now = _hits[(kind, key)], time.monotonic()
+    while q and q[0] < now - window:
+        q.popleft()
+    if len(q) >= limit:
+        return True
+    q.append(now)
+    return False
+
+
+def _client_ip(request: Request) -> str:
+    fwd = request.headers.get("x-forwarded-for", "")
+    return fwd.split(",")[0].strip() or (request.client.host if request.client else "unknown")
+
+
+async def save_message(session_id: str, role: str, content: str, **meta) -> None:
+    await db.chat_messages.insert_one({"id": str(uuid.uuid4()), "session_id": session_id, "role": role, "content": content, "created_at": now_iso(), **meta})
 
 
 def sse(data: dict) -> str:
     return f"data: {json.dumps(data)}\n\n"
 
 
-async def create_demo_request(session_id: str, args: dict) -> dict:
-    email = (args.get("email") or "").strip()
-    name = (args.get("name") or "").strip()
-    company = (args.get("company") or "").strip()
-    if not EMAIL_RX.match(email):
-        return {"ok": False, "error": "The email address looks invalid. Ask the visitor to re-enter their work email."}
-    if len(name) < 2 or len(company) < 2:
-        return {"ok": False, "error": "Name and company are required. Ask the visitor for the missing detail."}
+def _clean(args: dict, key: str) -> str:
+    return str(args.get(key) or "").strip()
+
+
+async def _save_lead(session_id: str, kind: str, args: dict, message: Optional[str]) -> dict:
     doc = {
         "id": str(uuid.uuid4()),
-        "type": "demo",
-        "email": email,
-        "name": name,
-        "company": company,
-        "interest": (args.get("interest") or None),
-        "message": (args.get("notes") or None),
+        "type": kind,
+        "email": _clean(args, "email"),
+        "name": _clean(args, "name"),
+        "company": _clean(args, "company") or None,
+        "interest": _clean(args, "interest") or None,
+        "message": message,
         "source": "chat",
         "source_page": f"chat:{session_id}",
         "created_at": now_iso(),
     }
     await db.submissions.insert_one(dict(doc))
     asyncio.create_task(notify_lead(doc))
-    logger.info("chat demo request saved %s", doc["id"])
+    logger.info("chat %s request saved %s", kind, doc["id"])
+    return doc
+
+
+async def create_demo_request(session_id: str, args: dict) -> dict:
+    email, name, company = _clean(args, "email"), _clean(args, "name"), _clean(args, "company")
+    if not EMAIL_RX.match(email):
+        return {"ok": False, "error": "The email address looks invalid. Ask the visitor to re-enter their work email."}
+    if len(name) < 2 or len(company) < 2:
+        return {"ok": False, "error": "Name and company are required. Ask the visitor for the missing detail."}
+    doc = await _save_lead(session_id, "demo", args, _clean(args, "notes") or None)
     return {"ok": True, "submission_id": doc["id"], "message": "Demo request saved. A Solix expert will reach out within one business day."}
+
+
+async def request_expert_contact(session_id: str, args: dict) -> dict:
+    email, name, question = _clean(args, "email"), _clean(args, "name"), _clean(args, "question")
+    if not EMAIL_RX.match(email):
+        return {"ok": False, "error": "The email address looks invalid. Ask the visitor to re-enter it."}
+    if len(name) < 2 or len(question) < 3:
+        return {"ok": False, "error": "Name and the question are required. Ask the visitor for the missing detail."}
+    doc = await _save_lead(session_id, "contact", args, question)
+    return {"ok": True, "submission_id": doc["id"], "message": "Question passed to a Solix expert, who will reply by email within one business day."}
+
+
+def _retrieve(message: str, history: List[dict], page: Optional[str]) -> List[dict]:
+    """Top excerpts for this turn, plus the page the visitor is reading."""
+    last_user = next((m["content"] for m in reversed(history) if m["role"] == "user"), "")
+    hits = sol_search.search(message, 6)
+    # Short follow-ups ("and for healthcare?") lean on the previous question.
+    if len(message.split()) < 8 and last_user:
+        hits += sol_search.search(f"{last_user} {message}", 4)
+    if page and page not in ("/", ""):
+        hits = [c for c in sol_search.index().chunks if c["url"] == page.split("?")[0]][:2] + hits
+    seen, per_url, out = set(), defaultdict(int), []
+    for h in hits:
+        if h["id"] in seen or per_url[h["url"]] >= 3:
+            continue
+        seen.add(h["id"])
+        per_url[h["url"]] += 1
+        out.append(h)
+    return out[:7]
+
+
+def _sources(message: str) -> List[dict]:
+    """Pages worth showing as 'Related' chips: only clearly relevant ones."""
+    hits = sol_search.search(message, 8)
+    if not hits or hits[0]["score"] < 6:
+        return []
+    top, out, urls = hits[0]["score"], [], set()
+    for h in hits:
+        if h["score"] < top * 0.6 or h["url"] in urls:
+            continue
+        urls.add(h["url"])
+        out.append({"title": h["title"].split(":")[0], "url": h["url"]})
+    return out[:3]
+
+
+@router.get("/status")
+async def chat_status():
+    """Which AI providers are configured (names only), for health checks."""
+    return {"ai": bool(configured_providers()), "providers": [p.name for p in configured_providers()], "knowledge_chunks": len(sol_search.index().chunks)}
 
 
 @router.get("/{session_id}", response_model=List[ChatMessage])
@@ -111,61 +217,77 @@ async def clear_chat_history(session_id: str):
 
 
 @router.post("/stream")
-async def chat_stream(req: ChatRequest):
-    if not LLM_KEY:
+async def chat_stream(req: ChatRequest, request: Request):
+    if not configured_providers():
         raise HTTPException(status_code=503, detail="AI concierge is not configured")
+    if _rate_limited("session", req.session_id) or _rate_limited("ip", _client_ip(request)):
+        raise HTTPException(status_code=429, detail="Too many messages. Please wait a moment.")
 
-    history = await db.chat_messages.find({"session_id": req.session_id}, {"_id": 0, "role": 1, "content": 1}).sort("created_at", 1).to_list(HISTORY_LIMIT)
-    initial = [{"role": "system", "content": CONCIERGE_SYSTEM_PROMPT}] + [{"role": m["role"], "content": m["content"]} for m in history]
+    recent = await db.chat_messages.find({"session_id": req.session_id}, {"_id": 0, "role": 1, "content": 1}).sort("created_at", -1).to_list(HISTORY_LIMIT)
+    history = [{"role": m["role"], "content": m["content"][:HISTORY_CHARS]} for m in reversed(recent)]
 
-    chat = (
-        LlmChat(api_key=LLM_KEY, session_id=req.session_id, system_message=CONCIERGE_SYSTEM_PROMPT, initial_messages=initial)
-        .with_model(*CHAT_MODEL)
-        .with_tools([DEMO_TOOL], tool_choice="auto")
+    lang = LANGUAGE_NAMES.get(req.language.split("-")[0].lower(), "English")
+    context = sol_search.format_context(_retrieve(req.message, history, req.page))
+    visitor = f"The visitor is on page {req.page}" + (f' ("{req.page_title}")' if req.page_title else "") + "." if req.page else "Page unknown."
+    turn_system = (
+        f"{visitor} Reply in {lang}; keep product names and page paths as they are.\n\n"
+        f"Site knowledge for this turn:\n{context or '(no matching pages; use search_site or offer an expert)'}"
     )
-
-    async def run_turn(user_message):
-        text = ""
-        pending = None
-        async for event in chat.stream_message(user_message):
-            if isinstance(event, TextDelta):
-                text += event.content
-                yield sse({"delta": event.content}), None
-            elif isinstance(event, StreamDone):
-                pending = event.tool_calls
-        yield None, (text, pending)
+    # One leading system message: some providers reject system turns mid-conversation.
+    messages = [{"role": "system", "content": f"{CONCIERGE_SYSTEM_PROMPT}\n\n## This turn\n{turn_system}"}, *history, {"role": "user", "content": req.message}]
 
     async def generate():
-        await save_message(req.session_id, "user", req.message)
-        full = ""
+        await save_message(req.session_id, "user", req.message, page=req.page, language=req.language)
+        full, meta, tools_used = "", {}, []
         try:
-            user_message = UserMessage(text=req.message)
-            for _ in range(3):
-                result = None
-                async for chunk, done in run_turn(user_message):
-                    if chunk:
-                        yield chunk
-                    if done:
-                        result = done
-                text, tool_calls = result
+            for round_no in range(MAX_TOOL_ROUNDS):
+                text, calls = "", []
+                # The last round gets no tools so the model must answer.
+                async for event in stream_completion(messages, TOOLS if round_no < MAX_TOOL_ROUNDS - 1 else None):
+                    if event["type"] == "text":
+                        text += event["text"]
+                        yield sse({"delta": event["text"]})
+                    elif event["type"] == "tool_calls":
+                        calls = event["calls"]
+                    elif event["type"] == "meta":
+                        meta = {"provider": event["provider"], "model": event["model"]}
                 full += text
-                if not tool_calls:
+                if not calls:
                     break
-                for tc in tool_calls:
-                    if tc.name == "create_demo_request":
-                        outcome = await create_demo_request(req.session_id, tc.arguments)
+                messages.append({"role": "assistant", "content": text or None, "tool_calls": [
+                    {"id": c["id"], "type": "function", "function": {"name": c["name"], "arguments": json.dumps(c["arguments"])}} for c in calls]})
+                for c in calls:
+                    tools_used.append(c["name"])
+                    if c["name"] == "search_site":
+                        hits = sol_search.search(str(c["arguments"].get("query", "")), 5)
+                        outcome = {"results": [{"title": h["title"], "page": h["url"], "text": h["text"][:1200]} for h in hits]} if hits else {"results": [], "note": "Nothing on the site matches."}
+                    elif c["name"] == "create_demo_request":
+                        outcome = await create_demo_request(req.session_id, c["arguments"])
                         if outcome.get("ok"):
-                            yield sse({"event": "demo_booked", "submission_id": outcome["submission_id"], "name": tc.arguments.get("name"), "email": tc.arguments.get("email"), "company": tc.arguments.get("company")})
+                            yield sse({"event": "demo_booked", "submission_id": outcome["submission_id"], "name": c["arguments"].get("name"), "email": c["arguments"].get("email"), "company": c["arguments"].get("company")})
+                    elif c["name"] == "request_expert_contact":
+                        outcome = await request_expert_contact(req.session_id, c["arguments"])
+                        if outcome.get("ok"):
+                            yield sse({"event": "expert_requested", "submission_id": outcome["submission_id"], "name": c["arguments"].get("name"), "email": c["arguments"].get("email")})
                     else:
-                        outcome = {"ok": False, "error": f"Unknown tool {tc.name}"}
-                    chat.add_tool_result(tc.id, json.dumps(outcome))
-                user_message = None
+                        outcome = {"ok": False, "error": f"Unknown tool {c['name']}"}
+                    messages.append({"role": "tool", "tool_call_id": c["id"], "name": c["name"], "content": json.dumps(outcome)})
+                if text and not text.endswith(("\n", " ")):
+                    full += "\n\n"
+                    yield sse({"delta": "\n\n"})
+        except ProviderError as e:
+            logger.error("Sol could not answer: %s", e)
+            yield sse({"error": "The concierge is temporarily unavailable. Please try again."})
+            return
         except Exception:
             logger.exception("chat stream failed")
             yield sse({"error": "The concierge is temporarily unavailable. Please try again."})
             return
+        sources = _sources(req.message)
+        if sources:
+            yield sse({"event": "sources", "sources": sources})
         if full:
-            await save_message(req.session_id, "assistant", full)
+            await save_message(req.session_id, "assistant", full, tools=tools_used or None, **meta)
         yield sse({"done": True})
 
     return StreamingResponse(generate(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

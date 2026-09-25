@@ -56,12 +56,13 @@ export const fetchChatHistory = (sessionId) => api.get(`/chat/${sessionId}`).the
 export const clearChatHistory = (sessionId) => api.delete(`/chat/${sessionId}`);
 
 /**
- * Streams an AI concierge reply. Resolves to "ok", or to "unavailable" when
- * the backend has no model configured, errors before replying, or doesn't
- * answer within `timeoutMs` - the caller then answers with the built-in
- * concierge instead.
+ * Streams an AI concierge reply. Resolves to "ok"; "rate_limited" when the
+ * visitor is sending too fast; or "unavailable" when the backend has no model
+ * configured, errors before replying, or doesn't answer within `timeoutMs` -
+ * the caller then answers with the built-in concierge instead. `page` and
+ * `pageTitle` tell Sol what the visitor is looking at.
  */
-export async function streamChat({ sessionId, message, language = "en", onDelta, onEvent, onError, timeoutMs = 8000 }) {
+export async function streamChat({ sessionId, message, language = "en", page, pageTitle, onDelta, onEvent, onError, timeoutMs = 8000 }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res;
@@ -69,7 +70,7 @@ export async function streamChat({ sessionId, message, language = "en", onDelta,
     res = await fetch(`${API}/chat/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, message, language }),
+      body: JSON.stringify({ session_id: sessionId, message, language, page, page_title: pageTitle }),
       signal: controller.signal,
     });
   } catch {
@@ -77,6 +78,7 @@ export async function streamChat({ sessionId, message, language = "en", onDelta,
   } finally {
     clearTimeout(timer);
   }
+  if (res.status === 429) return "rate_limited";
   if (!res.ok || !res.body) return "unavailable";
   const reader = res.body.getReader();
   const decoder = new TextDecoder();

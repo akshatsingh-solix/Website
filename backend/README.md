@@ -9,9 +9,9 @@ files — it cannot run this service.
 Once deployed with a database and the four required secrets below, everything
 works except two optional Emergent-platform integrations:
 
-- **AI concierge chat** (`EMERGENT_LLM_KEY`) — without it, `/api/chat/stream`
-  returns a clean 503 and the widget shows "temporarily unavailable" instead
-  of crashing.
+- **AI concierge chat (Sol)** — needs one free AI key (see "Sol" below).
+  Without one, `/api/chat/stream` returns a clean 503 and the widget answers
+  with its built-in scripted concierge instead.
 - **Outbound lead email alerts** (`EMERGENT_EMAIL_KEY`) — without it, leads
   still save to MongoDB and show up in the admin dashboard; only the email
   ping to your sales inbox is skipped.
@@ -42,6 +42,51 @@ fully with just MongoDB configured.
 Any other Python host (Railway, Fly.io, a VM) works too — the `Dockerfile`
 here builds and runs the same service; just set the same environment
 variables (see `.env.example`).
+
+## Sol, the AI concierge
+
+Sol answers visitors in the site's chat widget. It runs on free-tier models
+and is built like a production assistant:
+
+- **Grounded answers (RAG).** `sol_knowledge.json` holds every product,
+  solution, industry, article, press release, job, partner programme and
+  service page on the site, split into ~150 sections with their URLs. Each
+  question is matched against it with BM25 (in-process keyword search: no
+  embedding API or vector database to pay for) and the best sections go into
+  the prompt, so Sol quotes the site and links the page it drew on.
+  Regenerate after changing site content (the deploy workflow warns when it's
+  stale): `cd frontend && node scripts/sol-knowledge.js`
+- **Tools.** `search_site` (Sol looks things up itself when the first
+  retrieval isn't enough), `create_demo_request` and `request_expert_contact`
+  (both save to Leads with `source: chat` and trigger the sales alert email).
+- **Context.** Sol knows the page the visitor is on, the last 16 messages of
+  the conversation, and replies in the site language they chose (EN/ES/FR/DE).
+- **Failover.** Providers and models are tried in order; one that is rate
+  limited or down is skipped (and rested for a minute) so free-tier limits
+  never reach the visitor. If all fail, the widget falls back to its
+  built-in scripted concierge.
+- **Guardrails.** Prompt-injection resistant system prompt, no invented
+  pricing or customers, per-session (20 per 5 min) and per-IP (60 per hour)
+  rate limits.
+- **Admin → Sol chats.** Every conversation, the page it started on, the
+  model that answered, and whether it became a lead.
+
+Set at least one key on the backend (all free, no card needed):
+
+| Provider | Env var | Get a key | Default models (`SOL_*_MODELS` to change) |
+|---|---|---|---|
+| Google Gemini | `GEMINI_API_KEY` | https://aistudio.google.com/apikey | `gemini-2.5-flash,gemini-2.5-flash-lite` |
+| Groq | `GROQ_API_KEY` | https://console.groq.com/keys | `openai/gpt-oss-120b,openai/gpt-oss-20b` |
+| Mistral (Experiment plan) | `MISTRAL_API_KEY` | https://console.mistral.ai | `mistral-small-latest` |
+| OpenRouter | `OPENROUTER_API_KEY` (shared with SEO) | https://openrouter.ai/keys | `SOL_OPENROUTER_MODELS`, else `OPENROUTER_MODELS` |
+| Any OpenAI-compatible server | `SOL_CUSTOM_BASE_URL`, `SOL_CUSTOM_API_KEY`, `SOL_CUSTOM_MODELS` | e.g. a model you host, Together, Cerebras | — |
+
+`SOL_PROVIDER_ORDER` (default `gemini,groq,mistral,openrouter,custom`) sets
+the order. Setting two or three keys is recommended: Gemini for quality,
+Groq for speed, OpenRouter as the last resort. `GET /api/chat/status` shows
+which providers are active. Free tiers may use prompts to improve their
+models, so move to a paid key (same variables) before handling sensitive
+customer data.
 
 ## SEO / AEO / GEO analytics (Admin → SEO)
 
