@@ -12,6 +12,16 @@ os.environ.setdefault("DB_NAME", "solix_test")
 import seo  # noqa: E402
 
 
+def run_sync(coro):
+    """Run a coroutine on a private loop; asyncio.run() would unset the
+    thread's default loop and break other tests sharing this worker."""
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
+
+
 def test_parse_semrush_csv_maps_by_position():
     rows = seo.parse_semrush_csv("Keyword;Position;Search Volume\ndata archiving;3;1900\n", ["Ph", "Po", "Nq"])
     assert rows == [{"Ph": "data archiving", "Po": "3", "Nq": "1900"}]
@@ -76,7 +86,7 @@ def test_gather_topic_scores_momentum_with_mocked_sources():
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as c:
             return await seo.gather_topic(c, "AI Act")
 
-    t = asyncio.run(run())
+    t = run_sync(run())
     assert t["mentions_30d"] == 4 and t["mentions_7d"] == 2
     assert t["voices"] == {"news": 2, "practitioners": 2}
     assert t["failed_sources"] == []  # reddit non-200 degrades to empty, not a failure
@@ -101,14 +111,14 @@ def test_openrouter_answer_and_citations(monkeypatch):
         return httpx.Response(200, json={"choices": [{"message": {"content": "Solix and Informatica.", "annotations": [
             {"type": "url_citation", "url_citation": {"url": "https://www.solix.com/x"}}]}}]})
 
-    res = asyncio.run(_openrouter(handler)(web=True))
+    res = run_sync(_openrouter(handler)(web=True))
     assert res["answer"] == "Solix and Informatica." and res["cited"] == ["https://www.solix.com/x"]
     assert seen["plugins"] == [{"id": "web", "max_results": 5}] and seen["model"].endswith(":free")
 
 
 def test_openrouter_no_web_by_default_and_rate_limit(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "k")
-    res = asyncio.run(_openrouter(lambda req: httpx.Response(429, json={"error": {"message": "limit"}}))(web=False))
+    res = run_sync(_openrouter(lambda req: httpx.Response(429, json={"error": {"message": "limit"}}))(web=False))
     assert "50 requests a day" in res["error"]
 
 
@@ -126,6 +136,6 @@ def test_ai_provider_prefers_openrouter(monkeypatch):
 def test_role_check_blocks_viewers():
     check = seo._roles("admin")
     with pytest.raises(seo.HTTPException) as e:
-        asyncio.run(check(user={"role": "viewer"}))
+        run_sync(check(user={"role": "viewer"}))
     assert e.value.status_code == 403
-    assert asyncio.run(check(user={"role": "admin"}))["role"] == "admin"
+    assert run_sync(check(user={"role": "admin"}))["role"] == "admin"

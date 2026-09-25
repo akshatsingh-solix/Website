@@ -16,6 +16,7 @@ falls back to clearly labelled sample data.
 """
 import asyncio
 import csv
+import importlib.util
 import io
 import logging
 import os
@@ -626,7 +627,7 @@ def ai_provider() -> Optional[dict]:
     if os.environ.get("OPENROUTER_API_KEY"):
         models = [m.strip() for m in os.environ.get("OPENROUTER_MODELS", DEFAULT_OPENROUTER_MODELS).split(",") if m.strip()]
         return {"name": "openrouter", "models": models, "web": os.environ.get("OPENROUTER_WEB") == "1"}
-    if os.environ.get("ANTHROPIC_API_KEY"):
+    if os.environ.get("ANTHROPIC_API_KEY") and importlib.util.find_spec("anthropic"):
         return {"name": "anthropic", "models": [AI_MODEL], "web": True}
     return None
 
