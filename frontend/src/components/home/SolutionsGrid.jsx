@@ -3,11 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SOLUTIONS, PRODUCTS } from "@/data/site";
-import { Section, SectionHeading } from "@/components/shared/Section";
-import { Stagger, Item } from "@/components/shared/Reveal";
+import { PRODUCTS } from "@/data/site";
 import { useTx } from "@/i18n/tx";
-import { useMediaQuery } from "@/hooks/use-media-query";
 
 export const SolutionCard = ({ s, detailed = false }) => {
   const tx = useTx();
@@ -41,16 +38,16 @@ export const SolutionCard = ({ s, detailed = false }) => {
 };
 
 /**
- * Chapter 05 on desktop: six outcome panels in a row. The open panel widens
+ * Outcome programmes on desktop: six panels in a row. The open panel widens
  * to tell its story (metric, programme, products); the others stand as
  * narrow spines with their title set vertically. Hover, focus or tap opens a
  * panel. Phones and tablets get the card grid.
  */
-const OutcomePanels = ({ items }) => {
+export const OutcomePanels = ({ items, className }) => {
   const tx = useTx();
   const [open, setOpen] = useState(0);
   return (
-    <div className="mt-14 flex h-[540px] gap-3" data-testid="outcome-panels">
+    <div className={cn("flex h-[540px] gap-3", className)} data-testid="outcome-panels">
       {items.map((s, i) => {
         const on = i === open;
         const Icon = s.icon;
@@ -106,33 +103,5 @@ const OutcomePanels = ({ items }) => {
         );
       })}
     </div>
-  );
-};
-
-export const SolutionsGrid = () => {
-  const items = SOLUTIONS.slice(0, 6);
-  const wide = useMediaQuery("(min-width: 1024px)");
-  return (
-    <Section className="bg-muted" id="the-outcomes">
-      <div className="container">
-        <SectionHeading
-          chapter="05"
-          eyebrow="The outcomes"
-          title="Start with the outcome. We'll bring the platform."
-          description="Six programs, each with a measurable target and a proven path. Mix and match: they share one foundation."
-        />
-        {wide ? (
-          <OutcomePanels items={items} />
-        ) : (
-          <Stagger className="mt-12 grid gap-4 md:grid-cols-2">
-            {items.map((s) => (
-              <Item key={s.id} className="flex">
-                <SolutionCard s={s} />
-              </Item>
-            ))}
-          </Stagger>
-        )}
-      </div>
-    </Section>
   );
 };

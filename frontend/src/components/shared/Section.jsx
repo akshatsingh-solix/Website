@@ -47,7 +47,7 @@ export const SectionHeading = ({ eyebrow, chapter, title, description, align = "
       </h2>
       {description && (
         <Reveal delay={0.15} y={16}>
-          <p className="mt-5 text-fluid-sm leading-relaxed text-muted-foreground">{tx(description)}</p>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground lg:text-[1.05rem]">{tx(description)}</p>
         </Reveal>
       )}
     </div>

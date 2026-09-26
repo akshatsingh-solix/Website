@@ -7,6 +7,7 @@ import { Reveal, Stagger, Item, Tilt } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
+import { FlowExplainer } from "@/components/products/FlowExplainer";
 
 export default function Platform() {
   const tx = useTx();
@@ -15,7 +16,7 @@ export default function Platform() {
       <PageHero
         eyebrow="Platform"
         crumbs={[{ label: "Platform" }]}
-        image="/Website/images/platform-cube.jpg"
+        image="/Website/images/key-slabs.jpg"
         title="One governed platform, deployed however your enterprise runs."
         description="SOLIXCloud, your cloud, on-premises or hybrid. Every deployment model runs the same Common Data Platform, the same policy engine and the same audit trail."
       >
@@ -24,7 +25,9 @@ export default function Platform() {
         </Button>
       </PageHero>
 
-      {PLATFORM_SECTIONS.map((s, i) => (
+      {PLATFORM_SECTIONS.map((s, i) => [
+        // The live flow diagram sits after the first section, between light bands.
+        i === 1 && <FlowExplainer key="flow" />,
         <Section key={s.id} id={s.id} bordered className={i % 2 === 1 ? "bg-muted" : undefined}>
           <div className="container grid gap-12 lg:grid-cols-12 lg:items-center">
             <div className={i % 2 === 1 ? "lg:col-span-7 lg:col-start-6 lg:order-2" : "lg:col-span-7"}>
@@ -52,7 +55,7 @@ export default function Platform() {
             </Reveal>
           </div>
         </Section>
-      ))}
+      ])}
 
       <CTABand eyebrow="Start your 30-day free trial" title="See Enterprise Edition on your own data." primary={{ label: "Try Solix", to: "/signup" }} />
     </div>

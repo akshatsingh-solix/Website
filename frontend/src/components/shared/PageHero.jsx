@@ -5,7 +5,9 @@ import { motion, useMotionValue, useScroll, useSpring, useTransform } from "fram
 import { cn } from "@/lib/utils";
 import { useTx } from "@/i18n/tx";
 import { Reveal } from "./Reveal";
+import { webpSrcSet } from "./Picture";
 import { SignalField } from "@/components/motion/signal/SignalField";
+import { Nebula } from "@/components/motion/signal/Nebula";
 import { SplitWords } from "@/components/motion/KineticText";
 import { ScrambleText } from "@/components/motion/Scramble";
 import { useDarkSurface } from "@/components/layout/navTone";
@@ -90,7 +92,10 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
 
   return (
     <motion.section ref={ref} style={{ scale: slabScale, transformOrigin: "50% 0%" }} className={cn("dark relative isolate overflow-hidden rounded-b-[2rem] bg-background text-foreground sm:rounded-b-[3rem]", className)} data-testid="page-hero">
-      <div className="absolute inset-0 -z-10 grid-lines grid-fade opacity-80" />
+      <div className="absolute inset-0 -z-10 opacity-90">
+        <Nebula scale={0.3} />
+      </div>
+      <div className="absolute inset-0 -z-10 grid-lines grid-fade opacity-60" />
       <div className="absolute -z-10 right-[-8%] top-1/2 h-[80vmin] w-[80vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.2),transparent)]" />
       <div className="absolute -z-10 left-[-12%] top-[-25%] h-[60vmin] w-[60vmin] rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.13),transparent)]" />
       <div className="absolute inset-0 -z-10">
@@ -135,7 +140,10 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
                   <div className="relative rounded-3xl shadow-[0_2px_6px_rgba(0,0,0,0.2),0_50px_100px_-45px_rgba(0,0,0,0.85)]">{media}</div>
                 ) : (
                   <div className="relative overflow-hidden rounded-3xl border border-line/15 bg-background shadow-[0_2px_6px_rgba(0,0,0,0.2),0_50px_100px_-45px_rgba(0,0,0,0.85)]">
-                    <motion.img src={image} alt="" style={{ y: imgY, scale: 1.12 }} className="aspect-[4/3] w-full object-cover" />
+                    <picture style={{ display: "contents" }}>
+                      {webpSrcSet(image) && <source type="image/webp" srcSet={webpSrcSet(image)} sizes="(min-width: 1024px) 42vw, 100vw" />}
+                      <motion.img src={image} alt="" style={{ y: imgY, scale: 1.12 }} className="aspect-[4/3] w-full object-cover" decoding="async" />
+                    </picture>
                     <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
                     <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/80">{tx(eyebrow || "Solix")}</span>
@@ -147,6 +155,11 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
                     </div>
                   </div>
                 )}
+                {/* HUD corners framing the visual. */}
+                <span aria-hidden="true" className="pointer-events-none absolute -left-3 -top-3 h-6 w-6 border-l border-t border-line/40" />
+                <span aria-hidden="true" className="pointer-events-none absolute -right-3 -top-3 h-6 w-6 border-r border-t border-line/40" />
+                <span aria-hidden="true" className="pointer-events-none absolute -bottom-3 -left-3 h-6 w-6 border-b border-l border-line/40" />
+                <span aria-hidden="true" className="pointer-events-none absolute -bottom-3 -right-3 h-6 w-6 border-b border-r border-line/40" />
                 {/* One scan pass across the window as it opens. */}
                 <motion.span
                   aria-hidden="true"

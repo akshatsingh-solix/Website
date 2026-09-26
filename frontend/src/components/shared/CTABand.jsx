@@ -22,7 +22,7 @@ export const CTABand = ({
   description = "Bring one system you wish you could switch off, one dataset your AI team can't touch, or one audit you dread. We'll show you the path.",
   primary = { label: "Request a demo", to: "/contact" },
   secondary = { label: "Talk to an expert", to: "/contact?type=contact" },
-  image = "/Website/images/prod-cdp.jpg",
+  image = "/Website/images/key-bolt.jpg",
 }) => {
   const tx = useTx();
   const ref = useRef(null);
