@@ -21,11 +21,11 @@ export const ResourceCard = ({ r, className }) => {
     <Link
       to={`/resources/${r.slug}`}
       data-testid={`resource-card-${r.id}`}
-      className={cn("group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-card p-6 text-left shadow-soft card-hover", className)}
+      className={cn("spot group relative flex h-full w-full flex-col overflow-hidden rounded-3xl border border-line/10 bg-card p-6 text-left shadow-soft card-hover", className)}
     >
       <span className="absolute inset-x-0 top-0 z-10 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-teal to-primary transition-transform duration-500 group-hover:scale-x-100" />
       <div className="dark relative -mx-6 -mt-6 mb-5 aspect-[16/7] overflow-hidden border-b border-line/10 bg-background">
-        <img src={(r.cover && fileHref(r.cover)) || resourceCover(r.type)} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <img src={(r.cover && fileHref(r.cover)) || resourceCover(r.type)} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform [transition-duration:1200ms] ease-out group-hover:scale-110" />
       </div>
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-2 rounded-full bg-teal/10 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-teal">

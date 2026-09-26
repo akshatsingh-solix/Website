@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Plug, ShieldCheck, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AuroraField, Reveal } from "@/components/shared/Reveal";
+import { AuroraField, Reveal, Tilt } from "@/components/shared/Reveal";
 import { SectionHeading } from "@/components/shared/Section";
 import { DataFlowDiagram } from "./DataFlowDiagram";
 import { useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
+import { useDarkSurface } from "@/components/layout/navTone";
 
 const STEPS = [
   { key: "sources", icon: Plug, title: "Connect every system", desc: "150+ connectors pull live, inactive and retired data from ERP, CRM, mainframes, files and SaaS, with full context intact." },
@@ -28,6 +29,8 @@ export const PlatformStory = () => {
   const steps = useLocalized(STEPS);
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const ref = useRef(null);
+  useDarkSurface(ref);
 
   useEffect(() => {
     if (paused) return;
@@ -36,7 +39,7 @@ export const PlatformStory = () => {
   }, [paused]);
 
   return (
-    <section className="dark relative overflow-hidden bg-background py-16 text-foreground sm:py-20 lg:py-24" id="the-platform" data-testid="platform-story">
+    <section ref={ref} className="dark relative overflow-hidden bg-background py-20 text-foreground sm:py-24 lg:py-32" id="the-platform" data-testid="platform-story">
       <div className="absolute inset-0 grid-lines grid-fade" />
       <AuroraField />
       <div className="container relative grid items-center gap-12 lg:grid-cols-12 lg:gap-10">
@@ -56,7 +59,7 @@ export const PlatformStory = () => {
                     aria-pressed={on}
                     data-testid={`platform-step-${s.key}`}
                     className={cn(
-                      "relative w-full overflow-hidden rounded-2xl border p-5 text-left transition-[background-color,border-color] duration-300",
+                      "spot relative w-full overflow-hidden rounded-2xl border p-5 text-left transition-[background-color,border-color] duration-300",
                       on ? "border-line/15 bg-card" : "border-transparent hover:bg-line/[0.03]"
                     )}
                   >
@@ -90,7 +93,8 @@ export const PlatformStory = () => {
         </div>
 
         <Reveal delay={0.1} className="lg:col-span-7">
-          <div className="relative rounded-3xl border border-line/10 bg-card/60 p-4 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.8)] backdrop-blur sm:p-6">
+          <Tilt max={4}>
+          <div className="beam-border relative rounded-3xl border border-line/10 bg-card/60 p-4 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.8)] backdrop-blur sm:p-6">
             <div className="mb-2 flex items-center justify-between px-1">
               <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{tx("Common Data Platform")}</span>
               <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-teal">
@@ -107,6 +111,7 @@ export const PlatformStory = () => {
               ))}
             </div>
           </div>
+          </Tilt>
         </Reveal>
       </div>
     </section>

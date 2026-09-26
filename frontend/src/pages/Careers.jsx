@@ -36,7 +36,7 @@ export default function Careers() {
                 <button
                   onClick={() => setJob(j)}
                   data-testid={`job-card-${j.id}`}
-                  className="group grid w-full gap-4 rounded-2xl border border-line/10 bg-card p-6 text-left card-hover sm:grid-cols-12 sm:items-center"
+                  className="spot relative group grid w-full gap-4 rounded-2xl border border-line/10 bg-card p-6 text-left card-hover sm:grid-cols-12 sm:items-center"
                 >
                   <div className="sm:col-span-7">
                     <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary-ink">{j.icon && <span className="grid h-6 w-6 place-items-center rounded-md bg-primary/10"><j.icon className="h-3.5 w-3.5" strokeWidth={1.75} /></span>}{j.team}</p>

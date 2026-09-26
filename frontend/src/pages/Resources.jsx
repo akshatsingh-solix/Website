@@ -4,6 +4,7 @@ import { useCmsResources } from "@/lib/content";
 import { detectTopics } from "@/lib/localConcierge";
 import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { RESOURCES, RESOURCE_TYPES } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
@@ -65,11 +66,12 @@ export default function Resources() {
                   onClick={() => setParams(t.key === "all" ? {} : { type: t.key })}
                   data-testid={`resource-filter-${t.key}`}
                   className={cn(
-                    "rounded-full border px-4 py-2 text-sm transition-[background-color,border-color,color] duration-200",
-                    type === t.key ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:border-line/40 hover:text-foreground"
+                    "relative rounded-full border px-4 py-2 text-sm transition-[border-color,color] duration-200",
+                    type === t.key ? "border-primary text-white" : "border-line/15 text-muted-foreground hover:border-line/40 hover:text-foreground"
                   )}
                 >
-                  {t.label}
+                  {type === t.key && <motion.span layoutId="resource-filter-pill" className="absolute inset-0 rounded-full bg-primary" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+                  <span className="relative">{t.label}</span>
                 </button>
               ))}
             </div>

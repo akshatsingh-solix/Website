@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
-import { ArrowRight, Linkedin, Twitter, Youtube, Check, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowUp, Linkedin, Twitter, Youtube, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { NAV, OFFICES } from "@/data/site";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,63 @@ import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/shared/Logo";
 import { submitLead } from "@/lib/api";
 import { NAV_LABEL_KEYS } from "./Navbar";
+import { Magnetic } from "@/components/shared/Reveal";
+import { scrollWindowTo } from "@/components/motion/SmoothScroll";
+import { useDarkSurface } from "./navTone";
+
+/**
+ * The sign-off: SOLIX set huge in outline. The letters rise into place as
+ * the footer arrives, and a red-into-blue light follows the pointer through
+ * them, filling the type where it passes.
+ */
+const Wordmark = () => {
+  const ref = useRef(null);
+  const onMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--fx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--fy", `${e.clientY - r.top}px`);
+    el.style.setProperty("--fo", "1");
+  };
+  const letters = ["S", "O", "L", "I", "X"];
+  const row = (extra) =>
+    letters.map((l, i) => (
+      <motion.span
+        key={l}
+        className="inline-block"
+        initial={{ y: "70%", opacity: 0 }}
+        whileInView={{ y: "0%", opacity: 1 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 1.1, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+        {...extra}
+      >
+        {l}
+      </motion.span>
+    ));
+  return (
+    <div
+      ref={ref}
+      onPointerMove={onMove}
+      onPointerLeave={() => ref.current?.style.setProperty("--fo", "0")}
+      className="relative mt-12 select-none overflow-hidden"
+      style={{ "--fx": "50%", "--fy": "50%", "--fo": "0" }}
+      aria-hidden="true"
+      data-testid="footer-wordmark"
+    >
+      <p className="text-outline font-display text-[25vw] font-semibold leading-[0.8] tracking-[-0.045em] lg:text-[23vw] 2xl:text-[21rem]">{row()}</p>
+      <p
+        className="pointer-events-none absolute inset-0 bg-clip-text font-display text-[25vw] font-semibold leading-[0.8] tracking-[-0.045em] text-transparent transition-opacity duration-500 lg:text-[23vw] 2xl:text-[21rem]"
+        style={{
+          opacity: "var(--fo)",
+          backgroundImage: "radial-gradient(circle at var(--fx) var(--fy), #EE2424 0, #EE2424 6%, #0088CF 20%, transparent 34%)",
+        }}
+      >
+        {row()}
+      </p>
+    </div>
+  );
+};
 
 const NewsletterForm = () => {
   const { t } = useTranslation();
@@ -55,8 +113,10 @@ const NewsletterForm = () => {
 export const Footer = () => {
   const { t } = useTranslation();
   const tx = useTx();
+  const ref = useRef(null);
+  useDarkSurface(ref);
   return (
-  <footer className="dark relative overflow-hidden bg-background text-foreground" data-testid="site-footer">
+  <footer ref={ref} className="dark relative overflow-hidden bg-background text-foreground" data-testid="site-footer">
     <div className="absolute inset-0 grid-lines grid-fade opacity-70" />
     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
     <div className="absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.18),transparent)]" />
@@ -129,8 +189,19 @@ export const Footer = () => {
         ))}
       </div>
 
-      <div className="mt-12 select-none overflow-hidden">
-        <p className="font-display text-[22vw] font-semibold leading-[0.8] tracking-tighter text-line/[0.05] lg:text-[13vw]">SOLIX</p>
+      <div className="relative">
+        <Wordmark />
+        <Magnetic strength={0.35} className="absolute right-0 top-14 z-10 sm:top-16">
+          <button
+            type="button"
+            onClick={() => scrollWindowTo(0)}
+            className="group grid h-12 w-12 place-items-center rounded-full border border-line/15 text-foreground transition-[border-color,background-color] duration-300 hover:border-primary hover:bg-primary"
+            aria-label={tx("Back to top")}
+            data-testid="footer-back-to-top"
+          >
+            <ArrowUp className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
+          </button>
+        </Magnetic>
       </div>
 
       <div className="mt-6 flex flex-col gap-3 border-t border-line/10 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">

@@ -19,7 +19,7 @@ export const ApproachTimeline = () => {
           <span className="absolute left-0 top-0 grid h-14 w-14 place-items-center rounded-2xl border border-line/10 bg-accent/50 text-teal lg:relative lg:mb-6">
             <s.icon className="h-6 w-6" strokeWidth={1.5} />
           </span>
-          <div className="rounded-2xl border border-line/10 bg-card p-6 card-hover">
+          <div className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs text-primary-ink">{s.n}</span>
               <span className="rounded-full border border-line/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{s.duration}</span>

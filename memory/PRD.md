@@ -57,6 +57,15 @@ Rebuild the Solix Technologies website (https://www.solix.com/) from scratch as 
 - **Sales inbox reminder**: amber banner on admin Leads page while alert recipient is still `delivered@resend.dev` (user has skipped providing a real address twice).
 - Self-tested via screenshots/curl (PDF download, status save, filter, banner). No testing_agent run this iteration.
 
+### Iteration 5 (2026-09) — "Signal" motion redesign
+Design language: every page opens in a navy data field and resolves into the light editorial canvas as you scroll (noise into signal). Brand tokens unchanged (Solix Red #EE2424, Solix Blue #0088CF, navy scale, Outfit / IBM Plex Sans / JetBrains Mono); blue still never fills a button.
+- **SignalField** (`components/motion/signal/`): raw-WebGL particle engine (no 3D library), code-split, draws only on screen. Formations: flow (streams funnelling through a core), cloud, sphere, globe, bolt (the Solix mark), stack, cube, ring, helix, grid, `text:<word>`. Pointer repulsion + camera parallax, click shockwave. Reduced motion = one still frame; no WebGL = CSS glow.
+- **Motion core** (`components/motion/`): Lenis smooth scroll (off for touch + reduced motion, pauses under Radix scroll locks), route curtain (Layout swaps routes under it; `FrozenOutlet` keeps the leaving page), first-session intro ident (skipped for reduced motion, slow networks, automation; `?intro=1` forces it), scroll progress bar, SplitWords kinetic headlines, ScrambleText decode labels, Odometer counters, VelocityMarquee, delegated pointer spotlight (`.spot` class on any card).
+- **Chrome**: navbar switches to light-on-navy over dark surfaces (`layout/navTone.js`, `useDarkSurface(ref)`; dark `Section`s register automatically), tucks away on scroll down, sliding hover pill, staggered mega menus, kinetic mobile menu; footer with interactive outline wordmark; CTA band opens with a clip reveal, beam border and pointer glow.
+- **Home**: pinned 3-beat hero (streams -> governed core -> bolt) with depth-parallax product cards, light sheet rising over it; odometer stats; scroll-drawn growth chart with scrubber (replaced recharts); pinned horizontal lifecycle (vertical timeline under 1024px); expanding outcome panels (cards under 1024px); governed-AI console demo (typed question, policy checks, masked streaming answer); industries wipe transitions; swipeable testimonials with countdown ring.
+- **Inner pages**: PageHero is a navy slab with a per-section formation (platform cube, products stack, solutions helix, industries globe, resources/newsroom grid, partners/services ring, company bolt); Contact and 404 are full navy stages; architecture stack assembles on scroll; company timeline draws; number rings fill.
+- i18n: all new copy translated (es/fr/de). Auth pages (solix.com/ai layout) and the SOLIXEmpower site are unchanged.
+
 ## Notes / mock data
 - Customer logos, testimonials, leadership (except founder/CEO), jobs, timeline years, stats are illustrative MOCK content in `data/site.js` — replace with real content.
 - Resource "Continue reading" is a preview (no real article pages yet).

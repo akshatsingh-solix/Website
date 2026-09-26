@@ -110,7 +110,7 @@ export default function PressRelease() {
                 <a href={`mailto:${PRESS_CONTACT.email}?subject=${encodeURIComponent("Re: " + pr.title)}`} className="mt-2 flex items-center gap-2 text-muted-foreground hover:text-primary-ink"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
                 <p className="mt-1.5 text-muted-foreground">{PRESS_CONTACT.phone}</p>
               </div>
-              <Link to="/newsroom#media-kit" className="group flex items-center justify-between rounded-2xl border border-line/10 bg-card p-5 text-sm card-hover" data-testid="press-media-kit-link">
+              <Link to="/newsroom#media-kit" className="spot relative group flex items-center justify-between rounded-2xl border border-line/10 bg-card p-5 text-sm card-hover" data-testid="press-media-kit-link">
                 <span><span className="block font-medium">{tx("Media kit")}</span><span className="text-xs text-muted-foreground">{tx("Logos, colors, guidelines")}</span></span>
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary-ink" />
               </Link>
@@ -126,7 +126,7 @@ export default function PressRelease() {
           <Stagger className="mt-12 grid gap-4 md:grid-cols-3">
             {others.map((p) => (
               <Item key={p.id} className="flex">
-                <Link to={`/newsroom/${p.id}`} className="group flex w-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid={`press-related-${p.id}`}>
+                <Link to={`/newsroom/${p.id}`} className="spot relative group flex w-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid={`press-related-${p.id}`}>
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{tx(p.category)} · {fmt(p.date, lng)}</span>
                   <h3 className="mt-4 font-display text-lg font-medium leading-snug transition-colors group-hover:text-primary-ink">{p.title}</h3>
                   <p className="mt-3 text-sm text-muted-foreground">{p.summary}</p>
