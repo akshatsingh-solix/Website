@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/shared/Section";
 import { AuroraField, Reveal } from "@/components/shared/Reveal";
 import { NeuralField } from "./NeuralField";
+import { Picture } from "@/components/shared/Picture";
 import { useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
 import { useDarkSurface } from "@/components/layout/navTone";
@@ -212,12 +213,16 @@ export const AISection = () => {
   useDarkSurface(ref);
   return (
     <section ref={ref} className="dark relative overflow-hidden bg-background py-20 text-foreground sm:py-24 lg:py-32" id="enterprise-ai" data-testid="ai-section">
-      <div className="absolute inset-0 grid-lines grid-fade" />
+      {/* The rendered neural globe (scripts/art/lattice.frag) sits behind the
+          glass console, so it glows through the console's blur. */}
+      <Picture src="/Website/images/key-lattice.jpg" sizes="100vw" alt="" className="absolute inset-0 h-full w-full object-cover object-[70%_50%] opacity-90" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/10" />
+      <div className="absolute inset-0 grid-lines grid-fade opacity-60" />
       <AuroraField />
-      <NeuralField className="pointer-events-none absolute -left-40 top-10 hidden h-[640px] w-[680px] opacity-30 lg:block" />
+      <NeuralField className="pointer-events-none absolute -left-40 top-10 hidden h-[640px] w-[680px] opacity-25 lg:block" />
       <div className="container relative grid items-center gap-14 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5">
-          <SectionHeading chapter="06" eyebrow="Enterprise AI" title="AI your risk team will sign off on." description="Most AI programs stall at governance. Solix starts there. Business builders compose agents and copilots on data products IT has already curated, classified and secured." />
+          <SectionHeading chapter="04" eyebrow="Enterprise AI" title="AI your risk team will sign off on." description="Most AI programs stall at governance. Solix starts there. Business builders compose agents and copilots on data products IT has already curated, classified and secured." />
           <div className="mt-10 grid gap-3">
             {points.map((p, i) => (
               <Reveal key={p.title} delay={0.08 * i} className="spot relative flex gap-4 rounded-2xl border border-line/10 bg-card/50 p-4 transition-colors duration-300 hover:bg-card">

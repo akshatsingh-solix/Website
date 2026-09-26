@@ -1,54 +1,42 @@
 import { Hero } from "@/components/home/Hero";
-import { LogoMarquee } from "@/components/home/LogoMarquee";
-import { StatsBand } from "@/components/home/StatsBand";
-import { GrowthChart } from "@/components/home/GrowthChart";
-import { DataEras } from "@/components/home/DataEras";
-import { PlatformStory } from "@/components/home/PlatformStory";
-import { PlatformBento } from "@/components/home/PlatformBento";
-import { SolutionsGrid } from "@/components/home/SolutionsGrid";
+import { ProofFrame } from "@/components/home/ProofFrame";
+import { PlatformFrame } from "@/components/home/PlatformFrame";
+import { OfferingsFrame } from "@/components/home/OfferingsFrame";
 import { AISection } from "@/components/home/AISection";
 import { IndustriesStrip } from "@/components/home/IndustriesStrip";
-import { Testimonials } from "@/components/home/Testimonials";
 import { InsightsPreview } from "@/components/home/InsightsPreview";
 import { CTABand } from "@/components/shared/CTABand";
+import { ChapterRail } from "@/components/home/ChapterRail";
 
 /**
- * The homepage is a storyboard, not a stack of blocks. Each numbered
- * chapter answers the question the previous one raises:
+ * The homepage is a storyboard of a few dense frames rather than a long
+ * stack of blocks. Each frame answers the question the previous one raises:
  *
- *   Hero       - pinned, three beats: the promise (data streams), one
- *                governed core, activated (the Solix bolt) - the live
- *                SignalField morphs with the scroll. The light page then
- *                rises over it as a sheet.
- *   Proof      - who we serve and at what scale
- *   01 Challenge   - data compounds faster than budgets
- *   02 Lifecycle   - every record, every era, one path
- *   03 Platform    - how: connect, govern, activate   (navy moment)
- *   04 Products    - what you buy
- *   05 Outcomes    - what you get
- *   06 Enterprise AI - the payoff, governed           (navy moment)
- *   07 Industries  - it fits your world
- *   08 Proof       - customers say so
- *   09 Insights    - go deeper
- *   CTA + footer   - act                              (navy close)
+ *   Hero  - pinned, three beats over the rendered governed core: data
+ *           streams in, one governed core, activated (the Solix bolt).
+ *           The light page then rises over it as a sheet.
+ *   01 The case      - cost chart, scale counters, facts, sectors (one bento)
+ *   02 The platform  - six eras of a record's life on the platform layer
+ *                      stack, pinned (navy moment)
+ *   03 What you get  - outcomes or products, one toggle
+ *   04 Enterprise AI - the governed console, shown working (navy moment)
+ *   05 Industries    - each industry with its results and customer voice
+ *   06 Insights      - go deeper
+ *   CTA + footer     - act (navy close)
  */
 export default function Home() {
   return (
     <div data-testid="home-page">
       <Hero />
       <div className="relative z-10 -mt-[14vh] rounded-t-[2.5rem] bg-background shadow-[0_-40px_80px_-40px_rgba(0,0,0,0.55)] sm:rounded-t-[3.5rem]">
-      <LogoMarquee />
-      <StatsBand />
-      <GrowthChart />
-      <DataEras />
-      <PlatformStory />
-      <PlatformBento />
-      <SolutionsGrid />
-      <AISection />
-      <IndustriesStrip />
-      <Testimonials />
-      <InsightsPreview />
-      <CTABand />
+        <ChapterRail />
+        <ProofFrame />
+        <PlatformFrame />
+        <OfferingsFrame />
+        <AISection />
+        <IndustriesStrip />
+        <InsightsPreview />
+        <CTABand />
       </div>
     </div>
   );

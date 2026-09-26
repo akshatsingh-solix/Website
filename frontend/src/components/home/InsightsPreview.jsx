@@ -54,7 +54,7 @@ export const InsightsPreview = () => {
   <Section className="bg-background" id="insights">
     <div className="container">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <SectionHeading chapter="09" eyebrow="Insights" title="Field notes from two decades of enterprise data." />
+        <SectionHeading chapter="06" eyebrow="Insights" title="Field notes from two decades of enterprise data." />
         <Link to="/resources" className="link-underline shrink-0 text-sm font-medium text-foreground" data-testid="insights-view-all">
           {tx("Browse all resources")} →
         </Link>

@@ -1,0 +1,42 @@
+<!doctype html><html><body style="margin:0;background:#000">
+<canvas id="c"></canvas>
+<script>
+// Offline renderer: draws scene shaders in horizontal tiles (so no single
+// draw call runs long), supersampled, then downsamples into a 2D canvas.
+window.renderScene = async (fragSrc, W, H, SS, T) => {
+  const c = document.getElementById("c");
+  c.width = W * SS; c.height = H * SS;
+  const gl = c.getContext("webgl2", { preserveDrawingBuffer: true, antialias: false });
+  const vs = `#version 300 es
+  in vec2 p; void main(){ gl_Position = vec4(p,0.,1.); }`;
+  const mk = (t, s) => { const sh = gl.createShader(t); gl.shaderSource(sh, s); gl.compileShader(sh); if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); return sh; };
+  const pr = gl.createProgram();
+  gl.attachShader(pr, mk(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, mk(gl.FRAGMENT_SHADER, fragSrc)); gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
+  gl.useProgram(pr);
+  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  gl.uniform2f(gl.getUniformLocation(pr, "R"), c.width, c.height);
+  gl.uniform1f(gl.getUniformLocation(pr, "T"), T || 0);
+  gl.viewport(0, 0, c.width, c.height);
+  gl.enable(gl.SCISSOR_TEST);
+  const band = 48;
+  for (let y = 0; y < c.height; y += band) {
+    gl.scissor(0, y, c.width, band);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.finish();
+    await new Promise((r) => setTimeout(r, 0));
+  }
+  const out = document.createElement("canvas"); out.width = W; out.height = H;
+  const g = out.getContext("2d"); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+  g.drawImage(c, 0, 0, W, H);
+  const small = (w) => { const s = document.createElement("canvas"); s.width = w; s.height = Math.round(H * w / W); const sg = s.getContext("2d"); sg.imageSmoothingQuality = "high"; sg.drawImage(out, 0, 0, s.width, s.height); return s; };
+  return {
+    full: out.toDataURL("image/webp", 0.9),
+    fullJpg: out.toDataURL("image/jpeg", 0.88),
+    w1264: small(1264).toDataURL("image/webp", 0.88),
+    w720: small(720).toDataURL("image/webp", 0.85),
+  };
+};
+</script></body></html>

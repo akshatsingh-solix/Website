@@ -17,6 +17,7 @@ import { useAccount } from "@/components/account/AccountAuth";
 import { useTx } from "@/i18n/tx";
 import { useSiteSettings } from "@/lib/site";
 import { useOverDarkSurface } from "./navTone";
+import { SearchButton } from "@/components/search/SearchHost";
 
 // Only the site's top-level nav chrome is translated so far - the deep
 // mega-menu content (product/solution/industry names) is still English
@@ -380,6 +381,7 @@ export const Navbar = () => {
         </nav>
 
         <div className="flex items-center gap-2">
+          <SearchButton />
           <AccountButtons />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>

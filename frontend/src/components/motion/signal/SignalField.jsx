@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
  * tab is visible. Reduced motion gets one still frame of the final shape;
  * no WebGL gets a soft CSS glow instead.
  */
-export const SignalField = ({ formations, progress = 0, className, density = 1, place, placeFor, interactive = true, onReady }) => {
+export const SignalField = ({ formations, progress = 0, className, density = 1, place, placeFor, interactive = true, trails = 0, onReady }) => {
   const canvasRef = useRef(null);
   const engineRef = useRef(null);
   const [fallback, setFallback] = useState(false);
@@ -49,6 +49,7 @@ export const SignalField = ({ formations, progress = 0, className, density = 1, 
           place,
           placeFor,
           interactive,
+          trails,
           staticFrame: reduce,
         });
       } catch {

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PRODUCTS } from "@/data/site";
-import { Section, SectionHeading } from "@/components/shared/Section";
 import { Stagger, Item, Tilt } from "@/components/shared/Reveal";
 import { useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
@@ -67,34 +66,17 @@ export const ProductCard = ({ product, className, large = false, horizontal = fa
   );
 };
 
-export const PlatformBento = () => {
-  const tx = useTx();
-  return (
-  <Section className="bg-background" id="the-products">
-    <div className="container">
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <SectionHeading
-          chapter="04"
-          eyebrow="The products"
-          title="Built on the Common Data Platform. Delivered as outcomes."
-          description="Every Solix product runs on one governed foundation, so archiving, retirement, privacy and AI share the same catalog, policies and Preservation Zone."
-        />
-        <Link to="/products" className="link-underline shrink-0 text-sm font-medium text-foreground" data-testid="platform-view-all">
-          {tx("View all products")} →
-        </Link>
-      </div>
-      <Stagger className="mt-12 grid gap-4 lg:grid-cols-12">
-        {FEATURED_SLUGS.map((slug, i) => {
-          const p = PRODUCTS.find((prod) => prod.slug === slug);
-          if (!p) return null;
-          return (
-            <Item key={p.slug} className={cn(spans[i], "flex")}>
-              <ProductCard product={p} large={i === 0} image={i === 0 ? "/Website/images/platform-cube.jpg" : undefined} className="w-full" />
-            </Item>
-          );
-        })}
-      </Stagger>
-    </div>
-  </Section>
-  );
-};
+/** The curated eight, in the hand-tuned bento. */
+export const ProductBento = ({ className }) => (
+  <Stagger className={cn("grid gap-4 lg:grid-cols-12", className)}>
+    {FEATURED_SLUGS.map((slug, i) => {
+      const p = PRODUCTS.find((prod) => prod.slug === slug);
+      if (!p) return null;
+      return (
+        <Item key={p.slug} className={cn(spans[i], "flex")}>
+          <ProductCard product={p} large={i === 0} image={i === 0 ? "/Website/images/key-slabs.jpg" : undefined} className="w-full" />
+        </Item>
+      );
+    })}
+  </Stagger>
+);

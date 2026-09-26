@@ -140,9 +140,11 @@ export const createSignalEngine = (canvas, opts = {}) => {
     placeFor = null, // optional per-formation placement: (name, index) => place
     interactive = true,
     staticFrame = false,
+    trails = 0, // 0 = off; otherwise how much of the previous frame fades per frame (e.g. 0.2)
   } = opts;
 
-  const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true, powerPreference: "high-performance" });
+  const useTrails = trails > 0 && !staticFrame;
+  const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: useTrails, powerPreference: "high-performance" });
   if (!gl) return null;
   const vs = compile(gl, gl.VERTEX_SHADER, VERT);
   const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
@@ -178,6 +180,44 @@ export const createSignalEngine = (canvas, opts = {}) => {
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE);
+
+  // Light trails: instead of clearing, each frame multiplies what is already
+  // on the canvas down a little (premultiplied, so colour and alpha fade
+  // together), leaving a streak behind every moving particle.
+  let fade = null;
+  if (useTrails) {
+    const fvs = compile(gl, gl.VERTEX_SHADER, "attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }");
+    const ffs = compile(gl, gl.FRAGMENT_SHADER, "precision mediump float; uniform float a; void main(){ gl_FragColor = vec4(0.0, 0.0, 0.0, a); }");
+    if (fvs && ffs) {
+      const fp = gl.createProgram();
+      gl.attachShader(fp, fvs);
+      gl.attachShader(fp, ffs);
+      gl.linkProgram(fp);
+      const fb = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, fb);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      fade = { prog: fp, buf: fb, loc: gl.getAttribLocation(fp, "p"), a: gl.getUniformLocation(fp, "a") };
+    }
+  }
+  const fadeCanvas = (amount) => {
+    gl.useProgram(fade.prog);
+    // Attributes 0..3 belong to the particle program; point the quad at its own slot.
+    gl.bindBuffer(gl.ARRAY_BUFFER, fade.buf);
+    gl.enableVertexAttribArray(fade.loc);
+    gl.vertexAttribPointer(fade.loc, 2, gl.FLOAT, false, 0, 0);
+    gl.blendFunc(gl.ZERO, gl.ONE_MINUS_SRC_ALPHA);
+    gl.uniform1f(fade.a, amount);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.blendFunc(gl.ONE, gl.ONE);
+    gl.useProgram(prog);
+    // Restore the particle attribute bindings the quad may have replaced.
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufR);
+    gl.vertexAttribPointer(locR, 4, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufA);
+    gl.vertexAttribPointer(locA, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufB);
+    gl.vertexAttribPointer(locB, 3, gl.FLOAT, false, 0, 0);
+  };
   gl.disable(gl.DEPTH_TEST);
   gl.clearColor(0, 0, 0, 0);
 
@@ -261,7 +301,8 @@ export const createSignalEngine = (canvas, opts = {}) => {
     const py = mobile ? (pa.my ?? pa.y) + ((pb.my ?? pb.y) - (pa.my ?? pa.y)) * e : pa.y + (pb.y - pa.y) * e;
     const ps = pa.scale + (pb.scale - pa.scale) * e;
 
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    if (fade && dt > 0) fadeCanvas(Math.min(0.6, trails * dt * 60));
+    else gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(U.uMix, mix);
     gl.uniform1f(U.uTime, time);
     gl.uniform1f(U.uAspect, width / height);

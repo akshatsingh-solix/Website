@@ -66,6 +66,13 @@ Design language: every page opens in a navy data field and resolves into the lig
 - **Inner pages**: PageHero is a navy slab with a per-section formation (platform cube, products stack, solutions helix, industries globe, resources/newsroom grid, partners/services ring, company bolt); Contact and 404 are full navy stages; architecture stack assembles on scroll; company timeline draws; number rings fill.
 - i18n: all new copy translated (es/fr/de). Auth pages (solix.com/ai layout) and the SOLIXEmpower site are unchanged.
 
+### Iteration 6 (2026-09) — frames, rendered key visuals, command palette
+- **Key visuals rendered from shaders** (`frontend/scripts/art`, see its README): governed glass core (hero), platform layer stack, Solix bolt monolith (CTA), neural globe (Enterprise AI). Brand-exact colours, no stock or AI-service licences. `Picture` serves their full-size WebP too.
+- **Hero**: live nebula shader + the core render (dollies in with the beats, pointer parallax, screen-blended) + particles anchored on the core with light trails (`trails` engine option) + HUD frame with live counters + bottom story scrubber.
+- **Homepage consolidated from 13 sections to 7 frames**: 01 The case (chart with facts, counters, sector ribbon in one bento), 02 The platform (six eras pinned over the layer stack; eras light their layer and platform move), 03 What you get (outcomes / products toggle), 04 Enterprise AI (console over the neural globe), 05 Industries & customers (customer voice inside the industry panel), 06 Insights, CTA. Chapter rail (scrollspy) on wide screens.
+- **Command palette** (`components/search`): Cmd/Ctrl+K or "/" searches pages, products, solutions, industries, resources and quick actions; code-split.
+- Inner pages: nebula behind every PageHero, HUD corners on framed visuals; Platform page gets the live flow explainer and the layer-stack render.
+
 ## Notes / mock data
 - Customer logos, testimonials, leadership (except founder/CEO), jobs, timeline years, stats are illustrative MOCK content in `data/site.js` — replace with real content.
 - Resource "Continue reading" is a preview (no real article pages yet).
