@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/shared/Reveal";
 import { useTx } from "@/i18n/tx";
 import { SignalField } from "@/components/motion/signal/SignalField";
+import { Nebula } from "@/components/motion/signal/Nebula";
+import { webpSrcSet } from "@/components/shared/Picture";
 import { SplitWords } from "@/components/motion/KineticText";
 import { ScrambleText } from "@/components/motion/Scramble";
 import { useIntroDone } from "@/components/motion/Intro";
@@ -18,10 +20,13 @@ const ease = [0.22, 1, 0.36, 1];
 
 // The field gathers from noise into data streams on arrival (0 -> 1), then
 // the scroll carries it through the platform story: streams (1), one
-// governed core (2), activated - the Solix bolt (3).
+// governed core (2), activated - the Solix bolt (3). Everything is anchored
+// on the glass core of the rendered key visual (scripts/art/core.frag), which
+// sits at 80% / 47% of the frame at any aspect (object-position below).
 const FORMATIONS = ["cloud", "flow", "sphere", "bolt"];
-const RIGHT = { x: 0.4, y: 0.02, scale: 1, mx: 0, my: 0.34 };
-const PLACE_FOR = (name) => (name === "bolt" ? { ...RIGHT, scale: 0.92 } : name === "sphere" ? { ...RIGHT, scale: 1.02 } : RIGHT);
+const KEY_VISUAL = "/Website/images/key-core.jpg";
+const CORE = { x: 0.6, y: 0.06, scale: 1, mx: 0.6, my: 0.06 };
+const PLACE_FOR = (name) => (name === "bolt" ? { ...CORE, scale: 0.6 } : name === "sphere" ? { ...CORE, scale: 0.88 } : CORE);
 
 // Beats of the pinned hero, as fractions of its scroll.
 const BEATS = [
@@ -92,6 +97,47 @@ const Floater = ({ children, depth, mx, my, className, delay, fade }) => {
   );
 };
 
+/** Live telemetry: a counter that never stops ticking, written straight to the DOM. */
+const LiveCount = ({ start, rate }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    let n = start;
+    let t = 0;
+    const tick = () => {
+      n += Math.round(rate * (0.6 + Math.random() * 0.8));
+      if (ref.current) ref.current.textContent = n.toLocaleString("en-US");
+      t = setTimeout(tick, 140 + Math.random() * 160);
+    };
+    tick();
+    return () => clearTimeout(t);
+  }, [start, rate]);
+  return <span ref={ref} className="tabular-nums text-foreground" />;
+};
+
+/**
+ * Heads-up frame over the stage: corner brackets, a coordinate readout and
+ * live counters, so the first screen reads like the platform's own console.
+ */
+const HudFrame = ({ fade }) => {
+  const tx = useTx();
+  const corner = "absolute h-5 w-5 border-line/35";
+  return (
+    <motion.div style={{ opacity: fade }} className="pointer-events-none absolute inset-x-5 bottom-5 top-[7.5rem] hidden lg:block xl:inset-x-8" aria-hidden="true">
+      <span className={cn(corner, "left-0 top-0 border-l border-t")} />
+      <span className={cn(corner, "right-0 top-0 border-r border-t")} />
+      <span className={cn(corner, "bottom-0 left-0 border-b border-l")} />
+      <span className={cn(corner, "bottom-0 right-0 border-b border-r")} />
+      <div className="absolute left-7 top-0 -translate-y-1/2 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+        37.3875° N · 121.9636° W · {tx("Santa Clara")}
+      </div>
+      <div className="absolute bottom-0 left-7 flex translate-y-1/2 gap-6 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal" /> {tx("Records governed today")} <LiveCount start={1284229} rate={37} /></span>
+        <span className="hidden items-center gap-2 xl:flex"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" /> {tx("Policy checks")} <LiveCount start={98311} rate={4} /></span>
+      </div>
+    </motion.div>
+  );
+};
+
 /** A beat's copy block: in and out with the scroll. */
 const BeatCopy = ({ progress, range, children, className, testId }) => {
   const [a, b] = range;
@@ -124,6 +170,8 @@ export const Hero = () => {
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.0005 });
   const formation = useTransform(scrollYProgress, [0, 0.12, 0.34, 0.5, 0.68, 1], [1, 1, 2, 2, 3, 3]);
   const cardsFade = useTransform(progress, [0, 0.2, 0.3], [1, 1, 0]);
+  const imgScale = useTransform(progress, [0, 0.4, 1], [1.02, 1.22, 1.5]);
+  const imgOpacity = useTransform(progress, [0, 0.45, 0.8, 1], [1, 0.85, 0.45, 0.35]);
   const cueFade = useTransform(progress, [0, 0.06], [1, 0]);
   const [beat, setBeat] = useState(0);
   useMotionValueEvent(scrollYProgress, "change", (v) => setBeat(v < 0.32 ? 0 : v < 0.66 ? 1 : 2));
@@ -133,6 +181,8 @@ export const Hero = () => {
   const my = useMotionValue(0);
   const smx = useSpring(mx, { stiffness: 50, damping: 16 });
   const smy = useSpring(my, { stiffness: 50, damping: 16 });
+  const imgX = useTransform(smx, (v) => v * -22);
+  const imgY = useTransform(smy, (v) => v * -14);
   const onPointerMove = (e) => {
     if (e.pointerType !== "mouse") return;
     mx.set(e.clientX / window.innerWidth - 0.5);
@@ -142,20 +192,35 @@ export const Hero = () => {
   return (
     <section ref={sectionRef} className="dark relative h-[260vh] bg-background text-foreground" data-testid="home-hero" onPointerMove={onPointerMove}>
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        {/* Depth: a faint grid stage, brand glows, the live field, then scrims for legibility. */}
-        <div className="absolute inset-0 grid-lines grid-fade opacity-80" />
-        <div className="absolute right-[-10%] top-1/2 h-[90vmin] w-[90vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.22),transparent)]" />
-        <div className="absolute left-[-15%] top-[-20%] h-[70vmin] w-[70vmin] rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.14),transparent)]" />
+        {/* Depth, back to front: living nebula, the rendered key visual
+            (dollying into the core as the story advances), the particle
+            field with light trails, scrims for legibility, grain, HUD. */}
         <div className="absolute inset-0">
-          <SignalField formations={FORMATIONS} progress={formation} placeFor={PLACE_FOR} place={RIGHT} />
+          <Nebula />
         </div>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-full bg-gradient-to-r from-background/85 via-background/40 to-transparent lg:w-[62%]" />
+        <motion.div className="absolute inset-0" style={{ scale: imgScale, opacity: imgOpacity, x: imgX, y: imgY, transformOrigin: "80% 47%" }}>
+          <picture style={{ display: "contents" }}>
+            <source type="image/webp" srcSet={webpSrcSet(KEY_VISUAL)} sizes="100vw" />
+            <img
+              src={KEY_VISUAL}
+              alt=""
+              className="h-full w-full object-cover object-[80%_47%] mix-blend-screen"
+              decoding="async"
+              fetchPriority="high"
+            />
+          </picture>
+        </motion.div>
+        <div className="absolute inset-0">
+          <SignalField formations={FORMATIONS} progress={formation} placeFor={PLACE_FOR} place={CORE} density={0.8} trails={0.14} />
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-full bg-gradient-to-r from-background/90 via-background/55 to-transparent lg:w-[60%]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
         <div className="absolute inset-0 grain" />
+        <HudFrame fade={cardsFade} />
 
-        <Floater depth={0.6} mx={smx} my={smy} fade={cardsFade} delay={0.9} className="right-[6%] top-[18%] xl:right-[9%]"><ArchiveCard t={t} /></Floater>
-        <Floater depth={1} mx={smx} my={smy} fade={cardsFade} delay={1.1} className="bottom-[14%] right-[4%] xl:right-[7%]"><AnswerCard t={t} /></Floater>
-        <Floater depth={0.35} mx={smx} my={smy} fade={cardsFade} delay={1.3} className="bottom-[34%] right-[30%]"><CostChip t={t} /></Floater>
+        <Floater depth={0.6} mx={smx} my={smy} fade={cardsFade} delay={0.9} className="right-[25%] top-[17%]"><ArchiveCard t={t} /></Floater>
+        <Floater depth={1} mx={smx} my={smy} fade={cardsFade} delay={1.1} className="bottom-[11%] right-[3%] xl:right-[5%]"><AnswerCard t={t} /></Floater>
+        <Floater depth={0.35} mx={smx} my={smy} fade={cardsFade} delay={1.3} className="bottom-[20%] right-[33%]"><CostChip t={t} /></Floater>
 
         <div className="relative h-full">
           {/* Beat 1: the promise. */}
@@ -168,7 +233,7 @@ export const Hero = () => {
               <h1 className="text-balance font-display text-[clamp(2.9rem,1.8rem+4.6vw,6.4rem)] font-medium leading-[0.95] tracking-[-0.04em] text-foreground">
                 <SplitWords text={`${t("hero.headlineStart")} ${t("hero.headlineAccent")}`} play={ready} delay={0.15} stagger={0.07} accentFrom={t("hero.headlineStart").split(/\s+/).length} />
               </h1>
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8, ease, delay: 0.7 }} className="mt-8 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8, ease, delay: 0.7 }} className="mt-8 max-w-xl text-base leading-relaxed text-foreground/80 md:text-lg">
                 Solix{" "}
                 <span className="relative inline-grid h-[1.625em] overflow-hidden align-top font-medium text-teal">
                   {/* Invisible copies of every word reserve exactly the longest one's width in the current language. */}
@@ -219,7 +284,7 @@ export const Hero = () => {
             <div className="max-w-xl">
               <p className="mb-6 flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.22em]"><span className="text-primary-ink">02</span><span className="h-px w-10 bg-gradient-to-r from-primary/70 to-teal/60" /><span className="text-muted-foreground">{tx("Govern")}</span></p>
               <h2 className="text-balance font-display text-[clamp(2.4rem,1.6rem+3.4vw,5rem)] font-medium leading-[0.98] tracking-[-0.035em]">{tx("Hundreds of systems.")} <span className="text-gradient-accent">{tx("One governed core.")}</span></h2>
-              <p className="mt-7 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">{tx("150+ connectors bring live, inactive and retired data into the Common Data Platform, where classification, masking and retention are applied once and travel with every record.")}</p>
+              <p className="mt-7 max-w-md text-base leading-relaxed text-foreground/80 md:text-lg">{tx("150+ connectors bring live, inactive and retired data into the Common Data Platform, where classification, masking and retention are applied once and travel with every record.")}</p>
               <div className="mt-8 flex flex-wrap gap-2">
                 {["SAP ERP", "Oracle EBS", "Salesforce", "Mainframe", "Email & Files", "Retired Apps"].map((s) => (
                   <span key={s} className="rounded-full border border-line/15 bg-line/[0.04] px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-foreground/80 backdrop-blur">{tx(s)}</span>
@@ -233,7 +298,7 @@ export const Hero = () => {
             <div className="max-w-xl">
               <p className="mb-6 flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.22em]"><span className="text-primary-ink">03</span><span className="h-px w-10 bg-gradient-to-r from-primary/70 to-teal/60" /><span className="text-muted-foreground">{tx("Activate")}</span></p>
               <h2 className="text-balance font-display text-[clamp(2.4rem,1.6rem+3.4vw,5rem)] font-medium leading-[0.98] tracking-[-0.035em]">{tx("Governed once.")} <span className="text-gradient-accent">{tx("Activated everywhere.")}</span></h2>
-              <p className="mt-7 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">{tx("The same trusted data feeds AI agents, analytics, compliance search and decades of preservation. No shadow copies, no dead ends.")}</p>
+              <p className="mt-7 max-w-md text-base leading-relaxed text-foreground/80 md:text-lg">{tx("The same trusted data feeds AI agents, analytics, compliance search and decades of preservation. No shadow copies, no dead ends.")}</p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Button asChild size="lg" data-testid="hero-activate-demo">
                   <Link to="/contact?type=demo">{tx("See it on your data")} <ArrowRight /></Link>
@@ -246,22 +311,20 @@ export const Hero = () => {
           </BeatCopy>
         </div>
 
-        {/* Beat rail: where you are in the story. */}
-        <div className="absolute bottom-8 right-5 hidden flex-col gap-3 sm:flex lg:bottom-auto lg:right-8 lg:top-1/2 lg:-translate-y-1/2" aria-hidden="true">
-          {BEATS.map((b, idx) => (
-            <div key={b.key} className="flex items-center justify-end gap-3">
-              <span className={cn("font-mono text-[10px] uppercase tracking-[0.2em] transition-colors duration-500", beat === idx ? "text-foreground" : "text-muted-foreground/50")}>{String(idx + 1).padStart(2, "0")} {tx(b.label)}</span>
-              <span className={cn("h-px transition-[width,background-color] duration-500", beat === idx ? "w-10 bg-primary" : "w-4 bg-line/25")} />
-            </div>
-          ))}
-        </div>
-
-        <motion.div style={{ opacity: cueFade }} className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex" aria-hidden="true">
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{tx("Scroll")}</span>
-          <span className="relative h-12 w-px overflow-hidden bg-line/15">
-            <span className="absolute inset-x-0 top-0 h-1/2 animate-[scan-sweep_1.8s_cubic-bezier(0.65,0,0.35,1)_infinite] bg-gradient-to-b from-transparent via-primary to-transparent" />
+        {/* Story scrubber: three beats on a track that fills with the scroll. */}
+        <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex" aria-hidden="true">
+          <motion.span style={{ opacity: cueFade }} className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{tx("Scroll")}</motion.span>
+          <div className="flex items-center gap-4">
+            {BEATS.map((b, idx) => (
+              <span key={b.key} className={cn("font-mono text-[10px] uppercase tracking-[0.2em] transition-colors duration-500", beat === idx ? "text-foreground" : "text-muted-foreground/60")}>
+                <span className={beat === idx ? "text-primary-ink" : undefined}>{String(idx + 1).padStart(2, "0")}</span> {tx(b.label)}
+              </span>
+            ))}
+          </div>
+          <span className="relative h-px w-[22rem] overflow-hidden bg-line/15">
+            <motion.span className="absolute inset-0 origin-left bg-gradient-to-r from-teal via-primary to-primary" style={{ scaleX: progress }} />
           </span>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

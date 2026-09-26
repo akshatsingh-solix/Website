@@ -184,10 +184,13 @@
     background-image: linear-gradient(100deg, hsl(var(--foreground)) 10%, hsl(var(--muted-foreground)) 60%, hsl(var(--foreground)) 90%);
   }
 
-  /* Solix Red -> Solix Blue: the brand's own complementary pair. */
+  /* Solix Red -> Solix Blue: the brand's own complementary pair. The light
+     drifts slowly along the words (the gradient is a seamless loop). */
   .text-gradient-accent {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(100deg in oklab, #EE2424 0%, #0088CF 100%);
+    background-image: linear-gradient(100deg in oklab, #EE2424 0%, #0088CF 50%, #EE2424 100%);
+    background-size: 200% 100%;
+    animation: accent-drift 12s linear infinite;
   }
 
   .surface-elevated {
@@ -439,6 +442,10 @@ html.lenis {
 @keyframes scan-sweep {
   from { transform: translateY(-100%); }
   to { transform: translateY(100%); }
+}
+@keyframes accent-drift {
+  from { background-position: 0% 50%; }
+  to { background-position: -200% 50%; }
 }
 @keyframes caret {
   50% { opacity: 0; }

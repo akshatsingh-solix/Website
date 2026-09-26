@@ -1,12 +1,9 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion";
-import { Section, SectionHeading } from "@/components/shared/Section";
-import { Reveal } from "@/components/shared/Reveal";
 import { useTx } from "@/i18n/tx";
-import { useLocalized } from "@/i18n/localize";
 import { cn } from "@/lib/utils";
 
-const FACTS = [
+export const FACTS = [
   { value: "38%", label: "Average annual growth in enterprise data volume" },
   { value: "60-80%", label: "Of production data that is inactive but retained" },
   { value: "~3%", label: "Annual infrastructure cost growth with archive-first" },
@@ -51,15 +48,14 @@ const GAP = (() => {
 })();
 
 /**
- * Chapter 01: the cost of doing nothing, drawn by the scroll. The three
+ * The cost of doing nothing, drawn by the scroll. The three
  * curves trace out as the chart moves up the screen and a scrubber walks the
  * years with them; hovering (or dragging a finger) takes over the scrubber
  * so any year can be read off. The gap between the dashed and red curves is
  * shaded - that is the money archive-first keeps.
  */
-export const GrowthChart = () => {
+export const GrowthChartCard = ({ className, children }) => {
   const tx = useTx();
-  const facts = useLocalized(FACTS);
   const chartRef = useRef(null);
   const svgRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: chartRef, offset: ["start 85%", "center 40%"] });
@@ -86,21 +82,7 @@ export const GrowthChart = () => {
   const saved = Math.round((1 - SERIES.solix[idx] / SERIES.status[idx]) * 100);
 
   return (
-    <Section className="bg-background" id="the-challenge">
-      <div className="container grid items-center gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-5">
-          <SectionHeading chapter="01" eyebrow="The challenge" title="Data compounds. Your budget shouldn't." description="Every year the estate grows and the inactive share grows faster. Archive-first programs on the Common Data Platform decouple infrastructure cost from data growth." />
-          <Reveal delay={0.1} className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            {facts.map((f, i) => (
-              <div key={f.label} className={cn("spot relative rounded-xl border border-line/10 border-l-[3px] bg-muted/60 py-3 pl-4 pr-3", i === 2 ? "border-l-primary" : "border-l-teal")}>
-                <span className="block font-display text-2xl font-semibold tracking-tight text-foreground">{f.value}</span>
-                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{f.label}</span>
-              </div>
-            ))}
-          </Reveal>
-        </div>
-        <Reveal delay={0.15} className="lg:col-span-7">
-          <div ref={chartRef} className="surface-elevated spot rounded-3xl p-5 sm:p-8" data-testid="growth-chart">
+          <div ref={chartRef} className={cn("surface-elevated spot rounded-3xl p-5 sm:p-8", className)} data-testid="growth-chart">
             <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{tx("Indexed to 2019 = 100")}</p>
@@ -169,9 +151,7 @@ export const GrowthChart = () => {
               </g>
             </svg>
             <p className="mt-4 text-xs text-muted-foreground">{tx("Illustrative model based on typical Solix customer programs. Your assessment will produce your own curve.")}</p>
+            {children}
           </div>
-        </Reveal>
-      </div>
-    </Section>
   );
 };

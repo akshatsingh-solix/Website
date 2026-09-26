@@ -14,6 +14,7 @@ import { RouteCurtain, ROUTE_SWAP_EVENT } from "@/components/motion/RouteCurtain
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { Intro } from "@/components/motion/Intro";
 import { usePointerSpotlight } from "@/components/motion/spotlight";
+import { SearchHost } from "@/components/search/SearchHost";
 
 // The live route element - until this page starts leaving. While it plays
 // its exit under the curtain it must keep showing itself, not the route
@@ -57,6 +58,7 @@ export const Layout = () => {
       </main>
       <Footer />
       <RouteCurtain />
+      <SearchHost />
       <Intro />
       <LazyConcierge />
       <ConsentBanner />
