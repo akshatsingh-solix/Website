@@ -7,6 +7,10 @@ const EXTRA_STRINGS = [
   "AI Solutions", "Preservation & Archive",
   "Product", "Customer", "Partner", "Event", "Company",
 
+  // Beat labels of the pinned homepage hero (Hero.jsx BEATS) and the route
+  // curtain's destination names (RouteCurtain.jsx).
+  "Signal", "Govern", "Activate", "Services & Support", "My trial",
+
   // Component default props.
   "Ready when you are",
   "See your data activated in a live demo.",

@@ -21,7 +21,7 @@ export default function Partners() {
           <SectionHeading eyebrow="Our Partners" title="An ecosystem organized by what you need done." />
           <Stagger className="mt-14 grid gap-6 lg:grid-cols-2">
             {PARTNER_TIERS.map((t) => (
-              <Item key={t.id} id={t.id} className="surface-elevated scroll-mt-28 p-7 card-hover lg:[&:last-child:nth-child(odd)]:col-span-2" data-testid={`partner-tier-${t.id}`}>
+              <Item key={t.id} id={t.id} className="spot relative surface-elevated scroll-mt-28 p-7 card-hover lg:[&:last-child:nth-child(odd)]:col-span-2" data-testid={`partner-tier-${t.id}`}>
                 <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-teal"><t.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                 <h3 className="mt-6 font-display text-2xl font-medium">{t.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>

@@ -38,13 +38,13 @@ export const ProductCard = ({ product, className, large = false, horizontal = fa
       <Link
         to={`/products/${product.slug}`}
         data-testid={`product-card-${product.slug}`}
-        className={cn("group relative flex w-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-card shadow-soft card-hover", horizontal && "md:flex-row")}
+        className={cn("spot group relative flex w-full flex-col overflow-hidden rounded-3xl border border-line/10 bg-card shadow-soft card-hover", horizontal && "md:flex-row")}
       >
         {/* Brand hairline that draws in on hover. */}
         <span className="absolute inset-x-0 top-0 z-10 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-teal to-primary transition-transform duration-500 group-hover:scale-x-100" />
         {showImage && (
           <div className={cn("dark relative min-h-[240px] flex-1 overflow-hidden bg-background", horizontal && "md:min-h-[300px] md:w-1/2 md:flex-none")}>
-            <Picture src={image || product.image} sizes="(min-width: 1024px) 50vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <Picture src={image || product.image} sizes="(min-width: 1024px) 50vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform [transition-duration:1200ms] ease-out group-hover:scale-110" />
             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/70 to-transparent" />
             {large && <span className="absolute bottom-4 left-5 rounded-full border border-line/20 bg-background/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground backdrop-blur">{tx("Flagship")}</span>}
           </div>

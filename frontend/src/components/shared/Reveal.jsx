@@ -123,11 +123,13 @@ export const Parallax = ({ children, className, range = 60 }) => {
 /** Slow-drifting dual-tone gradient field — replaces a flat single blur-circle with layered ambient depth. */
 export const AuroraField = ({ className }) => <div className={`aurora-field ${className || ""}`} aria-hidden="true" />;
 
-/** Route-change transition. */
-// Opacity + a small rise only: a full-page `filter: blur()` forces the whole
+/** Route-change transition, choreographed with RouteCurtain: the leaving
+ * page sinks back as the curtain rises over it (CURTAIN_COVER seconds), and
+ * the arriving page lifts into place as the curtain clears. */
+// Opacity + transform only: a full-page `filter: blur()` forces the whole
 // route to re-rasterise every frame of the transition.
 export const pageTransitionVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
-  exit: { opacity: 0, y: -8, transition: { duration: 0.25, ease } },
+  initial: { opacity: 0, y: 56 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.9, ease, delay: 0.14 } },
+  exit: { opacity: 0.5, y: -64, scale: 0.985, transition: { duration: 0.42, ease: [0.76, 0, 0.24, 1] } },
 };

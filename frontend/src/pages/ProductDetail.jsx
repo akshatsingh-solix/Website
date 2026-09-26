@@ -106,7 +106,7 @@ export default function ProductDetail() {
             {product.features.map((f, i) => {
               const FeatureIcon = featureIcon(sourceFeatures[i]?.title || f.title);
               return (
-              <Item key={f.title} className="rounded-2xl border border-line/10 bg-card p-6 card-hover">
+              <Item key={f.title} className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
                 <span className={`grid h-9 w-9 place-items-center rounded-lg border border-line/10 bg-accent/50 ${product.accent === "teal" ? "text-teal" : "text-primary-ink"}`}><FeatureIcon className="h-4 w-4" strokeWidth={1.75} /></span>
                 <h3 className="mt-5 font-display text-lg font-medium">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>

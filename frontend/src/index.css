@@ -305,3 +305,149 @@
     animation: none;
   }
 }
+
+/* ------------------------------------------------------------------------
+ * "Signal" motion layer
+ * Every page opens in the navy data field (live particle hero) and resolves
+ * into the light editorial canvas as you scroll: noise into signal. The
+ * rules below support the shared motion primitives in components/motion.
+ * --------------------------------------------------------------------- */
+
+/* Lenis smooth scrolling (components/motion/SmoothScroll.jsx). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.lenis {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+@layer components {
+  /* Pointer spotlight (components/motion/spotlight.js): a soft glow under
+     the pointer and a lit hairline where the border is nearest to it.
+     Painted between the surface's background and its content. */
+  .spot {
+    isolation: isolate;
+  }
+  .spot::before,
+  .spot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  .spot::before {
+    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), rgb(0 136 207 / 0.09), transparent 42%);
+  }
+  .dark .spot::before,
+  .spot.dark::before {
+    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), rgb(0 136 207 / 0.16), transparent 45%);
+  }
+  .spot::after {
+    padding: 1px;
+    background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgb(238 36 36 / 0.65), rgb(0 136 207 / 0.45) 38%, transparent 70%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    z-index: 2;
+  }
+  .spot:hover::before,
+  .spot:hover::after,
+  .spot:focus-within::after {
+    opacity: 1;
+  }
+
+  /* Light sweep across a filled button on hover. */
+  .btn-sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .btn-sheen::after {
+    content: "";
+    position: absolute;
+    top: -10%;
+    bottom: -10%;
+    left: -70%;
+    width: 50%;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.38), transparent);
+    transform: skewX(-22deg);
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn-sheen:hover::after {
+    transform: skewX(-22deg) translateX(460%);
+  }
+
+  /* A light beam that travels around a panel's border. */
+  .beam-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: conic-gradient(from var(--beam-angle), transparent 0 64%, rgb(238 36 36 / 0.9) 78%, rgb(0 136 207 / 0.9) 88%, transparent 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: beam-spin 7s linear infinite;
+    z-index: 3;
+  }
+
+  /* Outline display type, for oversized background words. */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(var(--line) / 0.16);
+  }
+
+  .mask-fade-y {
+    mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
+  }
+
+  /* Scan line that sweeps a framed visual as it reveals. */
+  .scanline {
+    background: linear-gradient(180deg, transparent, rgb(0 136 207 / 0.0) 40%, rgb(0 136 207 / 0.55) 50%, rgb(238 36 36 / 0.0) 60%, transparent);
+  }
+}
+
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+@keyframes scan-sweep {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
+}
+@keyframes caret {
+  50% { opacity: 0; }
+}
+@keyframes orbit {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beam-border::before {
+    animation: none;
+  }
+}

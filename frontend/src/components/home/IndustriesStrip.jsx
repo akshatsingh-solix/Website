@@ -58,8 +58,11 @@ export const IndustriesStrip = () => {
                     >
                       <span className="flex items-center gap-4">
                         <span className="w-6 font-mono text-[10px] tracking-[0.16em] text-muted-foreground">{String(idx + 1).padStart(2, "0")}</span>
-                        <span className={cn("h-px transition-[width,background-color] duration-300", on ? "w-8 bg-primary" : "w-3 bg-line/20")} />
-                        <span className="font-display text-lg sm:text-xl">{ind.name}</span>
+                        <span className="relative h-px w-8">
+                          <span className="absolute inset-y-0 left-0 w-3 bg-line/20" />
+                          {on && <motion.span layoutId="industry-rule" className="absolute inset-y-0 left-0 w-8 bg-primary" transition={{ type: "spring", stiffness: 400, damping: 34 }} />}
+                        </span>
+                        <span className={cn("font-display text-lg transition-transform duration-300 sm:text-xl", on && "translate-x-1")}>{ind.name}</span>
                       </span>
                       <ArrowUpRight className={cn("h-5 w-5 shrink-0 text-primary-ink transition-[opacity,transform] duration-300", on ? "opacity-100" : "-translate-x-2 opacity-0")} />
                     </button>
@@ -72,15 +75,17 @@ export const IndustriesStrip = () => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={current.slug}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="flex h-full flex-col overflow-hidden rounded-3xl border border-line/10 bg-card shadow-soft"
+                initial={{ opacity: 0, clipPath: "inset(0% 0% 0% 100% round 24px)" }}
+                animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0% round 24px)" }}
+                exit={{ opacity: 0, clipPath: "inset(0% 100% 0% 0% round 24px)" }}
+                transition={{ duration: 0.42, ease: [0.76, 0, 0.24, 1] }}
+                className="spot relative flex h-full flex-col overflow-hidden rounded-3xl border border-line/10 bg-card shadow-soft"
                 data-testid="industry-detail-panel"
               >
-                <div className="dark relative h-52 shrink-0 overflow-hidden bg-background sm:h-60">
-                  <Picture src={current.image} loading="eager" sizes={SIZES} className="absolute inset-0 h-full w-full object-cover" />
+                <div className="dark relative h-56 shrink-0 overflow-hidden bg-background sm:h-72">
+                  <motion.div className="absolute inset-0" initial={{ scale: 1.18 }} animate={{ scale: 1.02 }} transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}>
+                    <Picture src={current.image} loading="eager" sizes={SIZES} className="h-full w-full object-cover" />
+                  </motion.div>
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent" />
                   <div className="absolute bottom-5 left-6 right-6 flex items-end gap-4 sm:left-8">
                     <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lift">

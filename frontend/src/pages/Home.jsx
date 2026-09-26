@@ -16,7 +16,10 @@ import { CTABand } from "@/components/shared/CTABand";
  * The homepage is a storyboard, not a stack of blocks. Each numbered
  * chapter answers the question the previous one raises:
  *
- *   Hero       - the promise: AI on all your enterprise data
+ *   Hero       - pinned, three beats: the promise (data streams), one
+ *                governed core, activated (the Solix bolt) - the live
+ *                SignalField morphs with the scroll. The light page then
+ *                rises over it as a sheet.
  *   Proof      - who we serve and at what scale
  *   01 Challenge   - data compounds faster than budgets
  *   02 Lifecycle   - every record, every era, one path
@@ -33,6 +36,7 @@ export default function Home() {
   return (
     <div data-testid="home-page">
       <Hero />
+      <div className="relative z-10 -mt-[14vh] rounded-t-[2.5rem] bg-background shadow-[0_-40px_80px_-40px_rgba(0,0,0,0.55)] sm:rounded-t-[3.5rem]">
       <LogoMarquee />
       <StatsBand />
       <GrowthChart />
@@ -45,6 +49,7 @@ export default function Home() {
       <Testimonials />
       <InsightsPreview />
       <CTABand />
+      </div>
     </div>
   );
 }

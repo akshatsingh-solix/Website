@@ -13,21 +13,12 @@
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
         <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet" /></noscript>
         <script>
-          // Start the slow parts of the first visit early: open the API connection
-          // (the backend may also need to wake up) and, on the homepage, fetch the
-          // hero photo before the app code asks for it.
+          // Start the slow part of the first visit early: open the API
+          // connection (the backend may also need to wake up).
           (function () {
             var head = document.head, api = "%REACT_APP_BACKEND_URL%";
             if (/^https:\/\//.test(api)) {
               var pc = document.createElement("link"); pc.rel = "preconnect"; pc.href = api; pc.crossOrigin = ""; head.appendChild(pc);
-            }
-            var path = window.location.pathname.replace(/\/+$/, "");
-            var redirect = new URLSearchParams(window.location.search).get("redirect");
-            if ((path === "%PUBLIC_URL%" || path === "") && !redirect) {
-              var l = document.createElement("link"); l.rel = "preload"; l.as = "image"; l.setAttribute("fetchpriority", "high");
-              l.setAttribute("imagesrcset", "%PUBLIC_URL%/images/hero-architecture-720.webp 720w, %PUBLIC_URL%/images/hero-architecture.webp 1264w");
-              l.setAttribute("imagesizes", "(min-width: 1024px) 620px, 100vw"); l.type = "image/webp";
-              head.appendChild(l);
             }
           })();
         </script>

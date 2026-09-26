@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { CountUp } from "@/components/shared/CountUp";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { useTx } from "@/i18n/tx";
@@ -14,10 +15,10 @@ const RINGS = [
 const Ring = ({ pct, color, children }) => {
   const r = 44, c = 2 * Math.PI * r;
   return (
-    <div className="relative grid h-28 w-28 place-items-center">
+    <div className="group relative grid h-28 w-28 place-items-center transition-transform duration-500 hover:scale-110">
       <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
         <circle cx="50" cy="50" r={r} fill="none" stroke="rgb(var(--line) / 0.08)" strokeWidth="6" />
-        <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (c * pct) / 100} className="transition-[stroke-dashoffset] duration-1000 ease-out" />
+        <motion.circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} initial={{ strokeDashoffset: c }} whileInView={{ strokeDashoffset: c - (c * pct) / 100 }} viewport={{ once: true }} transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }} />
       </svg>
       <span className="relative font-display text-2xl font-medium tracking-tight text-foreground">{children}</span>
     </div>

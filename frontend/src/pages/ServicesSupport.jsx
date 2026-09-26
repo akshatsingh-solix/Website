@@ -29,7 +29,7 @@ export default function ServicesSupport() {
           <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {SERVICES.map((s) => (
               <Item key={s.id} className="flex">
-                <a href={`#${s.id}`} className="group flex w-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover">
+                <a href={`#${s.id}`} className="spot relative group flex w-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover">
                   <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-teal"><s.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                   <h3 className="mt-6 font-display text-lg font-medium">{s.title}</h3>
                   <p className="mt-2 flex-1 text-sm text-muted-foreground">{s.desc}</p>

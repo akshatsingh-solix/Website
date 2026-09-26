@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowRight, BarChart3, HeartHandshake, MapPin, TrendingUp } from "lucide-react";
 import { LEADERSHIP, OFFICES, TIMELINE, VALUES } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
@@ -16,6 +18,29 @@ const MORE = [
   { id: "investor-relations", icon: TrendingUp, eyebrow: "Investor Relations", title: "Independent and growing since 2002.", body: "Solix has grown as an independent, privately held company for over two decades. For investment or partnership inquiries, reach our corporate development team through the contact form." },
   { id: "csr", icon: HeartHandshake, eyebrow: "Corporate Social Responsibility", title: "Stewardship, on and off the platform.", body: "The same stewardship we apply to customer data guides how we operate as a company: annual volunteer days for every employee, data-minimization built into our own internal systems, and a hiring practice that reflects the global, regulated industries we serve." },
 ];
+
+/** Timeline whose rule draws itself as the years scroll past. */
+const Timeline = () => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 80%", "end 50%"] });
+  const draw = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
+  return (
+    <div ref={ref} className="relative mt-16">
+      <div className="absolute left-0 right-0 top-5 hidden h-px bg-line/10 lg:block" />
+      <motion.div className="absolute left-0 right-0 top-5 hidden h-[2px] origin-left bg-gradient-to-r from-primary via-primary to-teal lg:block" style={{ scaleX: draw }} />
+      <Stagger className="grid gap-8 md:grid-cols-2 lg:grid-cols-7" stagger={0.06}>
+        {TIMELINE.map((t) => (
+          <Item key={t.year} className="group relative">
+            <span className="relative z-10 grid h-10 w-10 place-items-center rounded-full border border-primary/50 bg-background font-mono text-[11px] text-primary-ink transition-[background-color,color,transform] duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">{t.year.slice(2)}</span>
+            <p className="mt-5 font-mono text-xs text-muted-foreground">{t.year}</p>
+            <h3 className="mt-1 font-display text-lg font-medium leading-snug">{t.title}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>
+          </Item>
+        ))}
+      </Stagger>
+    </div>
+  );
+};
 
 export default function Company() {
   const tx = useTx();
@@ -59,7 +84,7 @@ export default function Company() {
           <SectionHeading eyebrow="Values" title="What we optimize for." />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((v) => (
-              <Item key={v.title} className="rounded-2xl border border-line/10 bg-card p-6 card-hover">
+              <Item key={v.title} className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
                 <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-primary-ink"><v.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                 <h3 className="mt-6 font-display text-xl font-medium">{v.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
@@ -72,19 +97,7 @@ export default function Company() {
       <Section bordered>
         <div className="container">
           <SectionHeading eyebrow="Timeline" title="Twenty-four years, one direction." />
-          <div className="relative mt-16">
-            <div className="absolute left-0 right-0 top-5 hidden h-px bg-line/10 lg:block" />
-            <Stagger className="grid gap-8 md:grid-cols-2 lg:grid-cols-7" stagger={0.06}>
-              {TIMELINE.map((t) => (
-                <Item key={t.year} className="relative">
-                  <span className="relative z-10 grid h-10 w-10 place-items-center rounded-full border border-primary/50 bg-background font-mono text-[11px] text-primary-ink">{t.year.slice(2)}</span>
-                  <p className="mt-5 font-mono text-xs text-muted-foreground">{t.year}</p>
-                  <h3 className="mt-1 font-display text-lg font-medium leading-snug">{t.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>
-                </Item>
-              ))}
-            </Stagger>
-          </div>
+          <Timeline />
         </div>
       </Section>
 
@@ -93,7 +106,7 @@ export default function Company() {
           <SectionHeading eyebrow="Leadership" title="Operators who have shipped at scale." />
           <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {LEADERSHIP.map((l) => (
-              <Item key={l.name} className="rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid="leader-card">
+              <Item key={l.name} className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid="leader-card">
                 <span className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-primary/30 to-teal/20 font-display text-xl font-semibold">{l.initials}</span>
                 <h3 className="mt-6 font-display text-lg font-medium">{l.name}</h3>
                 <p className="text-sm text-primary-ink">{l.role}</p>

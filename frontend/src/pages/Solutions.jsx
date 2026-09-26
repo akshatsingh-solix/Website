@@ -40,7 +40,7 @@ export default function Solutions() {
           <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {INDUSTRIES.map((ind) => (
               <Item key={ind.slug}>
-                <Link to={`/industries/${ind.slug}`} className="group flex h-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid={`solutions-industry-${ind.slug}`}>
+                <Link to={`/industries/${ind.slug}`} className="spot relative group flex h-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid={`solutions-industry-${ind.slug}`}>
                   <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-teal"><ind.icon className="h-5 w-5" strokeWidth={1.5} /></span>
                   <h3 className="mt-5 font-display text-lg font-medium">{ind.name}</h3>
                   <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-muted-foreground transition-colors group-hover:text-primary-ink">

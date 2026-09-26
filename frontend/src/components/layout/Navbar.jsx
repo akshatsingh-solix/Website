@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,7 @@ import { LanguageDetectionNotice } from "@/components/shared/LanguageDetectionNo
 import { useAccount } from "@/components/account/AccountAuth";
 import { useTx } from "@/i18n/tx";
 import { useSiteSettings } from "@/lib/site";
+import { useOverDarkSurface } from "./navTone";
 
 // Only the site's top-level nav chrome is translated so far - the deep
 // mega-menu content (product/solution/industry names) is still English
@@ -46,18 +47,18 @@ const GroupedPanel = ({ item, onNavigate }) => {
   const tx = useTx();
   return (
     <div className="grid gap-8 p-8 lg:grid-cols-4 lg:p-10" data-testid={`mega-panel-${slug(item.label)}`}>
-      {item.groups.map((group) => (
-        <div key={group.heading}>
+      {item.groups.map((group, gi) => (
+        <motion.div key={group.heading} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.04 * gi, ease: [0.22, 1, 0.36, 1] }}>
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary-ink">{tx(group.heading)}</p>
           <div className="mt-4 flex flex-col gap-0.5">
             {group.items.map(({ label, desc, to }) => (
-              <Link key={label} to={to} onClick={onNavigate} data-testid={`mega-link-${slug(label)}`} className="group -mx-2 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-muted">
+              <Link key={label} to={to} onClick={onNavigate} data-testid={`mega-link-${slug(label)}`} className="group -mx-2 block rounded-lg px-2 py-1.5 transition-[background-color,transform] duration-200 hover:translate-x-1 hover:bg-muted">
                 <span className="block text-sm font-medium text-foreground group-hover:text-primary-ink">{tx(label)}</span>
                 {desc && <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{tx(desc)}</span>}
               </Link>
             ))}
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );
@@ -94,8 +95,9 @@ const FlatPanel = ({ item, onNavigate, label }) => {
         </NavTo>
       </div>
       <div className="grid gap-1 p-4 sm:grid-cols-2 lg:col-span-8 lg:p-6">
-        {item.items.map(({ label: itemLabel, desc, to, href, icon: Icon }) => (
-          <NavTo key={itemLabel} to={to} href={href} onClick={onNavigate} data-testid={`mega-link-${slug(itemLabel)}`} className="group flex items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-muted">
+        {item.items.map(({ label: itemLabel, desc, to, href, icon: Icon }, ii) => (
+          <motion.div key={itemLabel} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.03 * ii, ease: [0.22, 1, 0.36, 1] }}>
+          <NavTo to={to} href={href} onClick={onNavigate} data-testid={`mega-link-${slug(itemLabel)}`} className="spot group relative flex h-full items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-muted/60">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line/10 bg-accent/60 text-teal transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/10 group-hover:text-primary-ink">
               <Icon className="h-5 w-5" strokeWidth={1.5} />
             </span>
@@ -104,6 +106,7 @@ const FlatPanel = ({ item, onNavigate, label }) => {
               {desc && <span className="mt-0.5 block text-sm text-muted-foreground">{tx(desc)}</span>}
             </span>
           </NavTo>
+          </motion.div>
         ))}
         <Link to={item.to} onClick={onNavigate} data-testid={`mega-viewall-${item.label.toLowerCase()}`} className="group mt-2 flex items-center justify-between rounded-xl border border-dashed border-line/15 px-4 py-3 text-sm text-muted-foreground transition-colors duration-200 hover:border-line/40 hover:text-foreground sm:col-span-2">
           {tx("View all")} · {label}
@@ -116,10 +119,10 @@ const FlatPanel = ({ item, onNavigate, label }) => {
 
 const MegaPanel = ({ item, onNavigate, label }) => (
   <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: 6 }}
-    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+    initial={{ opacity: 0, y: 10, clipPath: "inset(0% 0% 100% 0% round 16px)" }}
+    animate={{ opacity: 1, y: 0, clipPath: "inset(0% 0% 0% 0% round 16px)" }}
+    exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
+    transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
     className="absolute inset-x-0 top-full pt-3"
   >
     <div className="container">
@@ -182,35 +185,37 @@ const MobileNav = ({ onNavigate }) => {
   const tx = useTx();
   return (
     <div className="flex h-full flex-col">
-      <Accordion type="single" collapsible className="mt-6 w-full">
-        {NAV.map((item) => {
+      <Accordion type="single" collapsible className="mt-8 w-full">
+        {NAV.map((item, idx) => {
           const flatItems = item.groups ? item.groups.flatMap((g) => g.items) : item.items || item.simpleItems;
           const label = NAV_LABEL_KEYS[item.label] ? t(NAV_LABEL_KEYS[item.label]) : tx(item.label);
-          if (!flatItems) {
-            return (
-              <Link key={item.label} to={item.to} onClick={onNavigate} className="flex items-center justify-between border-b border-line/10 py-4 font-display text-lg" data-testid={`mobile-nav-${item.label.toLowerCase()}`}>
-                {label}
-              </Link>
-            );
-          }
+          const num = <span className="mr-4 font-mono text-[10px] tracking-[0.2em] text-primary-ink">{String(idx + 1).padStart(2, "0")}</span>;
           return (
-            <AccordionItem key={item.label} value={item.label} className="border-line/10">
-              <AccordionTrigger className="font-display text-lg hover:no-underline" data-testid={`mobile-nav-${item.label.toLowerCase()}`}>
-                {label}
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="flex flex-col gap-1 pb-2">
-                  <Link to={item.to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm font-medium text-primary-ink hover:bg-muted">
-                    {tx("View all")} · {label}
-                  </Link>
-                  {flatItems.map(({ label: itemLabel, to, href }) => (
-                    <NavTo key={itemLabel} to={to} href={href} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
-                      {tx(itemLabel)}
-                    </NavTo>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            <motion.div key={item.label} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.55, delay: 0.08 + idx * 0.05, ease: [0.22, 1, 0.36, 1] }}>
+              {!flatItems ? (
+                <Link to={item.to} onClick={onNavigate} className="flex items-center border-b border-line/10 py-4 font-display text-2xl tracking-tight" data-testid={`mobile-nav-${item.label.toLowerCase()}`}>
+                  {num}{label}
+                </Link>
+              ) : (
+                <AccordionItem value={item.label} className="border-line/10">
+                  <AccordionTrigger className="py-4 font-display text-2xl tracking-tight hover:no-underline" data-testid={`mobile-nav-${item.label.toLowerCase()}`}>
+                    <span className="flex items-center">{num}{label}</span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col gap-1 pb-2 pl-9">
+                      <Link to={item.to} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm font-medium text-primary-ink hover:bg-muted">
+                        {tx("View all")} · {label}
+                      </Link>
+                      {flatItems.map(({ label: itemLabel, to, href }) => (
+                        <NavTo key={itemLabel} to={to} href={href} onClick={onNavigate} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
+                          {tx(itemLabel)}
+                        </NavTo>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </motion.div>
           );
         })}
       </Accordion>
@@ -284,12 +289,24 @@ export const Navbar = () => {
   const { t } = useTranslation();
   const tx = useTx();
   const [open, setOpen] = useState(null);
+  const [hover, setHover] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const overDark = useOverDarkSurface(40);
+  const lastY = useRef(0);
 
+  // Solid glass once the page moves; tucks away while reading down and
+  // returns on the first scroll up.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 12);
+      const delta = y - lastY.current;
+      if (Math.abs(delta) > 6) setHidden(delta > 0 && y > 480);
+      lastY.current = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -298,19 +315,28 @@ export const Navbar = () => {
   useEffect(() => {
     setOpen(null);
     setMobileOpen(false);
+    setHidden(false);
   }, [location.pathname, location.search]);
 
   const active = NAV.find((n) => n.label === open);
   const labelOf = (item) => (NAV_LABEL_KEYS[item.label] ? t(NAV_LABEL_KEYS[item.label]) : tx(item.label));
+  // Light-on-navy while over a dark hero; an open mega menu brings the light glass back.
+  const darkTone = overDark && !open;
+  const tucked = hidden && !open && !mobileOpen;
 
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300",
-        scrolled || open ? "border-b border-line/10 bg-background/90 shadow-[0_8px_30px_-18px_rgba(13,25,45,0.25)] backdrop-blur-xl" : "border-b border-transparent bg-transparent"
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter,transform] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]",
+        darkTone && "dark text-foreground",
+        tucked && "-translate-y-full",
+        scrolled || open
+          ? cn("border-b border-line/10 backdrop-blur-xl", darkTone ? "bg-background/55" : "bg-background/85 shadow-[0_8px_30px_-18px_rgba(13,25,45,0.25)]")
+          : "border-b border-transparent bg-transparent"
       )}
-      onMouseLeave={() => setOpen(null)}
+      onMouseLeave={() => { setOpen(null); setHover(null); }}
       data-testid="site-header"
+      data-tone={darkTone ? "dark" : "light"}
     >
       <LanguageDetectionNotice />
       <UtilityBar hidden={scrolled} />
@@ -320,20 +346,33 @@ export const Navbar = () => {
         <nav className="hidden items-center gap-0.5 xl:flex" aria-label={tx("Primary")}>
           {NAV.map((item) => {
             const hasDropdown = Boolean(item.items || item.groups || item.simpleItems);
+            const lit = hover === item.label || open === item.label;
             return (
-              <div key={item.label} onMouseEnter={() => hasDropdown && setOpen(item.label)} className="relative">
+              <div key={item.label} onMouseEnter={() => { setHover(item.label); if (hasDropdown) setOpen(item.label); else setOpen(null); }} className="relative">
+                {lit && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-full bg-line/[0.07]"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  />
+                )}
                 <NavLink
                   to={item.to}
                   data-testid={`nav-${slug(item.label)}`}
                   className={({ isActive }) =>
                     cn(
-                      "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-2 text-[13.5px] transition-colors duration-200 2xl:px-3 2xl:text-sm",
-                      isActive || open === item.label ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                      "relative inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-2 text-[13.5px] transition-colors duration-200 2xl:px-3 2xl:text-sm",
+                      isActive || lit ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                     )
                   }
                 >
-                  {labelOf(item)}
-                  {hasDropdown && <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", open === item.label && "rotate-180")} />}
+                  {({ isActive }) => (
+                    <>
+                      {labelOf(item)}
+                      {hasDropdown && <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-300", open === item.label && "rotate-180")} />}
+                      {isActive && <span className="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" />}
+                    </>
+                  )}
                 </NavLink>
               </div>
             );
@@ -344,14 +383,19 @@ export const Navbar = () => {
           <AccountButtons />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <button className="ml-1 grid h-10 w-10 place-items-center rounded-full border border-line/15 bg-background/70 xl:hidden" aria-label={tx("Open menu")} data-testid="mobile-menu-button">
+              <button className="ml-1 grid h-10 w-10 place-items-center rounded-full border border-line/15 bg-background/70 backdrop-blur xl:hidden" aria-label={tx("Open menu")} data-testid="mobile-menu-button">
                 {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full max-w-sm overflow-y-auto border-line/10 bg-background p-6">
+            <SheetContent side="right" className="dark w-full max-w-md overflow-y-auto border-line/10 bg-background p-6 text-foreground">
               <SheetTitle className="sr-only">{tx("Navigation")}</SheetTitle>
-              <Logo />
-              <MobileNav onNavigate={() => setMobileOpen(false)} />
+              <div className="pointer-events-none absolute inset-0 grid-lines grid-fade opacity-60" />
+              <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.28),transparent)]" />
+              <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.25),transparent)]" />
+              <div className="relative">
+                <Logo />
+                <MobileNav onNavigate={() => setMobileOpen(false)} />
+              </div>
             </SheetContent>
           </Sheet>
         </div>

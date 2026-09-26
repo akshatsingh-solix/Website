@@ -3,7 +3,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { PLATFORM_SECTIONS } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
-import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
+import { Reveal, Stagger, Item, Tilt } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
@@ -39,7 +39,8 @@ export default function Platform() {
               </Stagger>
             </div>
             <Reveal className={i % 2 === 1 ? "lg:col-span-5 lg:col-start-1 lg:row-start-1" : "lg:col-span-5"}>
-              <div className="dark relative overflow-hidden rounded-3xl border border-line/10 bg-background p-8 text-foreground shadow-[0_40px_80px_-40px_rgba(13,25,45,0.55)]">
+              <Tilt max={6}>
+              <div className="beam-border spot dark relative overflow-hidden rounded-3xl border border-line/10 bg-background p-8 text-foreground shadow-[0_40px_80px_-40px_rgba(13,25,45,0.55)]">
                 <div className="absolute inset-0 grid-lines opacity-70" />
                 <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.3),transparent)]" />
                 <span className="relative grid h-14 w-14 place-items-center rounded-2xl bg-primary text-primary-foreground"><s.icon className="h-7 w-7" strokeWidth={1.25} /></span>
@@ -47,6 +48,7 @@ export default function Platform() {
                 <p className="relative mt-2 font-display text-3xl font-medium tracking-tight text-foreground">{s.highlight.value}</p>
                 <p className="relative mt-3 text-sm text-muted-foreground">{s.highlight.caption}</p>
               </div>
+              </Tilt>
             </Reveal>
           </div>
         </Section>

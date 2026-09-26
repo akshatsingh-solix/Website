@@ -27,7 +27,7 @@ export default function Industries() {
                 <Link
                   to={`/industries/${ind.slug}`}
                   data-testid={`industry-card-${ind.slug}`}
-                  className="group relative flex w-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-card shadow-soft card-hover"
+                  className="spot group relative flex w-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-card shadow-soft card-hover"
                 >
                   <div className="dark relative h-48 overflow-hidden bg-background">
                     <Picture src={ind.image} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />

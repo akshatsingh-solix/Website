@@ -115,7 +115,7 @@ export default function Newsroom() {
           <SectionHeading eyebrow="In the news" title="Coverage highlights." />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {COVERAGE.map((c) => (
-              <Item key={c.title} className="flex flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid="coverage-card">
+              <Item key={c.title} className="spot relative flex flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid="coverage-card">
                 <div className="flex items-center justify-between">
                   <span className="font-display text-sm font-semibold tracking-tight text-foreground">{c.outlet}</span>
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{c.date}</span>
@@ -145,7 +145,7 @@ export default function Newsroom() {
           <div className="space-y-4 lg:col-span-7">
             <div className="grid gap-3 sm:grid-cols-2" data-testid="media-kit-list">
               {MEDIA_KIT.map((m) => (
-                <a key={m.file} href={m.file} download className="group flex items-center justify-between rounded-2xl border border-line/10 bg-card p-5 card-hover" data-testid={`media-kit-${m.meta.toLowerCase()}-${m.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
+                <a key={m.file} href={m.file} download className="spot relative group flex items-center justify-between rounded-2xl border border-line/10 bg-card p-5 card-hover" data-testid={`media-kit-${m.meta.toLowerCase()}-${m.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
                   <div>
                     <p className="font-medium">{m.label}</p>
                     <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{m.meta}</p>
