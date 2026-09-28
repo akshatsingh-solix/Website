@@ -49,7 +49,7 @@ export const SplitWords = ({ text, className, wordClassName, delay = 0, stagger 
       {words.map((w, i) => (
         <Fragment key={`${w}-${i}`}>
           <span className="inline-block overflow-hidden pb-[0.12em] -mb-[0.12em] align-bottom">
-            <motion.span variants={word} className={cn("inline-block origin-bottom-left will-change-transform", i >= accentStart && "text-gradient-accent pr-[0.04em]", wordClassName)}>
+            <motion.span variants={word} className={cn("inline-block origin-bottom-left", i >= accentStart && "text-gradient-accent pr-[0.04em]", wordClassName)}>
               {w}
             </motion.span>
           </span>

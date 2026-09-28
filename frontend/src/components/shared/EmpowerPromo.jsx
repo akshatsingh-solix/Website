@@ -48,11 +48,12 @@ export const EmpowerPromo = () => {
   const days = useDaysLeft();
   const site = useSiteSettings();
   const [ready, setReady] = useState(false);
-  // Phones start with the compact pill: a full card would cover most of the first screen.
+  // Phones and short laptop screens start with the compact pill: a full card
+  // would cover the hero's copy and buttons there.
   const [mode, setMode] = useState(() => {
     const saved = readState();
     if (saved === "hidden" || saved === "min" || saved === "card") return saved;
-    return window.matchMedia?.("(max-width: 639px)").matches ? "min" : "card";
+    return window.matchMedia?.("(max-width: 639px), (max-height: 820px)").matches ? "min" : "card";
   });
 
   // Appear only once the visitor has answered the cookie banner (or it won't be shown).

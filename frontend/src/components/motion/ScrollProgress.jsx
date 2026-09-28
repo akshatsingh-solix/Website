@@ -1,9 +1,8 @@
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll } from "framer-motion";
 
 /** Hairline reading gauge across the top of the viewport, Solix Red into Solix Blue. */
 export const ScrollProgress = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 28, restDelta: 0.001 });
+  const { scrollYProgress: scaleX } = useScroll();
   return (
     <motion.div
       aria-hidden="true"

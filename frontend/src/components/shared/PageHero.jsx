@@ -7,7 +7,6 @@ import { useTx } from "@/i18n/tx";
 import { Reveal } from "./Reveal";
 import { webpSrcSet } from "./Picture";
 import { SignalField } from "@/components/motion/signal/SignalField";
-import { Nebula } from "@/components/motion/signal/Nebula";
 import { SplitWords } from "@/components/motion/KineticText";
 import { ScrambleText } from "@/components/motion/Scramble";
 import { useDarkSurface } from "@/components/layout/navTone";
@@ -36,7 +35,9 @@ const sectionOf = (pathname) => pathname.replace(/^\/+/, "").split("/")[0];
  * products, a globe for industries...), copy that decodes and rises in on
  * the left, and the page's render in a framed window on the right that
  * scans in and tilts toward the pointer. Scrolling away dissolves the field
- * back into noise while the copy drifts up and fades.
+ * back into noise while the copy drifts up and fades - all read straight off
+ * the scroll position, and nothing that scales or blurs the whole slab, so
+ * the page stays locked to the touchpad.
  *
  * With an `image`, the render is framed on the right and any `children`
  * (usually CTAs) sit under the copy. Without one, `children` take the right
@@ -56,14 +57,12 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
   const copyOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   const frameY = useTransform(scrollYProgress, [0, 1], [0, 60]);
   const imgY = useTransform(scrollYProgress, [0, 1], [0, 50]);
-  // The whole slab recedes a touch as the page moves on.
-  const slabScale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
 
-  // Pointer tilt for the framed visual.
+  // Pointer tilt for the framed visual: a stiff spring, so it tracks the pointer within a frame or two.
   const rx = useMotionValue(0);
   const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 120, damping: 18 });
-  const sry = useSpring(ry, { stiffness: 120, damping: 18 });
+  const srx = useSpring(rx, { stiffness: 420, damping: 36 });
+  const sry = useSpring(ry, { stiffness: 420, damping: 36 });
   const onMove = (e) => {
     if (e.pointerType !== "mouse") return;
     const r = e.currentTarget.getBoundingClientRect();
@@ -79,11 +78,11 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
   const copy = (
     <>
       {eyebrow && <ScrambleText as="p" text={tx(eyebrow)} trigger="mount" className="eyebrow mb-5 block" delay={150} />}
-      <h1 className={cn("text-balance font-display font-medium tracking-[-0.035em] text-foreground", compact ? "text-[clamp(2rem,1.5rem+2.2vw,3.5rem)] leading-[1.04]" : "text-[clamp(2.4rem,1.6rem+3.2vw,4.6rem)] leading-[0.98]")}>
+      <h1 className={cn("text-balance font-display font-medium tracking-[-0.035em] text-foreground", compact ? "text-[clamp(2rem,min(1.5rem+2.2vw,6.5vh),3.5rem)] leading-[1.04]" : "text-[clamp(2.4rem,min(1.6rem+3.2vw,8.5vh),4.6rem)] leading-[0.98]")}>
         <SplitWords text={tx(title)} play delay={0.25} stagger={0.05} />
       </h1>
       {description && (
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease, delay: 0.55 }} className="mt-7 max-w-2xl text-fluid-lead text-muted-foreground">
+        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease, delay: 0.55 }} className="mt-7 max-w-2xl text-fluid-lead text-muted-foreground short:mt-5">
           {tx(description)}
         </motion.p>
       )}
@@ -91,10 +90,8 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
   );
 
   return (
-    <motion.section ref={ref} style={{ scale: slabScale, transformOrigin: "50% 0%" }} className={cn("dark relative isolate overflow-hidden rounded-b-[2rem] bg-background text-foreground sm:rounded-b-[3rem]", className)} data-testid="page-hero">
-      <div className="absolute inset-0 -z-10 opacity-90">
-        <Nebula scale={0.3} />
-      </div>
+    <section ref={ref} className={cn("dark relative isolate overflow-hidden rounded-b-[2rem] bg-background text-foreground sm:rounded-b-[3rem]", className)} data-testid="page-hero">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_90%_at_85%_20%,rgba(0,136,207,0.16),transparent_60%),radial-gradient(90%_80%_at_10%_110%,rgba(238,36,36,0.08),transparent_60%)]" />
       <div className="absolute inset-0 -z-10 grid-lines grid-fade opacity-60" />
       <div className="absolute -z-10 right-[-8%] top-1/2 h-[80vmin] w-[80vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.2),transparent)]" />
       <div className="absolute -z-10 left-[-12%] top-[-25%] h-[60vmin] w-[60vmin] rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.13),transparent)]" />
@@ -103,11 +100,10 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
       </div>
       <div className="pointer-events-none absolute inset-y-0 left-0 -z-10 w-full bg-gradient-to-r from-background/90 via-background/50 to-transparent lg:w-[65%]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-t from-background to-transparent" />
-      <div className="absolute inset-0 -z-10 grain" />
 
-      <div className={cn("container relative", compact ? "pb-14 pt-32 sm:pb-16 sm:pt-36 md:pt-44" : "flex min-h-[74vh] flex-col justify-center pb-16 pt-32 sm:pb-20 sm:pt-36 md:pt-44 lg:min-h-[86vh]")}>
+      <div className={cn("container relative", compact ? "pb-14 pt-32 sm:pb-16 sm:pt-36 md:pt-44 short:md:pt-36" : "flex min-h-[74vh] flex-col justify-center pb-16 pt-32 sm:pb-20 sm:pt-36 md:pt-44 lg:min-h-[86vh] short:md:pt-36")}>
         {crumbs.length > 0 && (
-          <Reveal className="mb-8 flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground" y={10}>
+          <Reveal className="mb-8 flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground short:mb-5" y={10}>
             <Link to="/" className="transition-colors hover:text-foreground" data-testid="crumb-home">{tx("Home")}</Link>
             {crumbs.map((c) => (
               <span key={c.label} className="flex items-center gap-2">
@@ -123,7 +119,7 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
             <motion.div style={{ y: copyY, opacity: copyOpacity }} className="lg:col-span-7">
               {copy}
               {children && (
-                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.7 }} className="mt-9">
+                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.7 }} className="mt-9 short:mt-6">
                   {children}
                 </motion.div>
               )}
@@ -182,6 +178,6 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
           </div>
         )}
       </div>
-    </motion.section>
+    </section>
   );
 };

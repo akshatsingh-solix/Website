@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { useTx } from "@/i18n/tx";
 import { cn } from "@/lib/utils";
 
@@ -58,8 +58,8 @@ export const GrowthChartCard = ({ className, children }) => {
   const tx = useTx();
   const chartRef = useRef(null);
   const svgRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: chartRef, offset: ["start 85%", "center 40%"] });
-  const drawn = useSpring(scrollYProgress, { stiffness: 90, damping: 24, restDelta: 0.001 });
+  // Drawn 1:1 with the scroll (no spring): the line is exactly where the touchpad put it.
+  const { scrollYProgress: drawn } = useScroll({ target: chartRef, offset: ["start 85%", "center 40%"] });
   const scrubX = useTransform(drawn, [0, 1], [xAt(0), xAt(YEARS.length - 1)]);
   const gapOpacity = useTransform(drawn, [0.5, 1], [0, 1]);
   const [scrollIdx, setScrollIdx] = useState(0);

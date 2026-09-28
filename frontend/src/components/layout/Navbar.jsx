@@ -332,7 +332,7 @@ export const Navbar = () => {
         darkTone && "dark text-foreground",
         tucked && "-translate-y-full",
         scrolled || open
-          ? cn("border-b border-line/10 backdrop-blur-xl", darkTone ? "bg-background/55" : "bg-background/85 shadow-[0_8px_30px_-18px_rgba(13,25,45,0.25)]")
+          ? cn("border-b border-line/10", darkTone ? "bg-background/85" : "bg-background/85 shadow-[0_8px_30px_-18px_rgba(13,25,45,0.25)] backdrop-blur-xl")
           : "border-b border-transparent bg-transparent"
       )}
       onMouseLeave={() => { setOpen(null); setHover(null); }}

@@ -11,9 +11,9 @@ import { ScrambleText } from "@/components/motion/Scramble";
 
 /**
  * The closing "act" of every page: a navy panel that opens up as it
- * arrives (inset clip widening to full), with a light beam running around
- * its border, a pointer-following glow, the render drifting in parallax and
- * a kinetic headline. It leads straight into the (also navy) footer, so each
+ * arrives (growing to full size - a transform, so it costs no repaints),
+ * with a light beam running around its border on hover, a pointer-following
+ * glow, the render drifting in parallax and a kinetic headline. It leads straight into the (also navy) footer, so each
  * page ends on one confident dark chord.
  */
 export const CTABand = ({
@@ -29,7 +29,7 @@ export const CTABand = ({
   const glowRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
-  const clip = useTransform(scrollYProgress, [0, 0.32], ["inset(6% 5% 6% 5% round 48px)", "inset(0% 0% 0% 0% round 32px)"]);
+  const grow = useTransform(scrollYProgress, [0, 0.32], [0.92, 1]);
 
   const onMove = (e) => {
     const el = glowRef.current;
@@ -42,7 +42,7 @@ export const CTABand = ({
   return (
     <section ref={ref} className="relative bg-background pb-20 pt-4 sm:pb-24" data-testid="cta-band">
       <div className="container">
-        <motion.div style={{ clipPath: clip }} className="will-change-[clip-path]">
+        <motion.div style={{ scale: grow }}>
           <div
             ref={glowRef}
             onPointerMove={onMove}
@@ -76,7 +76,7 @@ export const CTABand = ({
                   </Magnetic>
                   {secondary && (
                     <Magnetic strength={0.3}>
-                      <Button asChild size="lg" variant="outline" className="bg-background/40 backdrop-blur" data-testid="cta-band-secondary">
+                      <Button asChild size="lg" variant="outline" className="bg-background/50" data-testid="cta-band-secondary">
                         <Link to={secondary.to}>{tx(secondary.label)}</Link>
                       </Button>
                     </Magnetic>

@@ -78,7 +78,7 @@ export default function CommandPalette({ open, onOpenChange }) {
               />
               <kbd className="hidden shrink-0 rounded-md border border-line/15 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">esc</kbd>
             </div>
-            <Command.List className="max-h-[min(62vh,520px)] overflow-y-auto overscroll-contain p-2" data-lenis-prevent>
+            <Command.List className="max-h-[min(62vh,520px)] overflow-y-auto overscroll-contain p-2">
               <Command.Empty className="px-4 py-12 text-center text-sm text-muted-foreground">{tx("No matches. Try a product name, a system like SAP, or a topic like retention.")}</Command.Empty>
 
               <Command.Group heading={tx("Quick actions")}>

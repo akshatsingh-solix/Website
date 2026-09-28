@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/shared/Section";
 import { AuroraField, Reveal } from "@/components/shared/Reveal";
-import { NeuralField } from "./NeuralField";
 import { Picture } from "@/components/shared/Picture";
 import { useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
@@ -119,7 +118,7 @@ const GovernedConsole = () => {
   const pick = (i) => { setS(i); setRun((r) => r + 1); };
 
   return (
-    <div ref={ref} className="beam-border relative overflow-hidden rounded-3xl border border-line/10 bg-card/70 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.85)] backdrop-blur-xl" data-testid="ai-console">
+    <div ref={ref} className="beam-border relative overflow-hidden rounded-3xl border border-line/10 bg-card/90 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.85)]" data-testid="ai-console">
       <div className="flex items-center justify-between border-b border-line/10 px-5 py-3.5">
         <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           <span className="grid h-6 w-6 place-items-center rounded-full bg-primary text-primary-foreground"><Bot className="h-3.5 w-3.5" /></span>
@@ -214,12 +213,12 @@ export const AISection = () => {
   return (
     <section ref={ref} className="dark relative overflow-hidden bg-background py-20 text-foreground sm:py-24 lg:py-32" id="enterprise-ai" data-testid="ai-section">
       {/* The rendered neural globe (scripts/art/lattice.frag) sits behind the
-          glass console, so it glows through the console's blur. */}
+          console. No backdrop blur on the console: the aurora drifting under
+          it would force the blur to be recomputed on every frame. */}
       <Picture src="/Website/images/key-lattice.jpg" sizes="100vw" alt="" className="absolute inset-0 h-full w-full object-cover object-[70%_50%] opacity-90" />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/10" />
       <div className="absolute inset-0 grid-lines grid-fade opacity-60" />
       <AuroraField />
-      <NeuralField className="pointer-events-none absolute -left-40 top-10 hidden h-[640px] w-[680px] opacity-25 lg:block" />
       <div className="container relative grid items-center gap-14 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5">
           <SectionHeading chapter="04" eyebrow="Enterprise AI" title="AI your risk team will sign off on." description="Most AI programs stall at governance. Solix starts there. Business builders compose agents and copilots on data products IT has already curated, classified and secured." />

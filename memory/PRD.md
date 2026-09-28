@@ -73,6 +73,14 @@ Design language: every page opens in a navy data field and resolves into the lig
 - **Command palette** (`components/search`): Cmd/Ctrl+K or "/" searches pages, products, solutions, industries, resources and quick actions; code-split.
 - Inner pages: nebula behind every PageHero, HUD corners on framed visuals; Platform page gets the live flow explainer and the layer-stack render.
 
+### Iteration 7 (2026-09) — performance and short-screen layout
+Feedback: choppy frames, text overlapping on a laptop (1536x730-class viewport at 125% scaling), scrolling should follow the touchpad with no lag.
+- **Native scroll**: Lenis removed (it eased every wheel/touchpad delta over ~1s). `lib/scroll.js` keeps `scrollWindowTo` for in-page jumps (native smooth scroll, instant for reduced motion). No `useSpring` on any scroll-linked value (hero beats, scrubber, progress bar, growth chart, platform bar, company timeline, architecture stack).
+- **Compositing budget** (rules for new work): one WebGL canvas per screen (the nebula shader is gone); no `mix-blend-mode` and no `backdrop-filter` over anything that animates (hero cards, AI console, contact form, dark navbar); no looping animation that repaints (gradient text is static, `beam-border` only runs on hover/focus, no SMIL network SVG); no `filter` left on revealed blocks (`Reveal` sets one only with `blur`); scroll reveals use transform/opacity only (CTA band scales instead of animating `clip-path`). Grain is plain alpha.
+- **SignalField**: DPR capped at 1.25 on desktop, no trails in the hero, adaptive quality (sustained long frames step resolution, then particle count, down), formation follows the scroll within ~0.1s.
+- **Short viewports**: Tailwind `short:` variant (max-height 820px, plugin variant so `max-sm:` keeps working). Hero copy sits in the band between header and scrubber (`.hero-beat`, `align-items: safe center`), headlines sized by `min(vw, svh)`, trust row/HUD/cost chip hide when short; pinned platform frame sizes its 4:3 render by viewport height; PageHero headline height-aware. Event promo opens as the pill on short screens; the chat launcher is icon-only on phones.
+- Measured (headless Chromium, 1530x700): wheel-to-scroll 977ms -> 43ms; main-thread time over ~9 screens of scrolling 10.4s -> 2.1s (WebGL off), style recalcs 5.4k -> 0.6k.
+
 ## Notes / mock data
 - Customer logos, testimonials, leadership (except founder/CEO), jobs, timeline years, stats are illustrative MOCK content in `data/site.js` — replace with real content.
 - Resource "Continue reading" is a preview (no real article pages yet).

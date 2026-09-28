@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { scrollWindowTo } from "@/components/motion/SmoothScroll";
+import { scrollWindowTo } from "@/lib/scroll";
 import { ROUTE_SWAP_EVENT, curtainEnabled } from "@/components/motion/RouteCurtain";
 
 const NAV_OFFSET = -96;

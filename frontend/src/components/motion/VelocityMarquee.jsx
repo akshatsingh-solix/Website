@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useAnimationFrame, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
+import { motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const wrap = (min, max, v) => {
@@ -24,9 +24,12 @@ export const VelocityMarquee = ({ children, baseVelocity = -2.2, className, trac
   const x = useTransform(baseX, (v) => `${wrap(-50, 0, v)}%`);
   const dir = useRef(1);
   const hover = useRef(false);
+  const ref = useRef(null);
+  // Off screen, the ribbon costs nothing: no per-frame work, no layer updates.
+  const visible = useInView(ref, { margin: "120px 0px" });
 
   useAnimationFrame((_, delta) => {
-    if (reduce) return;
+    if (reduce || !visible) return;
     const f = factor.get();
     if (f < 0) dir.current = -1;
     else if (f > 0) dir.current = 1;
@@ -38,6 +41,7 @@ export const VelocityMarquee = ({ children, baseVelocity = -2.2, className, trac
 
   return (
     <div
+      ref={ref}
       className={cn("overflow-hidden", className)}
       onMouseEnter={() => { hover.current = true; }}
       onMouseLeave={() => { hover.current = false; }}

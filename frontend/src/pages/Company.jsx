@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll } from "framer-motion";
 import { ArrowRight, BarChart3, HeartHandshake, MapPin, TrendingUp } from "lucide-react";
 import { LEADERSHIP, OFFICES, TIMELINE, VALUES } from "@/data/site";
 import { PageHero } from "@/components/shared/PageHero";
@@ -22,8 +22,7 @@ const MORE = [
 /** Timeline whose rule draws itself as the years scroll past. */
 const Timeline = () => {
   const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 80%", "end 50%"] });
-  const draw = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
+  const { scrollYProgress: draw } = useScroll({ target: ref, offset: ["start 80%", "end 50%"] });
   return (
     <div ref={ref} className="relative mt-16">
       <div className="absolute left-0 right-0 top-5 hidden h-px bg-line/10 lg:block" />
