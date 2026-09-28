@@ -140,7 +140,7 @@ export const createSignalEngine = (canvas, opts = {}) => {
     placeFor = null, // optional per-formation placement: (name, index) => place
     interactive = true,
     staticFrame = false,
-    trails = 0, // 0 = off; otherwise how much of the previous frame fades per frame (e.g. 0.2)
+    trails = 0, // 0 = off; otherwise how much of the previous frame fades per frame (e.g. 0.2). Needs preserveDrawingBuffer: keep it off full-screen canvases.
   } = opts;
 
   const useTrails = trails > 0 && !staticFrame;
@@ -257,6 +257,14 @@ export const createSignalEngine = (canvas, opts = {}) => {
   let width = 1;
   let height = 1;
   let dpr = 1;
+  // Adaptive quality: if frames run long for a sustained stretch (a weak
+  // integrated GPU, a 4K panel, a busy tab), step the canvas resolution and
+  // then the particle count down, so the page's scrolling never pays for
+  // the field. It never steps back up within a visit.
+  let quality = 0; // 0 = full; each step lowers resolution, then particles
+  let drawCount = count;
+  let slowFor = 0;
+  let warmup = 1.5; // seconds of frames ignored after (re)start: first frames include shader and upload work
   let time = Math.random() * 20;
   let last = 0;
   let raf = 0;
@@ -265,7 +273,10 @@ export const createSignalEngine = (canvas, opts = {}) => {
 
   const resize = () => {
     const r = canvas.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.5 : 1.75);
+    // Soft points need little resolution: a full-screen canvas at 1.25x is
+    // indistinguishable from 2x and fills a quarter of the pixels.
+    const cap = (window.innerWidth < 640 ? 1.5 : 1.25) * (quality >= 1 ? 0.8 : 1);
+    dpr = Math.min(window.devicePixelRatio || 1, cap);
     width = Math.max(1, r.width);
     height = Math.max(1, r.height);
     canvas.width = Math.round(width * dpr);
@@ -279,7 +290,8 @@ export const createSignalEngine = (canvas, opts = {}) => {
 
   function draw(dt) {
     const k = 1 - Math.pow(0.001, dt); // frame-rate independent easing
-    state.progress = staticFrame ? state.target : lerp(state.progress, state.target, Math.min(1, k * 0.9));
+    // The formation follows the scroll closely (about a tenth of a second behind), so the swarm feels attached to the touchpad.
+    state.progress = staticFrame ? state.target : lerp(state.progress, state.target, Math.min(1, k * 1.8));
     state.mouse[0] = lerp(state.mouse[0], state.mouseTarget[0], Math.min(1, k * 2.2));
     state.mouse[1] = lerp(state.mouse[1], state.mouseTarget[1], Math.min(1, k * 2.2));
     state.mouseOn = lerp(state.mouseOn, state.mouseOnTarget, Math.min(1, k * 1.2));
@@ -313,15 +325,29 @@ export const createSignalEngine = (canvas, opts = {}) => {
     gl.uniform1f(U.uMouseOn, state.mouseOn);
     gl.uniform2f(U.uCam, state.cam[0], state.cam[1]);
     gl.uniform3f(U.uPulse, state.pulse[0], state.pulse[1], state.pulse[2]);
-    gl.drawArrays(gl.POINTS, 0, count);
+    gl.drawArrays(gl.POINTS, 0, drawCount);
   }
+
+  const degrade = () => {
+    if (quality >= 3) return;
+    quality += 1;
+    if (quality === 1) resize();
+    else drawCount = Math.round(drawCount * 0.7);
+  };
 
   const loop = (now) => {
     if (!running) return;
-    const dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
+    const gap = last ? (now - last) / 1000 : 0.016;
+    const dt = Math.min(0.05, gap);
     last = now;
     time += dt;
     draw(dt);
+    if (warmup > 0) warmup -= gap;
+    else if (gap > 0.024 && gap < 0.25) {
+      // Long frames (but not a tab that was simply backgrounded).
+      slowFor += gap;
+      if (slowFor > 1.2) { slowFor = 0; degrade(); }
+    } else slowFor = Math.max(0, slowFor - gap * 0.5);
     raf = requestAnimationFrame(loop);
   };
 
@@ -371,6 +397,7 @@ export const createSignalEngine = (canvas, opts = {}) => {
       if (running || destroyed || staticFrame) return;
       running = true;
       last = 0;
+      warmup = Math.max(warmup, 0.6);
       raf = requestAnimationFrame(loop);
     },
     stop() {

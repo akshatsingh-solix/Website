@@ -72,7 +72,7 @@ export const FlowExplainer = () => {
         </div>
         <Reveal delay={0.1} className="lg:col-span-7">
           <Tilt max={4}>
-            <div className="beam-border relative rounded-3xl border border-line/10 bg-card/60 p-4 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.8)] backdrop-blur sm:p-6" data-testid="flow-explainer">
+            <div className="beam-border relative rounded-3xl border border-line/10 bg-card/85 p-4 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.8)] sm:p-6" data-testid="flow-explainer">
               <div className="mb-2 flex items-center justify-between px-1">
                 <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{tx("Common Data Platform")}</span>
                 <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-teal"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal" /> {tx("live")}</span>

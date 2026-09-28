@@ -38,11 +38,10 @@ export default function Contact() {
       <div className="absolute inset-0">
         <SignalField formations={["cloud", "sphere"]} progress={1} place={{ x: 0.3, y: -0.02, scale: 1.05, mx: 0, my: -0.3 }} density={0.6} />
       </div>
-      <div className="absolute inset-0 grain" />
       <div className="container relative grid gap-14 pt-32 pb-24 md:pt-40 lg:grid-cols-12 lg:pt-44">
         <Reveal className="lg:col-span-5">
           <ScrambleText as="p" text={tx("Contact")} trigger="mount" className="eyebrow mb-5 block" />
-          <div className="mb-8 inline-flex rounded-full border border-line/15 bg-card/60 p-1 backdrop-blur" role="tablist" data-testid="contact-mode-tabs">
+          <div className="mb-8 inline-flex rounded-full border border-line/15 bg-card/80 p-1" role="tablist" data-testid="contact-mode-tabs">
             {modes.map((m) => (
               <button
                 key={m.key}
@@ -87,7 +86,7 @@ export default function Contact() {
         </Reveal>
 
         <Reveal delay={0.12} className="lg:col-span-7">
-          <div className="beam-border relative rounded-3xl border border-line/10 bg-card/70 p-6 shadow-[0_2px_6px_rgba(0,0,0,0.2),0_60px_120px_-50px_rgba(0,0,0,0.85)] backdrop-blur-xl sm:p-10">
+          <div className="beam-border relative rounded-3xl border border-line/10 bg-card/90 p-6 shadow-[0_2px_6px_rgba(0,0,0,0.2),0_60px_120px_-50px_rgba(0,0,0,0.85)] sm:p-10">
             <LeadForm
               key={mode.key + (interest ?? "")}
               type={mode.key}

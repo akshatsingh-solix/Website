@@ -12,7 +12,7 @@ import { Logo } from "@/components/shared/Logo";
 import { submitLead } from "@/lib/api";
 import { NAV_LABEL_KEYS } from "./Navbar";
 import { Magnetic } from "@/components/shared/Reveal";
-import { scrollWindowTo } from "@/components/motion/SmoothScroll";
+import { scrollWindowTo } from "@/lib/scroll";
 import { useDarkSurface } from "./navTone";
 
 /**

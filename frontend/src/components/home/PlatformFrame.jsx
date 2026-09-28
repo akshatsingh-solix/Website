@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Activity, Archive, ArrowRight, Database, Plug, PowerOff, ShieldCheck, Sparkles, Vault } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTx } from "@/i18n/tx";
@@ -9,7 +9,7 @@ import { ChapterMark } from "@/components/shared/Section";
 import { Reveal } from "@/components/shared/Reveal";
 import { Picture } from "@/components/shared/Picture";
 import { SplitWords } from "@/components/motion/KineticText";
-import { scrollWindowTo } from "@/components/motion/SmoothScroll";
+import { scrollWindowTo } from "@/lib/scroll";
 import { useDarkSurface } from "@/components/layout/navTone";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -61,16 +61,17 @@ const StackVisual = ({ layer }) => {
         <Picture src="/Website/images/key-slabs.jpg" sizes="(min-width: 1024px) 58vw, 100vw" alt={tx("Four governed platform layers stacked as glass, with data rising between them")} className="absolute inset-0 h-full w-full object-cover" />
         {/* Light sweeping the active layer. */}
         <motion.div
-          className="pointer-events-none absolute inset-x-0 h-[16%] mix-blend-screen"
-          animate={{ top: `${active.band - 8}%` }}
-          transition={{ type: "spring", stiffness: 70, damping: 18 }}
+          className="pointer-events-none absolute inset-x-0 top-0 h-[16%]"
+          initial={false}
+          animate={{ y: `${((active.band - 8) / 16) * 100}%` }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           style={{ background: `radial-gradient(60% 50% at 50% 50%, ${active.tone === "red" ? "rgba(238,36,36,0.55)" : "rgba(0,136,207,0.55)"}, transparent 70%)` }}
         />
         {Object.entries(LAYERS).map(([key, l]) => {
           const on = key === layer;
           return (
             <div key={key} className="absolute left-3 flex -translate-y-1/2 items-center gap-2 sm:left-4" style={{ top: `${l.y}%` }}>
-              <span className={cn("rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] backdrop-blur transition-[background-color,border-color,color] duration-500", on ? (l.tone === "red" ? "border-primary bg-primary text-primary-foreground" : "border-teal bg-teal text-white") : "border-line/15 bg-background/50 text-muted-foreground")}>
+              <span className={cn("rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] transition-[background-color,border-color,color] duration-500", on ? (l.tone === "red" ? "border-primary bg-primary text-primary-foreground" : "border-teal bg-teal text-white") : "border-line/15 bg-background/70 text-muted-foreground")}>
                 {tx(l.label)}
               </span>
               <span className={cn("h-px w-6 transition-colors duration-500 sm:w-10", on ? "bg-foreground/70" : "bg-line/20")} />
@@ -83,8 +84,8 @@ const StackVisual = ({ layer }) => {
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/90 to-transparent" />
         <div className="absolute inset-x-4 bottom-4 grid grid-cols-3 gap-2 text-center sm:inset-x-6 sm:bottom-6">
           {[["150+", tx("connectors")], ["1", tx("policy layer")], ["0", tx("shadow copies")]].map(([v, l]) => (
-            <div key={l} className="rounded-xl border border-line/10 bg-background/55 px-2 py-2.5 backdrop-blur-md">
-              <p className="font-display text-xl font-semibold sm:text-2xl">{v}</p>
+            <div key={l} className="rounded-xl border border-line/10 bg-background/75 px-2 py-2.5 short:py-1.5">
+              <p className="font-display text-xl font-semibold sm:text-2xl short:sm:text-xl">{v}</p>
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{l}</p>
             </div>
           ))}
@@ -101,13 +102,13 @@ const EraDetail = ({ e, i }) => {
     <AnimatePresence mode="wait">
       <motion.div
         key={e.era}
-        initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -16, filter: "blur(4px)" }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -14 }}
+        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
         className="relative"
       >
-        <span className="text-outline pointer-events-none absolute -left-1 -top-14 select-none font-display text-[8rem] font-semibold leading-none tracking-tighter" aria-hidden="true">0{i + 1}</span>
+        <span className="text-outline pointer-events-none absolute -left-1 -top-14 select-none font-display text-[8rem] font-semibold leading-none tracking-tighter short:-top-8 short:text-[6rem]" aria-hidden="true">0{i + 1}</span>
         <div className="relative flex items-center gap-3">
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-foreground"><e.icon className="h-6 w-6" strokeWidth={1.5} /></span>
           <div>
@@ -118,7 +119,7 @@ const EraDetail = ({ e, i }) => {
             <move.icon className="h-3.5 w-3.5 text-teal" /> {tx(move.label)}
           </span>
         </div>
-        <h3 className="relative mt-6 font-display text-3xl font-medium tracking-tight sm:text-4xl">{e.title}</h3>
+        <h3 className="relative mt-6 font-display text-3xl font-medium tracking-tight sm:text-4xl short:mt-4 short:sm:text-3xl">{e.title}</h3>
         <p className="relative mt-3 max-w-md text-base leading-relaxed text-foreground/75">{e.desc}</p>
         <Link to={e.to} className="relative mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-foreground link-underline">
           {e.product} <ArrowRight className="h-4 w-4" />
@@ -143,7 +144,6 @@ export const PlatformFrame = () => {
   useDarkSurface(ref);
   const [idx, setIdx] = useState(0);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const bar = useSpring(scrollYProgress, { stiffness: 120, damping: 28 });
   useMotionValueEvent(scrollYProgress, "change", (v) => { if (wide) setIdx(Math.min(ERAS.length - 1, Math.max(0, Math.floor(v * ERAS.length)))); });
   const e = eras[idx];
 
@@ -158,7 +158,7 @@ export const PlatformFrame = () => {
   const heading = (
     <div>
       <ChapterMark n="02" label="The platform" />
-      <h2 className="text-balance font-display text-[clamp(1.85rem,1.35rem+1.8vw,3rem)] font-medium leading-[1.05] tracking-[-0.03em]">
+      <h2 className="text-balance font-display text-[clamp(1.85rem,min(1.35rem+1.8vw,5.6vh),3rem)] font-medium leading-[1.05] tracking-[-0.03em]">
         <SplitWords text={tx("One lifecycle. One governed platform. No dead ends.")} />
       </h2>
     </div>
@@ -219,19 +219,22 @@ export const PlatformFrame = () => {
         <div className="absolute inset-0 grid-lines grid-fade opacity-70" />
         <div className="absolute -left-40 top-1/4 h-[60vmin] w-[60vmin] rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.12),transparent)]" />
         <div className="absolute -right-40 bottom-0 h-[70vmin] w-[70vmin] rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.16),transparent)]" />
-        <div className="container relative grid items-center gap-12 pt-16 lg:grid-cols-12">
+        <div className="container relative grid items-center gap-12 pb-6 pt-20 lg:grid-cols-12">
           <div className="lg:col-span-5">
             {heading}
-            <div className="mt-8">{steps}</div>
-            <div className="mt-12 min-h-[19rem]"><EraDetail e={e} i={idx} /></div>
-            <div className="mt-8">{tabs}</div>
+            <div className="mt-8 short:mt-5">{steps}</div>
+            <div className="mt-12 min-h-[19rem] short:mt-10 short:min-h-[15.5rem]"><EraDetail e={e} i={idx} /></div>
+            <div className="mt-8 short:mt-5">{tabs}</div>
           </div>
           <div className="lg:col-span-7">
-            <StackVisual layer={ERA_META[idx].layer} />
-            <div className="mt-4 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            {/* 4:3, sized by whichever runs out first: the column's width or the viewport's height. */}
+            <div className="ml-auto w-full max-w-[calc((100vh-11rem)*4/3)]">
+              <StackVisual layer={ERA_META[idx].layer} />
+            </div>
+            <div className="ml-auto mt-4 flex w-full max-w-[calc((100vh-11rem)*4/3)] items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               <span>{tx("Active")}</span>
               <span className="relative h-px flex-1 overflow-hidden bg-line/15">
-                <motion.span className="absolute inset-0 origin-left bg-gradient-to-r from-teal via-primary to-primary" style={{ scaleX: bar }} />
+                <motion.span className="absolute inset-0 origin-left bg-gradient-to-r from-teal via-primary to-primary" style={{ scaleX: scrollYProgress }} />
               </span>
               <span>{tx("Activated")}</span>
             </div>

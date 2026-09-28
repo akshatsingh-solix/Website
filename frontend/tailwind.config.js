@@ -107,5 +107,11 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    // Height variant: laptops at 125-150% display scaling have wide but short
+    // viewports (e.g. 1536x730), where desktop layouts must tighten. A plugin
+    // variant rather than a `screens` entry, which would disable `max-sm:` etc.
+    ({ addVariant }) => addVariant("short", "@media (max-height: 820px)"),
+  ],
 };

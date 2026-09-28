@@ -3,10 +3,12 @@ import { motion, useMotionValue, useScroll, useSpring, useTransform } from "fram
 
 const ease = [0.22, 1, 0.36, 1];
 
+// A `filter` is only set when asked for: even `blur(0px)` left inline keeps a
+// filter node (and often its own render surface) on every revealed block.
 export const Reveal = ({ children, delay = 0, y = 28, className, once = true, blur = false, ...rest }) => (
   <motion.div
-    initial={{ opacity: 0, y, filter: blur ? "blur(8px)" : "blur(0px)" }}
-    whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+    initial={blur ? { opacity: 0, y, filter: "blur(8px)" } : { opacity: 0, y }}
+    whileInView={blur ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 1, y: 0 }}
     viewport={{ once, margin: "-60px" }}
     transition={{ duration: 0.7, ease, delay }}
     className={className}

@@ -184,13 +184,20 @@
     background-image: linear-gradient(100deg, hsl(var(--foreground)) 10%, hsl(var(--muted-foreground)) 60%, hsl(var(--foreground)) 90%);
   }
 
-  /* Solix Red -> Solix Blue: the brand's own complementary pair. The light
-     drifts slowly along the words (the gradient is a seamless loop). */
+  /* Solix Red -> Solix Blue: the brand's own complementary pair. Static on
+     purpose: a drifting background-position repaints the text every frame. */
   .text-gradient-accent {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(100deg in oklab, #EE2424 0%, #0088CF 50%, #EE2424 100%);
-    background-size: 200% 100%;
-    animation: accent-drift 12s linear infinite;
+    background-image: linear-gradient(100deg, #0088CF, #EE2424);
+    background-image: linear-gradient(100deg in oklab, #0088CF, #EE2424);
+  }
+
+  /* Hero beat copy: centred in its band, but never pushed above the band's
+     top edge when the viewport is too short for it (it scrolls off the
+     bottom instead of sliding under the header). */
+  .hero-beat {
+    align-items: center;
+    align-items: safe center;
   }
 
   .surface-elevated {
@@ -210,8 +217,9 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: var(--grain-opacity);
-    mix-blend-mode: overlay;
+    /* Plain alpha, no blend mode: an overlay blend over a live canvas forces
+       the whole layer to be re-blended every frame. */
+    opacity: calc(var(--grain-opacity) * 0.6);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
@@ -316,24 +324,6 @@
  * rules below support the shared motion primitives in components/motion.
  * --------------------------------------------------------------------- */
 
-/* Lenis smooth scrolling (components/motion/SmoothScroll.jsx). */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-html.lenis {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-stopped {
-  overflow: clip;
-}
-.lenis [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
-}
-
 @layer components {
   /* Pointer spotlight (components/motion/spotlight.js): a soft glow under
      the pointer and a lit hairline where the border is nearest to it.
@@ -408,8 +398,14 @@ html.lenis {
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-    animation: beam-spin 7s linear infinite;
+    /* The beam travels while the panel is pointed at. Always-on, the
+       conic gradient and its mask would be repainted on every frame. */
+    animation: beam-spin 5s linear infinite paused;
     z-index: 3;
+  }
+  .beam-border:hover::before,
+  .beam-border:focus-within::before {
+    animation-play-state: running;
   }
 
   /* Outline display type, for oversized background words. */
@@ -442,10 +438,6 @@ html.lenis {
 @keyframes scan-sweep {
   from { transform: translateY(-100%); }
   to { transform: translateY(100%); }
-}
-@keyframes accent-drift {
-  from { background-position: 0% 50%; }
-  to { background-position: -200% 50%; }
 }
 @keyframes caret {
   50% { opacity: 0; }

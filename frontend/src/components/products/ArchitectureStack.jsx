@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useTx } from "@/i18n/tx";
 
 // i18n: layer labels and product names are translated at render.
@@ -37,7 +37,7 @@ export const ArchitectureStack = () => {
   const tx = useTx();
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center 55%"] });
-  const spread = useSpring(useTransform(scrollYProgress, [0, 1], [70, 0]), { stiffness: 80, damping: 20 });
+  const spread = useTransform(scrollYProgress, [0, 1], [70, 0]);
   return (
   <div className="grid items-center gap-10 lg:grid-cols-12" data-testid="architecture-stack">
     <div ref={ref} className="relative lg:col-span-5">

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTx } from "@/i18n/tx";
-import { scrollWindowTo } from "@/components/motion/SmoothScroll";
+import { scrollWindowTo } from "@/lib/scroll";
 import { useOverDarkSurface } from "@/components/layout/navTone";
 
 // i18n: labels translated at render.

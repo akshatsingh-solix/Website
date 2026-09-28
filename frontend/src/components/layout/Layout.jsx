@@ -9,7 +9,6 @@ import { pageTransitionVariants } from "@/components/shared/Reveal";
 import { ConsentBanner } from "@/components/shared/ConsentBanner";
 import { EmpowerPromo } from "@/components/shared/EmpowerPromo";
 import { useIntentTracking } from "@/lib/useIntentTracking";
-import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { RouteCurtain, ROUTE_SWAP_EVENT } from "@/components/motion/RouteCurtain";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { Intro } from "@/components/motion/Intro";
@@ -37,7 +36,6 @@ export const Layout = () => {
     // skips transform/layout animation sitewide and keeps simple fades.
     <MotionConfig reducedMotion="user">
     <div className="relative min-h-screen bg-background text-foreground">
-      <SmoothScroll />
       <ScrollToTop />
       <ScrollProgress />
       <Navbar />
