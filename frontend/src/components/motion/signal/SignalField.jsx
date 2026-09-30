@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { isMotionValue } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { joinLiveCanvas } from "@/lib/liveCanvas";
 
 /**
  * The live data field behind every hero: a WebGL particle system that
@@ -12,8 +13,9 @@ import { cn } from "@/lib/utils";
  * `progress` (a number or a framer MotionValue) picks the position along
  * the formation list; the field eases toward it, so a number change reads
  * as a swarm re-forming and a scroll-linked MotionValue morphs with the
- * scroll. The engine is code-split and only draws while on screen and the
- * tab is visible. Reduced motion gets one still frame of the final shape;
+ * scroll. The engine is code-split and only draws while it holds the page's
+ * one live-canvas slot (lib/liveCanvas.js): on screen, tab visible, and the
+ * largest live canvas in view. Reduced motion gets one still frame of the final shape;
  * no WebGL gets a soft CSS glow instead.
  */
 export const SignalField = ({ formations, progress = 0, className, density = 1, place, placeFor, interactive = true, trails = 0, onReady }) => {
@@ -26,14 +28,8 @@ export const SignalField = ({ formations, progress = 0, className, density = 1, 
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
     let cancelled = false;
-    let io;
+    let leave;
     let unsub;
-    const onVisibility = () => {
-      const e = engineRef.current;
-      if (!e) return;
-      if (document.hidden) e.stop();
-      else if (canvas.dataset.visible === "1") e.start();
-    };
 
     // Start a beat after mount, so shader compilation never lands in the
     // same frames as a route transition or the page's first paint.
@@ -70,21 +66,26 @@ export const SignalField = ({ formations, progress = 0, className, density = 1, 
       }
       if (isMotionValue(progress) && !reduce) unsub = progress.on("change", (v) => engine.setProgress(v));
 
-      io = new IntersectionObserver(([entry]) => {
-        canvas.dataset.visible = entry.isIntersecting ? "1" : "0";
-        if (entry.isIntersecting && !document.hidden) engine.start();
-        else engine.stop();
-      }, { rootMargin: "80px" });
-      io.observe(canvas);
-      document.addEventListener("visibilitychange", onVisibility);
+      // Draws only while it holds the screen's one live-canvas slot (on
+      // screen, tab visible, and covering more of the viewport than any
+      // other live canvas).
+      leave = joinLiveCanvas(canvas, {
+        onGrant: () => {
+          canvas.dataset.visible = "1";
+          engine.start();
+        },
+        onRevoke: () => {
+          canvas.dataset.visible = "0";
+          engine.stop();
+        },
+      });
       onReady?.(engine);
     });
 
     return () => {
       cancelled = true;
       unsub?.();
-      io?.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
+      leave?.();
       engineRef.current?.destroy();
       engineRef.current = null;
     };
