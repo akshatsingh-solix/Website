@@ -126,15 +126,14 @@ export const IndustrySignatures = () => {
           description="Point at an industry to see the pace its records arrive at, how long they have to live and the rules they answer to. One platform governs all of them."
         />
         <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-start">
-          <div role="tablist" aria-label={tx("Industries")} className="flex flex-wrap gap-2 lg:col-span-5" data-testid="signature-tabs">
+          <div role="group" aria-label={tx("Industries")} className="flex flex-wrap gap-2 lg:col-span-5" data-testid="signature-tabs">
             {INDUSTRIES.map((ind) => {
               const on = ind.slug === active;
               return (
                 <button
                   key={ind.slug}
                   type="button"
-                  role="tab"
-                  aria-selected={on}
+                  aria-pressed={on}
                   aria-controls="signature-panel"
                   onMouseEnter={() => setActive(ind.slug)}
                   onFocus={() => setActive(ind.slug)}
@@ -150,7 +149,7 @@ export const IndustrySignatures = () => {
               );
             })}
           </div>
-          <div id="signature-panel" role="tabpanel" aria-live="polite" className="lg:col-span-7" data-testid="signature-panel">
+          <div id="signature-panel" aria-live="polite" className="lg:col-span-7" data-testid="signature-panel">
             <LiquidGlass tone="dark" className="rounded-3xl p-6 sm:p-8">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
