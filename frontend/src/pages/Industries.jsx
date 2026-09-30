@@ -9,6 +9,7 @@ import { useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
 import { LiquidGlass } from "@/components/materials/LiquidGlass";
 import { industryContext } from "@/data/industryContext";
+import { IndustrySignatures } from "@/components/industries/IndustrySignature";
 
 export default function Industries() {
   const tx = useTx();
@@ -57,6 +58,7 @@ export default function Industries() {
           </Stagger>
         </div>
       </Section>
+      <IndustrySignatures />
       <CTABand title="Talk to someone who has done this in your industry." />
     </div>
   );

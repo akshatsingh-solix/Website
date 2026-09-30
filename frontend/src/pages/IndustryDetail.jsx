@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { midSentence, useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
 import { LiquidGlass } from "@/components/materials/LiquidGlass";
+import { IndustrySignature } from "@/components/industries/IndustrySignature";
 
 export default function IndustryDetail() {
   const { slug } = useParams();
@@ -35,6 +36,8 @@ export default function IndustryDetail() {
           <Link to="/contact?type=demo">{tx("Talk to an industry expert")} <ArrowRight /></Link>
         </Button>
       </PageHero>
+
+      <IndustrySignature industry={ind} />
 
       <Section>
         <div className="container">
