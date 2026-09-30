@@ -10,6 +10,7 @@ so they use the exact brand colours (Solix Red `#EE2424`, Solix Blue
 | `core.frag` | `key-core` 2560x1440 | Homepage hero: sources streaming into the governed core, outcomes leaving it |
 | `slabs.frag` | `key-slabs` 1600x1200 | Platform frame and Platform page: four governed layers |
 | `bolt.frag` | `key-bolt` 2000x1125 | Closing call to action: the Solix bolt, activated |
+| `bolt-stage.frag` | `key-bolt-stage` 2000x1125 | The same scene without the bolt: the CTA band stands the live liquid-metal bolt in its ring (`key-bolt` is its still fallback) |
 | `lattice.frag` | `key-lattice` 2000x1125 | Enterprise AI frame: the neural globe behind the console |
 
 To re-render one (after editing its shader):
