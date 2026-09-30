@@ -13,6 +13,8 @@ import { midSentence, useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
 import { LiquidGlass } from "@/components/materials/LiquidGlass";
 import { IndustrySignature } from "@/components/industries/IndustrySignature";
+import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
+import { industryContext } from "@/data/industryContext";
 
 export default function IndustryDetail() {
   const { slug } = useParams();
@@ -20,7 +22,9 @@ export default function IndustryDetail() {
   const { i18n } = useTranslation();
   const ind = INDUSTRIES.find((i) => i.slug === slug);
   if (!ind) return <Navigate to="/404" replace />;
-  const products = PRODUCTS.filter((p) => ["enterprise-archiving", "application-retirement", "consumer-data-privacy"].includes(p.slug));
+  // The products this industry's programs usually start with (industryContext), first three.
+  const starters = industryContext(slug)?.products ?? ["enterprise-archiving", "application-retirement", "consumer-data-privacy"];
+  const products = starters.map((s) => PRODUCTS.find((p) => p.slug === s)).filter(Boolean).slice(0, 3);
   const others = INDUSTRIES.filter((i) => i.slug !== slug).slice(0, 4);
 
   return (
@@ -45,6 +49,14 @@ export default function IndustryDetail() {
           <div className="mt-12"><IndustryFlow industry={ind} /></div>
         </div>
       </Section>
+
+      <PlatformExplorer
+        industry={ind.slug}
+        id="platform"
+        eyebrow={tx("Platform")}
+        title={tx("Where {{name}} programs run on the platform.", { name: midSentence(ind.name, i18n.language) })}
+        description={tx("The lit layers are where programs in this industry usually start. Select any layer to see what runs on it.")}
+      />
 
       <Section bordered className="bg-muted">
         <div className="container">

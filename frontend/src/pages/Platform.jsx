@@ -8,6 +8,7 @@ import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
 import { FlowExplainer } from "@/components/products/FlowExplainer";
+import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
 
 export default function Platform() {
   const tx = useTx();
@@ -24,6 +25,8 @@ export default function Platform() {
           <Link to="/products/enterprise-edition">{tx("Explore Enterprise Edition")} <ArrowRight /></Link>
         </Button>
       </PageHero>
+
+      <PlatformExplorer />
 
       {PLATFORM_SECTIONS.map((s, i) => [
         // The live flow diagram sits after the first section, between light bands.
