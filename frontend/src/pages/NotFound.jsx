@@ -37,7 +37,7 @@ export default function NotFound() {
           <Button asChild size="lg" data-testid="not-found-home">
             <Link to="/"><ArrowLeft /> {tx("Back to home")}</Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="bg-background/40 backdrop-blur">
+          <Button asChild size="lg" variant="glass">
             <Link to="/resources"><Search /> {tx("Browse resources")}</Link>
           </Button>
         </motion.div>

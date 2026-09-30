@@ -338,7 +338,7 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? tx("Close AI concierge") : tx("Open AI concierge")}
         data-testid="chat-toggle-button"
-        className="group fixed bottom-5 right-4 z-[60] flex h-14 items-center gap-2 rounded-full bg-primary pl-4 pr-5 text-white shadow-[0_18px_40px_-12px_rgba(237,36,35,0.7)] transition-[transform,background-color] duration-300 hover:-translate-y-1 hover:bg-ember-deep max-sm:w-14 max-sm:justify-center max-sm:px-0 sm:right-6"
+        className="liquid-glass liquid-glass-red group fixed bottom-5 right-4 z-[60] flex h-14 items-center gap-2 rounded-full bg-primary pl-4 pr-5 text-white shadow-[0_18px_40px_-12px_rgba(237,36,35,0.7)] transition-[transform,background-color] duration-300 hover:-translate-y-1 hover:bg-ember-deep max-sm:w-14 max-sm:justify-center max-sm:px-0 sm:right-6"
       >
         {!open && <span className="absolute inset-0 -z-10 rounded-full bg-primary/60 animate-pulse-ring" />}
         {open ? <X className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" strokeWidth={1.75} />}

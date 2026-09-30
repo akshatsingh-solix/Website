@@ -9,12 +9,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Solix Red with a lit liquid-glass rim (index.css .liquid-glass).
         default:
-          "btn-sheen bg-primary text-primary-foreground hover:bg-ember-deep hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-10px_rgba(237,36,35,0.6)]",
+          "btn-sheen liquid-glass liquid-glass-red bg-primary text-primary-foreground hover:bg-ember-deep hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-10px_rgba(237,36,35,0.6)]",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-line/15 bg-transparent text-foreground hover:border-line/40 hover:bg-line/5",
+        // Secondary action as a liquid-glass pill: light on the editorial
+        // canvas, navy inside a .dark section. No backdrop blur, so it is
+        // safe over the live canvases.
+        glass:
+          "liquid-glass liquid-glass-auto text-foreground hover:-translate-y-0.5",
         secondary:
           "bg-foreground text-background hover:bg-foreground/90 hover:-translate-y-0.5",
         ghost: "text-muted-foreground hover:bg-line/5 hover:text-foreground",

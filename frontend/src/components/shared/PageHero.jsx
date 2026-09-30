@@ -141,7 +141,7 @@ export const PageHero = ({ eyebrow, title, description, crumbs = [], children, i
                       <motion.img src={image} alt="" style={{ y: imgY, scale: 1.12 }} className="aspect-[4/3] w-full object-cover" decoding="async" />
                     </picture>
                     <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
-                    <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 py-4">
+                    <div className="liquid-glass liquid-glass-dark absolute inset-x-0 top-0 flex items-center justify-between px-5 py-3.5 !shadow-none">
                       <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/80">{tx(eyebrow || "Solix")}</span>
                       <span className="flex gap-1.5" aria-hidden="true">
                         <span className="h-2 w-2 rounded-full bg-line/30" />
