@@ -16,6 +16,8 @@ import { FamilyVisual } from "@/components/media/FamilyVisual";
 import { FamilyTour } from "@/components/media/FamilyTour";
 import { familyOf } from "@/data/families";
 import { useTx } from "@/i18n/tx";
+import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
+import { layerOfProduct } from "@/data/platformLayers";
 
 const StepLabel = ({ n, label, className, id }) => (
     <p id={id} className={`mb-4 flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] ${className || ""}`}>
@@ -138,6 +140,16 @@ export default function ProductDetail() {
           </Stagger>
         </div>
       </Section>
+
+      {layerOfProduct(product.slug) && (
+        <PlatformExplorer
+          focusProduct={product.slug}
+          id="platform"
+          eyebrow={tx("Platform")}
+          title={tx("Where {{name}} runs on the platform.", { name: product.name })}
+          description={tx("Every product inherits the governance of the layers beneath it. This is where this one does its work.")}
+        />
+      )}
 
       {solutions.length > 0 && (
         <Section bordered>

@@ -11,6 +11,10 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { midSentence, useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
+import { LiquidGlass } from "@/components/materials/LiquidGlass";
+import { IndustrySignature } from "@/components/industries/IndustrySignature";
+import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
+import { industryContext } from "@/data/industryContext";
 
 export default function IndustryDetail() {
   const { slug } = useParams();
@@ -18,7 +22,9 @@ export default function IndustryDetail() {
   const { i18n } = useTranslation();
   const ind = INDUSTRIES.find((i) => i.slug === slug);
   if (!ind) return <Navigate to="/404" replace />;
-  const products = PRODUCTS.filter((p) => ["enterprise-archiving", "application-retirement", "consumer-data-privacy"].includes(p.slug));
+  // The products this industry's programs usually start with (industryContext), first three.
+  const starters = industryContext(slug)?.products ?? ["enterprise-archiving", "application-retirement", "consumer-data-privacy"];
+  const products = starters.map((s) => PRODUCTS.find((p) => p.slug === s)).filter(Boolean).slice(0, 3);
   const others = INDUSTRIES.filter((i) => i.slug !== slug).slice(0, 4);
 
   return (
@@ -35,12 +41,22 @@ export default function IndustryDetail() {
         </Button>
       </PageHero>
 
+      <IndustrySignature industry={ind} />
+
       <Section>
         <div className="container">
           <SectionHeading eyebrow="From challenge to outcome" title={tx("How {{name}} leaders get there.", { name: midSentence(ind.name, i18n.language) })} />
           <div className="mt-12"><IndustryFlow industry={ind} /></div>
         </div>
       </Section>
+
+      <PlatformExplorer
+        industry={ind.slug}
+        id="platform"
+        eyebrow={tx("Platform")}
+        title={tx("Where {{name}} programs run on the platform.", { name: midSentence(ind.name, i18n.language) })}
+        description={tx("The lit layers are where programs in this industry usually start. Select any layer to see what runs on it.")}
+      />
 
       <Section bordered className="bg-muted">
         <div className="container">
@@ -60,7 +76,7 @@ export default function IndustryDetail() {
                 <Link to={`/industries/${o.slug}`} className="dark group relative flex aspect-[4/3] w-full items-end overflow-hidden rounded-2xl border border-line/10 bg-background p-5 text-foreground shadow-soft" data-testid={`industry-related-${o.slug}`}>
                   <Picture src={o.image} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-                  <span className="relative flex items-center gap-2 font-display text-lg font-medium"><o.icon className="h-4 w-4 text-primary-ink" strokeWidth={1.5} /> {o.name}</span>
+                  <LiquidGlass lens className="relative flex items-center gap-2 rounded-2xl px-4 py-2.5 font-display text-lg font-medium text-white"><o.icon className="h-4 w-4 text-primary-ink" strokeWidth={1.5} /> {o.name}</LiquidGlass>
                 </Link>
               </Item>
             ))}

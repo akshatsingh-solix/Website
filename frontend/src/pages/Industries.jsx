@@ -7,6 +7,9 @@ import { Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
+import { LiquidGlass } from "@/components/materials/LiquidGlass";
+import { industryContext } from "@/data/industryContext";
+import { IndustrySignatures } from "@/components/industries/IndustrySignature";
 
 export default function Industries() {
   const tx = useTx();
@@ -35,6 +38,12 @@ export default function Industries() {
                     <span className="absolute bottom-4 left-5 grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lift">
                       <ind.icon className="h-5 w-5" strokeWidth={1.5} />
                     </span>
+                    {/* The rules this industry's records answer to, on a lens of liquid glass over the (still) photo. */}
+                    {industryContext(ind.slug) && (
+                      <LiquidGlass lens shape="pill" className="absolute right-4 top-4 max-w-[75%] truncate rounded-full px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-white">
+                        {industryContext(ind.slug).regulations.slice(0, 2).join(" · ")}
+                      </LiquidGlass>
+                    )}
                   </div>
                   <div className="flex flex-1 flex-col p-6">
                     <h3 className="font-display text-xl font-medium tracking-tight text-foreground">{ind.name}</h3>
@@ -49,6 +58,7 @@ export default function Industries() {
           </Stagger>
         </div>
       </Section>
+      <IndustrySignatures />
       <CTABand title="Talk to someone who has done this in your industry." />
     </div>
   );

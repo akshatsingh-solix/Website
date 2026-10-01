@@ -60,7 +60,7 @@ export default function CommandPalette({ open, onOpenChange }) {
         <DialogPrimitive.Overlay className="fixed inset-0 z-[70] bg-[#0D192D]/60 backdrop-blur-sm data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="dark fixed left-1/2 top-[10vh] z-[71] w-[min(700px,calc(100vw-1.5rem))] -translate-x-1/2 overflow-hidden rounded-3xl border border-line/15 bg-background/90 text-foreground shadow-[0_2px_8px_rgba(0,0,0,0.3),0_60px_140px_-40px_rgba(0,0,0,0.9)] backdrop-blur-2xl duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-4"
+          className="liquid-glass dark fixed left-1/2 top-[10vh] z-[71] w-[min(700px,calc(100vw-1.5rem))] -translate-x-1/2 overflow-hidden rounded-3xl border border-line/15 bg-background/90 text-foreground shadow-[0_2px_8px_rgba(0,0,0,0.3),0_60px_140px_-40px_rgba(0,0,0,0.9)] backdrop-blur-2xl duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-4"
           data-testid="command-palette"
         >
           <DialogPrimitive.Title className="sr-only">{tx("Search Solix")}</DialogPrimitive.Title>

@@ -36,8 +36,10 @@ const BEATS = [
 
 // Floating product-UI cards: the platform story in miniature (archive ->
 // govern -> answer), each drifting at its own depth under the pointer.
+// Liquid glass (liquid-glass-js shading, static layers): they float over the
+// live field, so no backdrop blur - the rim light and tint do the work.
 const ArchiveCard = ({ t }) => (
-  <div className="w-[240px] rounded-2xl border border-line/15 bg-background/85 p-4 shadow-lift">
+  <div className="liquid-glass liquid-glass-dark w-[240px] rounded-2xl p-4">
     <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
       <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal">
         <Database className="h-3.5 w-3.5" strokeWidth={1.75} /> {t("hero.archiveJob")}
@@ -63,7 +65,7 @@ const ArchiveCard = ({ t }) => (
 );
 
 const AnswerCard = ({ t }) => (
-  <div className="w-[270px] rounded-2xl border border-line/15 bg-background/85 p-4 shadow-lift">
+  <div className="liquid-glass liquid-glass-dark w-[270px] rounded-2xl p-4">
     <div className="flex items-center gap-2.5">
       <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground"><Bot className="h-4 w-4" strokeWidth={1.75} /></span>
       <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-ink">{t("hero.aiAnswer")}</span>
@@ -74,7 +76,7 @@ const AnswerCard = ({ t }) => (
 );
 
 const CostChip = ({ t }) => (
-  <div className="flex items-center gap-3 rounded-full border border-line/15 bg-background/85 py-2 pl-2 pr-4 shadow-lift">
+  <div className="liquid-glass liquid-glass-dark flex items-center gap-3 rounded-full py-2 pl-2 pr-4">
     <span className="grid h-8 w-8 place-items-center rounded-full bg-teal/15 text-teal"><TrendingDown className="h-4 w-4" strokeWidth={1.75} /></span>
     <span className="leading-tight">
       <span className="block font-display text-lg font-semibold text-foreground">-80%</span>
@@ -263,7 +265,7 @@ export const Hero = () => {
                   </Button>
                 </Magnetic>
                 <Magnetic strength={0.3}>
-                  <Button asChild size="lg" variant="outline" className="bg-background/50" data-testid="hero-explore-button">
+                  <Button asChild size="lg" variant="glass" data-testid="hero-explore-button">
                     <Link to="/products/enterprise-edition"><Play className="fill-current" /> {t("hero.exploreEnterpriseEdition")}</Link>
                   </Button>
                 </Magnetic>
@@ -303,7 +305,7 @@ export const Hero = () => {
                 <Button asChild size="lg" data-testid="hero-activate-demo">
                   <Link to="/contact?type=demo">{tx("See it on your data")} <ArrowRight /></Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="bg-background/50">
+                <Button asChild size="lg" variant="glass">
                   <Link to="/platform">{tx("How the platform works")}</Link>
                 </Button>
               </div>

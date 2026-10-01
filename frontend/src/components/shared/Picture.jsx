@@ -7,7 +7,7 @@
 const LOCAL = /^(.*\/images\/[^/]+)\.jpg$/;
 
 // Rendered key visuals (scripts/art) also ship a full-size WebP.
-const FULL_WIDTH = { "key-core": 2560, "key-slabs": 1600, "key-bolt": 2000, "key-lattice": 2000 };
+const FULL_WIDTH = { "key-core": 2560, "key-slabs": 1600, "key-bolt": 2000, "key-bolt-stage": 2000, "key-lattice": 2000 };
 
 export const webpSrcSet = (src) => {
   const m = typeof src === "string" && src.match(LOCAL);
