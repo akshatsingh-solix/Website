@@ -5,34 +5,39 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PRODUCTS } from "@/data/site";
 import { useTx } from "@/i18n/tx";
+import { GlyphImage, Sigil, solutionTone } from "@/components/materials/Sigil";
+import { GlyphTile, MetalIcon } from "@/components/materials/MetalIcon";
+import { LiquidGlass } from "@/components/materials/LiquidGlass";
 
 export const SolutionCard = ({ s, detailed = false }) => {
   const tx = useTx();
-  const Icon = s.icon;
+  const tone = solutionTone(s);
   const related = PRODUCTS.filter((p) => s.products.includes(p.slug));
   return (
-    <div id={detailed ? s.id : undefined} className={cn("spot group relative flex h-full w-full flex-col overflow-hidden rounded-3xl border border-line/10 bg-card p-6 shadow-soft card-hover sm:p-7", detailed && "scroll-mt-28")} data-testid={`solution-card-${s.id}`}>
-      <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[radial-gradient(closest-side,rgba(0,136,207,0.14),transparent)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      <div className="flex items-start justify-between">
-        <span className="relative grid h-11 w-11 place-items-center rounded-xl bg-teal/10 text-teal transition-colors duration-300 group-hover:bg-teal group-hover:text-white">
-          <Icon className="h-5 w-5" strokeWidth={1.5} />
-        </span>
-        <span className="relative rounded-full border border-primary/25 bg-primary/5 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-ink">{s.metric}</span>
-      </div>
-      <h3 className="relative mt-6 font-display text-2xl font-medium tracking-tight text-foreground">{s.title}</h3>
-      <p className="relative mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
-      <div className="relative mt-6 flex flex-wrap gap-2">
-        {related.map((p) => (
-          <Link key={p.slug} to={`/products/${p.slug}`} className="rounded-full border border-line/10 bg-muted px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-teal/40 hover:text-teal">
-            {p.name}
+    <div id={detailed ? s.id : undefined} className={cn("spot group relative flex h-full w-full flex-col overflow-hidden rounded-3xl border border-line/10 bg-card shadow-soft card-hover", detailed && "scroll-mt-28")} data-testid={`solution-card-${s.id}`}>
+      <Sigil icon={s.icon} tone={tone} sizes="(min-width: 1024px) 50vw, 100vw" className="aspect-[16/7] w-full shrink-0">
+        <LiquidGlass tone="dark" className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground !shadow-none">
+          <span className={cn("h-1.5 w-1.5 rounded-full", tone === "blue" ? "bg-teal" : "bg-primary")} />
+          {s.metric}
+        </LiquidGlass>
+      </Sigil>
+      <div className="relative flex flex-1 flex-col p-6 sm:p-7">
+        <h3 className="font-display text-2xl font-medium tracking-tight text-foreground">{s.title}</h3>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {related.map((p) => (
+            <Link key={p.slug} to={`/products/${p.slug}`} className="inline-flex items-center gap-1.5 rounded-full border border-line/10 bg-muted px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-teal/40 hover:text-teal">
+              <MetalIcon icon={p.icon} tone={p.accent === "teal" ? "blue" : "red"} className="h-3.5 w-3.5" />
+              {p.name}
+            </Link>
+          ))}
+        </div>
+        {!detailed && (
+          <Link to={`/solutions#${s.id}`} className="relative mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary-ink">
+            {tx("Explore solution")} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
-        ))}
+        )}
       </div>
-      {!detailed && (
-        <Link to={`/solutions#${s.id}`} className="relative mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary-ink">
-          {tx("Explore solution")} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </Link>
-      )}
     </div>
   );
 };
@@ -80,7 +85,7 @@ export const OutcomePanels = ({ items, className }) => {
             <div aria-hidden="true" className={cn("absolute inset-0 flex flex-col justify-between px-4 py-5 transition-opacity duration-300", on ? "pointer-events-none opacity-0" : "opacity-100")}>
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal/10 text-teal transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground"><Icon className="h-5 w-5" strokeWidth={1.5} /></span>
+                  <GlyphTile icon={Icon} tone={solutionTone(s)} />
                   <span className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground">0{i + 1}</span>
                 </div>
                 <p className="mt-5 font-mono text-[10px] font-semibold uppercase leading-relaxed tracking-[0.16em] text-muted-foreground">{tx(s.group)}</p>
@@ -93,8 +98,9 @@ export const OutcomePanels = ({ items, className }) => {
             {/* Open panel. */}
             <div className={cn("relative flex h-full w-full min-w-[400px] flex-col p-9 transition-opacity duration-500", on ? "opacity-100 delay-150" : "pointer-events-none opacity-0")}>
               <div className="flex items-start justify-between gap-4">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-foreground"><Icon className="h-6 w-6" strokeWidth={1.5} /></span>
                 <span className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground">0{i + 1} / 0{items.length}</span>
+                {/* The programme's glyph in liquid metal, standing off the panel. */}
+                <GlyphImage icon={Icon} tone={solutionTone(s)} className="-mr-3 -mt-3 h-28 w-28 transition-transform duration-700 group-hover:-translate-y-1" />
               </div>
               <p className="mt-auto text-balance font-display text-[clamp(2.4rem,1rem+2.4vw,3.4rem)] font-medium leading-[1.04] tracking-[-0.03em] text-gradient-accent">{s.metric}</p>
               <h3 className="mt-5 font-display text-[1.75rem] font-medium leading-tight tracking-tight">{s.title}</h3>

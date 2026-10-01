@@ -7,7 +7,9 @@ import { INDUSTRIES, SOURCE, TESTIMONIALS } from "@/data/site";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal } from "@/components/shared/Reveal";
 import { useTx } from "@/i18n/tx";
-import { Picture, webpSrcSet } from "@/components/shared/Picture";
+import { webpSrcSet } from "@/components/shared/Picture";
+import { IndustryPicture, hasIndustryPhoto } from "@/components/industries/IndustryPicture";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 import { slowConnection } from "@/lib/net";
 
 const SIZES = "(min-width: 1024px) 50vw, 100vw";
@@ -31,7 +33,7 @@ export const IndustriesStrip = () => {
   // what the visitor is actually looking at.
   useEffect(() => {
     if (slowConnection()) return undefined;
-    const warm = () => INDUSTRIES.forEach((ind) => {
+    const warm = () => INDUSTRIES.filter(hasIndustryPhoto).forEach((ind) => {
       const img = new Image();
       const set = webpSrcSet(ind.image);
       if (set) { img.sizes = SIZES; img.srcset = set; }
@@ -91,13 +93,11 @@ export const IndustriesStrip = () => {
               >
                 <div className="dark relative h-44 shrink-0 overflow-hidden bg-background sm:h-52">
                   <motion.div className="absolute inset-0" initial={{ scale: 1.18 }} animate={{ scale: 1.02 }} transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}>
-                    <Picture src={current.image} loading="eager" sizes={SIZES} className="h-full w-full object-cover" />
+                    <IndustryPicture industry={current} loading="eager" sizes={SIZES} className="h-full w-full object-cover" />
                   </motion.div>
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent" />
                   <div className="absolute bottom-5 left-6 right-6 flex items-end gap-4 sm:left-8">
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lift">
-                      <Icon className="h-6 w-6" strokeWidth={1.5} />
-                    </span>
+                    <GlyphTile icon={Icon} tone="red" size="lg" />
                     <h3 className="text-balance font-display text-xl font-medium leading-tight tracking-tight text-foreground sm:text-2xl">{current.headline}</h3>
                   </div>
                 </div>

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, ArrowUpRight, CalendarDays, ChevronDown, LogIn, Menu, Phone, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { empowerLink } from "@/lib/empower";
-import { SOURCE } from "@/data/site";
+import { PRODUCTS, SOURCE } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -18,6 +18,7 @@ import { useTx } from "@/i18n/tx";
 import { useSiteSettings } from "@/lib/site";
 import { useOverDarkSurface } from "./navTone";
 import { SearchButton } from "@/components/search/SearchHost";
+import { GlyphTile, MetalIcon } from "@/components/materials/MetalIcon";
 
 // Only the site's top-level nav chrome is translated so far - the deep
 // mega-menu content (product/solution/industry names) is still English
@@ -44,6 +45,13 @@ const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 // Nav entries either route inside this site (`to`) or leave for another Solix site (`href`, e.g. SOLIXEmpower).
 const NavTo = ({ to, href, ...props }) => (href ? <a href={href} {...props} /> : <Link to={to} {...props} />);
 
+// Mega-menu tiles take the chrome of what they link to: a product's own
+// accent, otherwise Solix Blue.
+const menuTone = (to) => {
+  const product = typeof to === "string" && to.startsWith("/products/") ? PRODUCTS.find((p) => to === `/products/${p.slug}`) : null;
+  return product?.accent === "teal" || !product ? "blue" : "red";
+};
+
 const GroupedPanel = ({ item, onNavigate }) => {
   const tx = useTx();
   return (
@@ -52,10 +60,13 @@ const GroupedPanel = ({ item, onNavigate }) => {
         <motion.div key={group.heading} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.04 * gi, ease: [0.22, 1, 0.36, 1] }}>
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary-ink">{tx(group.heading)}</p>
           <div className="mt-4 flex flex-col gap-0.5">
-            {group.items.map(({ label, desc, to }) => (
-              <Link key={label} to={to} onClick={onNavigate} data-testid={`mega-link-${slug(label)}`} className="group -mx-2 block rounded-lg px-2 py-1.5 transition-[background-color,transform] duration-200 hover:translate-x-1 hover:bg-muted">
-                <span className="block text-sm font-medium text-foreground group-hover:text-primary-ink">{tx(label)}</span>
-                {desc && <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{tx(desc)}</span>}
+            {group.items.map(({ label, desc, to, icon }) => (
+              <Link key={label} to={to} onClick={onNavigate} data-testid={`mega-link-${slug(label)}`} className="group -mx-2 flex gap-2.5 rounded-lg px-2 py-1.5 transition-[background-color,transform] duration-200 hover:translate-x-1 hover:bg-muted">
+                {icon && <MetalIcon icon={icon} tone={menuTone(to)} className="mt-0.5 h-4 w-4 shrink-0" />}
+                <span>
+                  <span className="block text-sm font-medium text-foreground group-hover:text-primary-ink">{tx(label)}</span>
+                  {desc && <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{tx(desc)}</span>}
+                </span>
               </Link>
             ))}
           </div>
@@ -99,9 +110,7 @@ const FlatPanel = ({ item, onNavigate, label }) => {
         {item.items.map(({ label: itemLabel, desc, to, href, icon: Icon }, ii) => (
           <motion.div key={itemLabel} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.03 * ii, ease: [0.22, 1, 0.36, 1] }}>
           <NavTo to={to} href={href} onClick={onNavigate} data-testid={`mega-link-${slug(itemLabel)}`} className="spot group relative flex h-full items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-muted/60">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line/10 bg-accent/60 text-teal transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/10 group-hover:text-primary-ink">
-              <Icon className="h-5 w-5" strokeWidth={1.5} />
-            </span>
+            <GlyphTile icon={Icon} tone={menuTone(to)} />
             <span>
               <span className="block font-medium text-foreground">{tx(itemLabel)}</span>
               {desc && <span className="mt-0.5 block text-sm text-muted-foreground">{tx(desc)}</span>}
@@ -385,7 +394,7 @@ export const Navbar = () => {
           <AccountButtons />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <button className="ml-1 grid h-10 w-10 place-items-center rounded-full border border-line/15 bg-background/70 backdrop-blur xl:hidden" aria-label={tx("Open menu")} data-testid="mobile-menu-button">
+              <button className="ml-1 grid h-10 w-10 place-items-center rounded-full border border-line/15 bg-background/85 xl:hidden" aria-label={tx("Open menu")} data-testid="mobile-menu-button">
                 {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </SheetTrigger>

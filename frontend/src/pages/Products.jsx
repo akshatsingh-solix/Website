@@ -5,7 +5,7 @@ import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { ProductCard } from "@/components/home/PlatformBento";
-import { ArchitectureStack } from "@/components/products/ArchitectureStack";
+import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
 import { ProductFinder } from "@/components/explorers/ProductFinder";
 import { CTABand } from "@/components/shared/CTABand";
 import { FamilyVisual } from "@/components/media/FamilyVisual";
@@ -23,7 +23,6 @@ export default function Products() {
         crumbs={[{ label: "Products" }]}
         title="One platform. Every era of your data. Every way to put it to work."
         description="Solix products are not point tools bolted together. They are capabilities on a single governed foundation, so a record archived today is searchable by legal tomorrow and usable by an AI agent next quarter."
-        image="/Website/images/prod-cdp.jpg"
         media={<FamilyVisual family={FAMILIES.find((f) => f.id === "platform")} />}
       >
         <Button asChild size="lg" data-testid="products-hero-demo">
@@ -45,13 +44,8 @@ export default function Products() {
         </div>
       </Section>
 
-      <Section className="dark overflow-hidden bg-background text-foreground">
-        <div className="absolute inset-0 grid-lines grid-fade" />
-        <div className="container relative">
-          <SectionHeading eyebrow="Architecture" title="Layered by design." description="Each layer inherits the governance of the one beneath it. Nothing leaves the trust perimeter." />
-          <div className="mt-14"><ArchitectureStack /></div>
-        </div>
-      </Section>
+      {/* The four layers in 3D, every product on the layer that does its work. */}
+      <PlatformExplorer id="architecture" eyebrow="Architecture" title="Layered by design." description="Each layer inherits the governance of the one beneath it. Nothing leaves the trust perimeter. Select a layer to see its products, or choose an industry to see where its programs start." />
 
       {["Platform", "Enterprise AI (EAI)", "Cloud Archive Products", "EAI Pharma", "Enterprise Foundation"].map((category, i) => (
         <Section key={category} bordered className={i % 2 === 0 ? "bg-muted" : undefined}>

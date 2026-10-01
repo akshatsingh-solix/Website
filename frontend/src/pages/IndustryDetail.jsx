@@ -10,7 +10,9 @@ import { ProductCard } from "@/components/home/PlatformBento";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { midSentence, useTx } from "@/i18n/tx";
-import { Picture } from "@/components/shared/Picture";
+import { IndustryPicture, hasIndustryPhoto } from "@/components/industries/IndustryPicture";
+import { Sigil } from "@/components/materials/Sigil";
+import { MetalIcon } from "@/components/materials/MetalIcon";
 import { LiquidGlass } from "@/components/materials/LiquidGlass";
 import { IndustrySignature } from "@/components/industries/IndustrySignature";
 import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
@@ -34,7 +36,8 @@ export default function IndustryDetail() {
         crumbs={[{ label: "Industries", to: "/industries" }, { label: ind.name }]}
         title={ind.headline}
         description={ind.desc}
-        image={ind.image}
+        image={hasIndustryPhoto(ind) ? ind.image : undefined}
+        media={hasIndustryPhoto(ind) ? undefined : <Sigil icon={ind.icon} tone="blue" float className="aspect-[4/3] w-full rounded-3xl border border-line/15" />}
       >
         <Button asChild size="lg" data-testid="industry-demo-button">
           <Link to="/contact?type=demo">{tx("Talk to an industry expert")} <ArrowRight /></Link>
@@ -74,9 +77,9 @@ export default function IndustryDetail() {
             {others.map((o) => (
               <Item key={o.slug} className="flex">
                 <Link to={`/industries/${o.slug}`} className="dark group relative flex aspect-[4/3] w-full items-end overflow-hidden rounded-2xl border border-line/10 bg-background p-5 text-foreground shadow-soft" data-testid={`industry-related-${o.slug}`}>
-                  <Picture src={o.image} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <IndustryPicture industry={o} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-                  <LiquidGlass lens className="relative flex items-center gap-2 rounded-2xl px-4 py-2.5 font-display text-lg font-medium text-white"><o.icon className="h-4 w-4 text-primary-ink" strokeWidth={1.5} /> {o.name}</LiquidGlass>
+                  <LiquidGlass lens className="relative flex items-center gap-2 rounded-2xl px-4 py-2.5 font-display text-lg font-medium text-white"><MetalIcon icon={o.icon} tone="red" className="h-4 w-4" /> {o.name}</LiquidGlass>
                 </Link>
               </Item>
             ))}

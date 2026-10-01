@@ -1,0 +1,65 @@
+<!doctype html><html><body style="margin:0;background:transparent">
+<script type="module">
+// Offline renderer for the glyph library (glyphs.js): one Paper liquid-metal
+// mount, reused for every glyph so the shader compiles once; each mask is
+// processed by Paper's own image pipeline, drawn at a fixed moment of the
+// flow, and read back as a transparent WebP.
+import {
+  ShaderMount, liquidMetalFragmentShader, toProcessedLiquidMetal, getShaderColorFromString,
+  ShaderFitOptions, LiquidMetalShapes, defaultObjectSizing,
+} from "/node_modules/@paper-design/shaders/dist/index.js";
+
+let mount = null;
+let host = null;
+
+const params = (tint, image) => ({
+  u_colorBack: getShaderColorFromString("#00000000"),
+  u_colorTint: getShaderColorFromString(tint),
+  u_image: image,
+  u_contour: 0.45,
+  u_distortion: 0.08,
+  u_softness: 0.12,
+  u_repetition: 2.2,
+  u_shiftRed: 0.35,
+  u_shiftBlue: 0.35,
+  u_angle: 70,
+  u_isImage: true,
+  u_shape: LiquidMetalShapes.none,
+  u_fit: ShaderFitOptions.contain,
+  u_scale: 0.94,
+  u_rotation: defaultObjectSizing.rotation,
+  u_offsetX: 0,
+  u_offsetY: 0,
+  u_originX: 0.5,
+  u_originY: 0.5,
+  u_worldWidth: 0,
+  u_worldHeight: 0,
+});
+
+const frames = (n) => new Promise((r) => { const step = () => (n-- <= 0 ? r() : requestAnimationFrame(step)); step(); });
+
+window.renderGlyph = async (maskUrl, tint, size, out, frame) => {
+  const processed = await toProcessedLiquidMetal(maskUrl);
+  const image = new Image();
+  image.src = URL.createObjectURL(processed.pngBlob);
+  await image.decode();
+  if (!mount) {
+    host = document.createElement("div");
+    host.style.cssText = `position:absolute;left:0;top:0;width:${size}px;height:${size}px`;
+    document.body.appendChild(host);
+    mount = new ShaderMount(host, liquidMetalFragmentShader, params(tint, image), { preserveDrawingBuffer: true, premultipliedAlpha: false }, 0, frame, 1, size * size, ["u_image"]);
+  } else {
+    mount.setUniforms(params(tint, image));
+    mount.setFrame(frame);
+  }
+  await frames(4);
+  const canvas = host.querySelector("canvas");
+  const small = document.createElement("canvas");
+  small.width = out;
+  small.height = out;
+  const g = small.getContext("2d");
+  g.imageSmoothingQuality = "high";
+  g.drawImage(canvas, 0, 0, out, out);
+  return small.toDataURL("image/webp", 0.9);
+};
+</script></body></html>

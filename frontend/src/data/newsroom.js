@@ -16,7 +16,7 @@ const PRESS_RELEASES_EN = [
     ],
   },
   {
-    id: "empower-2026", date: "2026-05-14", year: "2026", category: "Event", image: "/Website/images/art/news-event.svg", registerUrl: empowerLink("press_release", "register"),
+    id: "empower-2026", date: "2026-05-14", year: "2026", category: "Event", registerUrl: empowerLink("press_release", "register"),
     title: "SOLIXEmpower 2026 Comes to UC San Diego, October 28-30",
     summary: "The Agentic Enterprise: three days of Enterprise AI keynotes, panels, hands-on workshops and a hackathon at the Qualcomm Institute.",
     body: [
@@ -28,7 +28,7 @@ const PRESS_RELEASES_EN = [
     ],
   },
   {
-    id: "utility-merger-case", date: "2026-04-08", year: "2026", category: "Customer", image: "/Website/images/art/news-customer.svg",
+    id: "utility-merger-case", date: "2026-04-08", year: "2026", category: "Customer",
     title: "Combined Utility Retires 60 Applications and Preserves 12 PB on Solix CDP",
     summary: "Post-merger program eliminates $18M in annual run cost while meeting multi-decade regulatory retention.",
     body: [
@@ -51,7 +51,7 @@ const PRESS_RELEASES_EN = [
     ],
   },
   {
-    id: "aws-competency", date: "2025-11-19", year: "2025", category: "Partner", image: "/Website/images/art/news-partner.svg",
+    id: "aws-competency", date: "2025-11-19", year: "2025", category: "Partner",
     title: "Solix Achieves Expanded Cloud Partner Competencies for Data & Analytics",
     summary: "Recognition for archive-first migration patterns and governed data lake deployments on hyperscaler platforms.",
     body: [

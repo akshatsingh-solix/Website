@@ -6,7 +6,8 @@ import { Section } from "@/components/shared/Section";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { useTx } from "@/i18n/tx";
-import { Picture } from "@/components/shared/Picture";
+import { IndustryPicture } from "@/components/industries/IndustryPicture";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 import { LiquidGlass } from "@/components/materials/LiquidGlass";
 import { industryContext } from "@/data/industryContext";
 import { IndustrySignatures } from "@/components/industries/IndustrySignature";
@@ -33,11 +34,9 @@ export default function Industries() {
                   className="spot group relative flex w-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-card shadow-soft card-hover"
                 >
                   <div className="dark relative h-48 overflow-hidden bg-background">
-                    <Picture src={ind.image} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <IndustryPicture industry={ind} sizes="(min-width: 1024px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background/60 to-transparent" />
-                    <span className="absolute bottom-4 left-5 grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lift">
-                      <ind.icon className="h-5 w-5" strokeWidth={1.5} />
-                    </span>
+                    <GlyphTile icon={ind.icon} tone="red" className="absolute bottom-4 left-5" />
                     {/* The rules this industry's records answer to, on a lens of liquid glass over the (still) photo. */}
                     {industryContext(ind.slug) && (
                       <LiquidGlass lens shape="pill" className="absolute right-4 top-4 max-w-[75%] truncate rounded-full px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-white">

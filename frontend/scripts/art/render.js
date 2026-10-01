@@ -1,9 +1,11 @@
-// node scripts/art/render.js <scene> <W> <H> [SS] [outname]  (CHROMIUM_PATH=... to pick a browser)
+// node scripts/art/render.js <scene> <W> <H> [SS] [outname]  (CHROMIUM_PATH=... to pick a browser;
+// DEFINES="TONE 1.0" adds #define lines, e.g. for sigil-stage)
 const { chromium } = require("playwright-core");
 const fs = require("fs");
 (async () => {
   const [scene, W = "1600", H = "1000", SS = "1", name] = process.argv.slice(2);
-  const frag = fs.readFileSync(`${__dirname}/${scene}.frag`, "utf8");
+  const defines = (process.env.DEFINES || "").split(",").filter(Boolean).map((d) => `#define ${d.trim()}`).join("\n");
+  const frag = fs.readFileSync(`${__dirname}/${scene}.frag`, "utf8").replace(/^(#version[^\n]*\n)/, (v) => `${v}${defines}\n`);
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
   const p = await b.newPage({ viewport: { width: 800, height: 600 } });
   p.on("console", (m) => console.log("console:", m.text()));

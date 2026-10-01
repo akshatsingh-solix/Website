@@ -12,6 +12,7 @@ import { SignalField } from "@/components/motion/signal/SignalField";
 import { SplitWords } from "@/components/motion/KineticText";
 import { ScrambleText } from "@/components/motion/Scramble";
 import { useDarkSurface } from "@/components/layout/navTone";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 const MODES = [
   { key: "demo", label: "Request a demo", title: "See Solix on your data.", desc: "A 45-minute working session with a solutions architect, tailored to the systems and outcomes you care about." },
@@ -67,19 +68,19 @@ export default function Contact() {
 
           <dl className="mt-12 space-y-6 text-sm">
             <div className="flex gap-4">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line/10 bg-line/5 text-teal"><Phone className="h-5 w-5" strokeWidth={1.5} /></span>
+              <GlyphTile icon={Phone} tone="blue" />
               <div><dt className="text-muted-foreground">{tx("Sales & support")}</dt><dd className="mt-0.5 font-medium"><a href="tel:18884676549" className="hover:text-primary-ink">1.888.GO.SOLIX (467.6549)</a></dd></div>
             </div>
             <div className="flex gap-4">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line/10 bg-line/5 text-teal"><Mail className="h-5 w-5" strokeWidth={1.5} /></span>
+              <GlyphTile icon={Mail} tone="blue" />
               <div><dt className="text-muted-foreground">{tx("Email")}</dt><dd className="mt-0.5 font-medium"><a href="mailto:info@solix.com" className="hover:text-primary-ink">info@solix.com</a></dd></div>
             </div>
             <div className="flex gap-4">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line/10 bg-line/5 text-teal"><MapPin className="h-5 w-5" strokeWidth={1.5} /></span>
+              <GlyphTile icon={MapPin} tone="blue" />
               <div><dt className="text-muted-foreground">{tx("Headquarters")}</dt><dd className="mt-0.5 font-medium">{OFFICES[0].address}</dd></div>
             </div>
             <div className="flex gap-4">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line/10 bg-line/5 text-teal"><Clock className="h-5 w-5" strokeWidth={1.5} /></span>
+              <GlyphTile icon={Clock} tone="blue" />
               <div><dt className="text-muted-foreground">{tx("Response time")}</dt><dd className="mt-0.5 font-medium">{tx("Within one business day")}</dd></div>
             </div>
           </dl>

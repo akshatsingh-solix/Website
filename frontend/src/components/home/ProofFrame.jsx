@@ -9,6 +9,7 @@ import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { Odometer } from "@/components/motion/Odometer";
 import { VelocityMarquee } from "@/components/motion/VelocityMarquee";
 import { GrowthChartCard, FACTS } from "./GrowthChart";
+import { GlyphTile, MetalIcon } from "@/components/materials/MetalIcon";
 
 // One icon per STATS entry, in order: connectors, cost, years, petabytes.
 const STAT_ICONS = [PlugZap, TrendingDown, CalendarClock, HardDrive];
@@ -65,7 +66,7 @@ export const ProofFrame = () => {
                   <div className="spot surface-elevated group relative flex w-full flex-col overflow-hidden p-5 sm:p-6">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground">0{i + 1}</span>
-                      <Icon className={cn("h-5 w-5 transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110", blue ? "text-teal" : "text-primary-ink")} strokeWidth={1.5} />
+                      <GlyphTile icon={Icon} tone={blue ? "blue" : "red"} size="sm" />
                     </div>
                     <p className="mt-auto pt-6 font-display text-[clamp(2.4rem,1.6rem+2.4vw,4rem)] font-medium leading-none tracking-[-0.05em] text-foreground">
                       <Odometer value={s.value} suffix={s.suffix} />
@@ -97,7 +98,7 @@ export const ProofFrame = () => {
                   const Icon = SECTOR_ICONS[i % SECTOR_ICONS.length];
                   return (
                     <span key={`${l}-${i}`} className="group mx-6 inline-flex shrink-0 items-center gap-3 font-display text-2xl font-medium tracking-[-0.02em] text-foreground/30 transition-colors duration-500 hover:text-foreground sm:text-3xl">
-                      <Icon className="h-5 w-5 shrink-0 text-teal/60 transition-colors duration-500 group-hover:text-primary sm:h-6 sm:w-6" strokeWidth={1.5} />
+                      <MetalIcon icon={Icon} tone={i % 2 ? "red" : "blue"} className="h-5 w-5 shrink-0 opacity-70 transition-opacity duration-500 group-hover:opacity-100 sm:h-6 sm:w-6" strokeWidth={1.5} />
                       {l}
                       <span className="ml-6 text-base text-primary/40" aria-hidden="true">✦</span>
                     </span>

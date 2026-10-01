@@ -12,6 +12,8 @@ import { SplitWords } from "@/components/motion/KineticText";
 import { scrollWindowTo } from "@/lib/scroll";
 import { useDarkSurface } from "@/components/layout/navTone";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { GlyphImage } from "@/components/materials/Sigil";
+import { MetalIcon } from "@/components/materials/MetalIcon";
 
 // Each era of a record's life, the platform move that handles it, and the
 // layer of the stack (key-slabs render) that does the work.
@@ -110,13 +112,13 @@ const EraDetail = ({ e, i }) => {
       >
         <span className="text-outline pointer-events-none absolute -left-1 -top-14 select-none font-display text-[8rem] font-semibold leading-none tracking-tighter short:-top-8 short:text-[6rem]" aria-hidden="true">0{i + 1}</span>
         <div className="relative flex items-center gap-3">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-foreground"><e.icon className="h-6 w-6" strokeWidth={1.5} /></span>
+          <GlyphImage icon={e.icon} tone={LAYERS[ERA_META[i].layer].tone} className="-my-2 -ml-2 h-16 w-16" />
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{tx("Era")} 0{i + 1} / 06</p>
             <p className="font-display text-xl font-medium">{e.era}</p>
           </div>
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-line/15 bg-line/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-foreground">
-            <move.icon className="h-3.5 w-3.5 text-teal" /> {tx(move.label)}
+            <MetalIcon icon={move.icon} tone="blue" className="h-3.5 w-3.5" /> {tx(move.label)}
           </span>
         </div>
         <h3 className="relative mt-6 font-display text-3xl font-medium tracking-tight sm:text-4xl short:mt-4 short:sm:text-3xl">{e.title}</h3>

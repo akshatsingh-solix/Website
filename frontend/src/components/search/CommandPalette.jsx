@@ -8,6 +8,7 @@ import { useTx } from "@/i18n/tx";
 import { empowerLink } from "@/lib/empower";
 import { NAV_LABEL_KEYS } from "@/components/layout/Navbar";
 import { useTranslation } from "react-i18next";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 const Item = ({ icon: Icon, title, subtitle, value, onSelect, tone = "blue" }) => (
   <Command.Item
@@ -15,9 +16,7 @@ const Item = ({ icon: Icon, title, subtitle, value, onSelect, tone = "blue" }) =
     onSelect={onSelect}
     className="group flex cursor-pointer items-center gap-3.5 rounded-2xl px-3 py-2.5 outline-none transition-colors data-[selected=true]:bg-line/[0.08]"
   >
-    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-line/10 ${tone === "red" ? "bg-primary/15 text-primary-ink" : "bg-teal/10 text-teal"} group-data-[selected=true]:border-line/25`}>
-      <Icon className="h-4 w-4" strokeWidth={1.75} />
-    </span>
+    <GlyphTile icon={Icon} tone={tone === "red" ? "red" : "blue"} className="h-9 w-9" />
     <span className="min-w-0 flex-1">
       <span className="block truncate text-[15px] text-foreground">{title}</span>
       {subtitle && <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>}
@@ -57,10 +56,10 @@ export default function CommandPalette({ open, onOpenChange }) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-[70] bg-[#0D192D]/60 backdrop-blur-sm data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[70] bg-[#0D192D]/75 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="liquid-glass dark fixed left-1/2 top-[10vh] z-[71] w-[min(700px,calc(100vw-1.5rem))] -translate-x-1/2 overflow-hidden rounded-3xl border border-line/15 bg-background/90 text-foreground shadow-[0_2px_8px_rgba(0,0,0,0.3),0_60px_140px_-40px_rgba(0,0,0,0.9)] backdrop-blur-2xl duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-4"
+          className="liquid-glass dark fixed left-1/2 top-[10vh] z-[71] w-[min(700px,calc(100vw-1.5rem))] -translate-x-1/2 overflow-hidden rounded-3xl border border-line/15 bg-background/95 text-foreground shadow-[0_2px_8px_rgba(0,0,0,0.3),0_60px_140px_-40px_rgba(0,0,0,0.9)] duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-4"
           data-testid="command-palette"
         >
           <DialogPrimitive.Title className="sr-only">{tx("Search Solix")}</DialogPrimitive.Title>

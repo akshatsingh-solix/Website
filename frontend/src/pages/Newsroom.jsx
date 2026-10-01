@@ -13,7 +13,9 @@ import { useTx } from "@/i18n/tx";
 import { usePressReleases } from "@/lib/press";
 import { Button } from "@/components/ui/button";
 import { Picture } from "@/components/shared/Picture";
-import { pressArt } from "@/lib/art";
+import { pressGlyph } from "@/lib/art";
+import { Sigil } from "@/components/materials/Sigil";
+import { LiquidGlass } from "@/components/materials/LiquidGlass";
 
 const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
 // i18n: filter labels are translated at render; values stay English.
@@ -43,12 +45,12 @@ export default function Newsroom() {
         description="Product launches, customer outcomes, partnerships and events from Solix Technologies."
         compact
       >
-        <div className="rounded-2xl border border-line/10 bg-card/80 p-5 text-sm backdrop-blur lg:min-w-[260px]" data-testid="press-contact-card">
+        <LiquidGlass tone="dark" className="rounded-2xl p-5 text-sm lg:min-w-[260px]" data-testid="press-contact-card">
           <p className="eyebrow mb-3">{tx("Media inquiries")}</p>
           <p className="font-medium">{PRESS_CONTACT.name}</p>
           <a href={`mailto:${PRESS_CONTACT.email}`} className="mt-2 flex items-center gap-2 text-muted-foreground hover:text-primary-ink" data-testid="press-email-link"><Mail className="h-4 w-4" /> {PRESS_CONTACT.email}</a>
           <a href="tel:18884676549" className="mt-1.5 flex items-center gap-2 text-muted-foreground hover:text-primary-ink"><Phone className="h-4 w-4" /> {PRESS_CONTACT.phone}</a>
-        </div>
+        </LiquidGlass>
       </PageHero>
 
       {featured && (
@@ -93,7 +95,11 @@ export default function Newsroom() {
                 <Link to={`/newsroom/${p.id}`} className="group grid gap-3 py-6 sm:grid-cols-12 sm:items-start" data-testid={`release-${p.id}`}>
                   <div className="font-mono text-xs text-muted-foreground sm:col-span-2">{fmt(p.date, lng)}</div>
                   <div className="dark relative hidden aspect-[4/3] overflow-hidden rounded-xl border border-line/10 bg-background sm:col-span-2 sm:block">
-                    <Picture src={p.image || pressArt(p.category)} sizes="200px" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    {p.image ? (
+                      <Picture src={p.image} sizes="200px" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <Sigil {...pressGlyph(p.category)} sizes="200px" className="absolute inset-0" />
+                    )}
                   </div>
                   <div className="sm:col-span-6">
                     <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{tx(p.category)}</span>

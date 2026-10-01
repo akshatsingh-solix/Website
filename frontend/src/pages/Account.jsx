@@ -7,6 +7,8 @@ import { useAccount } from "@/components/account/AccountAuth";
 import { Section } from "@/components/shared/Section";
 import { AuroraField, Reveal } from "@/components/shared/Reveal";
 import { Button } from "@/components/ui/button";
+import { GlyphTile } from "@/components/materials/MetalIcon";
+import { GlyphImage } from "@/components/materials/Sigil";
 
 const TRIAL_DAYS = 30;
 
@@ -61,7 +63,7 @@ export default function Account() {
               <div className="absolute inset-0 grid-lines opacity-60" />
               <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.3),transparent)]" />
               <div className="relative flex items-start justify-between">
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground"><CalendarClock className="h-5 w-5" /></span>
+                <GlyphImage icon={CalendarClock} tone="red" className="-ml-2 -mt-2 h-16 w-16" />
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{tx("Trial")}</span>
               </div>
               <p className="relative mt-6 font-display text-5xl font-semibold tracking-tight" data-testid="account-days-left">{daysLeft}</p>
@@ -81,7 +83,7 @@ export default function Account() {
             <ol className="mt-6 space-y-3">
               {steps.map((s, i) => (
                 <li key={s.title} className="surface-elevated flex gap-4 p-5">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal/10 text-teal"><s.icon className="h-5 w-5" strokeWidth={1.75} /></span>
+                  <GlyphTile icon={s.icon} tone={i === steps.length - 1 ? "red" : "blue"} />
                   <div>
                     <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-ink">0{i + 1}</p>
                     <h3 className="mt-0.5 font-display text-lg font-medium">{s.title}</h3>

@@ -37,9 +37,18 @@ shadow).
 
 `@paper-design/shaders-react` and `@paper-design/shaders`, Apache License
 2.0, (c) Paper (https://github.com/paper-design/shaders). Used unmodified
-for the liquid-metal Solix bolt. This is the permissively licensed package
-from the authors of liquid-logo (liquid.paper.design). No code from the
-liquid-logo repository itself (PolyForm Shield 1.0.0) is used.
+for the liquid-metal Solix bolt, the live product and company sigils, and
+(at build time, scripts/art/glyphs.js) the liquid-metal glyph stills in
+public/images/glyphs. This is the permissively licensed package from the
+authors of liquid-logo (liquid.paper.design). No code from the liquid-logo
+repository itself (PolyForm Shield 1.0.0) is used.
+
+## Lucide (dependency) - icons and glyph library
+
+`lucide-react`, ISC, (c) Lucide Contributors (https://github.com/lucide-icons/lucide),
+with parts derived from Feather (MIT, (c) Cole Bemis). The site's icons, and
+the silhouette masks in public/brand/glyphs from which the liquid-metal
+glyph stills are rendered, are drawn from Lucide's icon paths.
 
 ## ShaderGradient (dependency) - data terrains
 

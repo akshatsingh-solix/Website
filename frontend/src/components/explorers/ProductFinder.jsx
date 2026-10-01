@@ -7,6 +7,7 @@ import { PRODUCTS } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { track } from "@/lib/intent";
 import { useTx } from "@/i18n/tx";
+import { Sigil } from "@/components/materials/Sigil";
 
 // Each answer adds weight to the products that solve it.
 const QUESTIONS = [
@@ -102,14 +103,16 @@ export const ProductFinder = () => {
               <h3 className="font-display text-2xl font-medium tracking-tight">{tx("Your best matches")}</h3>
               <div className="mt-6 grid gap-3 md:grid-cols-3">
                 {results.map(({ product, match }, i) => (
-                  <motion.div key={product.slug} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className={cn("flex flex-col rounded-2xl border p-5", i === 0 ? "border-primary/40 bg-primary/5" : "border-line/10 bg-background")}>
-                    <div className="flex items-center justify-between gap-2">
+                  <motion.div key={product.slug} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className={cn("group flex flex-col overflow-hidden rounded-2xl border", i === 0 ? "border-primary/40 bg-primary/5" : "border-line/10 bg-background")}>
+                    <Sigil icon={product.icon} tone={product.accent === "teal" ? "blue" : "red"} sizes="(min-width: 768px) 30vw, 100vw" className="aspect-[16/7] w-full shrink-0">
+                      <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 font-mono text-[11px] font-semibold text-ink-950">{match}%</span>
+                    </Sigil>
+                    <div className="flex flex-1 flex-col p-5">
                       <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{tx(product.category)}</span>
-                      <span className="rounded-full bg-foreground px-2 py-0.5 font-mono text-[11px] text-background">{match}%</span>
+                      <p className="mt-2 font-display text-lg font-medium">{product.name}</p>
+                      <p className="mt-1 flex-1 text-sm text-muted-foreground">{product.tagline}</p>
+                      <Link to={`/products/${product.slug}#explore`} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-ink hover:underline" data-testid="finder-result-link">{tx("Explore it")} <ArrowRight className="h-4 w-4" /></Link>
                     </div>
-                    <p className="mt-3 font-display text-lg font-medium">{product.name}</p>
-                    <p className="mt-1 flex-1 text-sm text-muted-foreground">{product.tagline}</p>
-                    <Link to={`/products/${product.slug}#explore`} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-ink hover:underline" data-testid="finder-result-link">{tx("Explore it")} <ArrowRight className="h-4 w-4" /></Link>
                   </motion.div>
                 ))}
               </div>
