@@ -21,10 +21,11 @@ const STAGE = { red: "/Website/images/sigil-stage-red.jpg", blue: "/Website/imag
  * Motion, all transform/opacity: while pointed at (the parent carries
  * `group`) the stage eases in, the glyph rises off its pedestal and a light
  * sweep crosses the chrome; `float` adds a slow hover in place, for the one
- * large sigil of a section (compositor-only, off for reduced motion). `live` swaps the still for the shader,
- * which flows only while it holds the page's live-canvas slot; the still is
- * its placeholder, so the two are drawn in the same geometry. Icons without
- * a render fall back to a chrome-gradient icon.
+ * large sigil of a section (compositor-only, off for reduced motion).
+ * `live` swaps the still for the shader, which flows only while it holds
+ * the page's live-canvas slot; the still is its placeholder, so the two are
+ * drawn in the same geometry. Icons without a render fall back to a
+ * chrome-gradient icon.
  */
 export const Sigil = ({ icon, glyph, tone = "red", live = false, float = false, sizes = "(min-width: 1024px) 40vw, 100vw", className, glyphClassName, children, ...rest }) => {
   const name = glyph || glyphName(icon);
