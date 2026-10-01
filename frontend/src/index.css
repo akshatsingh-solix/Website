@@ -184,12 +184,22 @@
     background-image: linear-gradient(100deg, hsl(var(--foreground)) 10%, hsl(var(--muted-foreground)) 60%, hsl(var(--foreground)) 90%);
   }
 
-  /* Solix Red -> Solix Blue: the brand's own complementary pair. Static on
-     purpose: a drifting background-position repaints the text every frame. */
+  /* Solix Blue to Solix Red: the brand's own complementary pair. Static on
+     purpose: a drifting background-position repaints the text every frame.
+     Interpolated in oklch, so the middle stays a saturated violet: in oklab
+     (or sRGB) the two hues meet in a dim grey-mauve that drops to ~4:1 on
+     navy and reads as smudged. On light canvases the AA-on-light ink tones;
+     on navy, lighter tints of the same two colours, which hold 6:1 or better
+     across the whole sweep. */
   .text-gradient-accent {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(100deg, #0088CF, #EE2424);
-    background-image: linear-gradient(100deg in oklab, #0088CF, #EE2424);
+    background-image: linear-gradient(100deg, #0072AD, #C81E1E);
+    background-image: linear-gradient(100deg in oklch, #0072AD, #C81E1E);
+  }
+  .dark .text-gradient-accent,
+  .dark.text-gradient-accent {
+    background-image: linear-gradient(100deg, #4FBDF5, #FF6464);
+    background-image: linear-gradient(100deg in oklch, #4FBDF5, #FF6464);
   }
 
   /* Hero beat copy: centred in its band, but never pushed above the band's

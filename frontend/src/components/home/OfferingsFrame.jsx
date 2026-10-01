@@ -25,7 +25,8 @@ const VIEWS = [
  */
 export const OfferingsFrame = () => {
   const tx = useTx();
-  const wide = useMediaQuery("(min-width: 1024px)");
+  // Outcome panels need 1280px for every closed column to hold its title upright; below that, cards.
+  const wide = useMediaQuery("(min-width: 1280px)");
   const [view, setView] = useState("outcomes");
   const outcomes = SOLUTIONS.slice(0, 6);
 
