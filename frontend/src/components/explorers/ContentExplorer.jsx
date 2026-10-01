@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
 import { ExplorerShell, prefillLead, useExplorerTracking } from "./kit";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 // Fictional documents in several languages.
 const DOCS = [
@@ -70,7 +71,7 @@ export default function ContentExplorer({ product }) {
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
           {DOCS.map((d) => (
             <button key={d.file} type="button" onClick={() => pick(d)} className={cn("flex items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors", sel === d ? "border-primary/50 bg-primary/5" : "border-line/10 hover:border-line/30 hover:bg-muted")} data-testid="content-doc">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-muted text-teal"><d.Icon className="h-4 w-4" /></span>
+              <GlyphTile icon={d.Icon} tone="blue" size="sm" className="h-9 w-9" />
               <span className="min-w-0">
                 <span className="block truncate font-mono text-xs">{d.file}</span>
                 <span className="block text-[11px] text-muted-foreground">{tx(d.language)}</span>

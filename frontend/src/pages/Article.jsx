@@ -8,7 +8,9 @@ import { PageHero } from "@/components/shared/PageHero";
 import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { ArticleBody, ArticleTOC } from "@/components/shared/ArticleBody";
-import { ResourceCard, typeLabel } from "@/components/home/InsightsPreview";
+import { ResourceCard, resourceTone, typeLabel } from "@/components/home/InsightsPreview";
+import { Sigil } from "@/components/materials/Sigil";
+import { LiquidGlass } from "@/components/materials/LiquidGlass";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
@@ -138,7 +140,7 @@ export default function Article() {
         description={article.summary}
         compact
       >
-        <div className="flex flex-col gap-4 rounded-2xl border border-line/10 bg-card/80 p-5 text-sm backdrop-blur lg:min-w-[260px]">
+        <LiquidGlass tone="dark" className="flex flex-col gap-4 rounded-2xl p-5 text-sm lg:min-w-[260px]">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-primary/30 to-teal/20 font-display text-sm font-semibold">{(r.author || "Solix").split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>
             <div>
@@ -157,7 +159,7 @@ export default function Article() {
             </Button>
           )}
           <Share title={r.title} />
-        </div>
+        </LiquidGlass>
       </PageHero>
 
       <Section className="py-16 sm:py-20">
@@ -176,7 +178,13 @@ export default function Article() {
           </aside>
 
           <div className="order-1 lg:order-2 lg:col-span-8 lg:col-start-5">
-            {r.cover && <img src={fileHref(r.cover)} alt="" className="mb-10 aspect-[16/9] w-full rounded-2xl border border-line/10 object-cover" loading="eager" decoding="async" data-testid="article-cover" />}
+            {r.cover ? (
+              <img src={fileHref(r.cover)} alt="" className="mb-10 aspect-[16/9] w-full rounded-2xl border border-line/10 object-cover" loading="eager" decoding="async" data-testid="article-cover" />
+            ) : (
+              <Sigil icon={r.icon} tone={resourceTone(r)} float sizes="(min-width: 1024px) 60vw, 100vw" className="mb-10 aspect-[16/7] w-full rounded-2xl border border-line/10" data-testid="article-cover">
+                <LiquidGlass tone="dark" className="absolute left-4 top-4 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground/90 !shadow-none">{typeLabel(r.type)}</LiquidGlass>
+              </Sigil>
+            )}
             {(r.video || (r.file && !gated)) && (
               <div className="mb-10 flex flex-wrap gap-3" data-testid="article-assets">
                 {r.video && (

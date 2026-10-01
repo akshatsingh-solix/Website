@@ -12,6 +12,11 @@ import { GlobalNetworkMap } from "@/components/company/GlobalNetworkMap";
 import { Button } from "@/components/ui/button";
 import { Rich, useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
+import { Sigil } from "@/components/materials/Sigil";
+import { GlyphTile } from "@/components/materials/MetalIcon";
+
+// Values alternate the two brand chromes.
+const VALUE_TONES = ["red", "blue"];
 
 const MORE = [
   { id: "analyst-views", icon: BarChart3, eyebrow: "Analyst Views", title: "Independent perspective on where we fit.", body: "Solix briefs industry analysts regularly on our platform strategy, from archiving and application retirement to governed Enterprise AI. If you're evaluating Solix as part of an analyst-led shortlist, your account team can share the relevant reports and briefing notes for your industry and use case." },
@@ -60,8 +65,12 @@ export default function Company() {
 
       <Section>
         <div className="container grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-5">
+          <div className="group lg:col-span-5">
             <SectionHeading eyebrow="Mission" title="Activate every era of enterprise data, inside a perimeter of trust." />
+            {/* The bolt of the mark in liquid metal: stewardship, activated. */}
+            <Reveal delay={0.15} className="mt-10">
+              <Sigil glyph="solix-bolt" tone="red" live float sizes="(min-width: 1024px) 38vw, 100vw" className="aspect-[4/3] w-full rounded-3xl border border-line/10 shadow-lift" data-testid="company-mission-bolt" />
+            </Reveal>
           </div>
           <Reveal delay={0.1} className="prose-solix text-base leading-relaxed text-muted-foreground md:text-lg lg:col-span-7">
             <p><Rich text={tx("Enterprises don't have a data problem. They have a data <em>history</em> problem: decades of systems, formats and regulations, each holding records the business still needs and regulators still expect.")} /></p>
@@ -82,9 +91,9 @@ export default function Company() {
         <div className="container">
           <SectionHeading eyebrow="Values" title="What we optimize for." />
           <Stagger className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {VALUES.map((v) => (
-              <Item key={v.title} className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
-                <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-primary-ink"><v.icon className="h-5 w-5" strokeWidth={1.5} /></span>
+            {VALUES.map((v, i) => (
+              <Item key={v.title} className="spot group relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
+                <GlyphTile icon={v.icon} tone={VALUE_TONES[i % VALUE_TONES.length]} />
                 <h3 className="mt-6 font-display text-xl font-medium">{v.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
               </Item>
@@ -105,8 +114,10 @@ export default function Company() {
           <SectionHeading eyebrow="Leadership" title="Operators who have shipped at scale." />
           <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {LEADERSHIP.map((l) => (
-              <Item key={l.name} className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid="leader-card">
-                <span className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-primary/30 to-teal/20 font-display text-xl font-semibold">{l.initials}</span>
+              <Item key={l.name} className="spot group relative rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid="leader-card">
+                <span className="dark liquid-glass grid h-16 w-16 place-items-center rounded-2xl bg-background shadow-lift">
+                  <span className="font-display text-xl font-semibold text-gradient-accent">{l.initials}</span>
+                </span>
                 <h3 className="mt-6 font-display text-lg font-medium">{l.name}</h3>
                 <p className="text-sm text-primary-ink">{l.role}</p>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{l.bio}</p>
@@ -120,13 +131,13 @@ export default function Company() {
         <div className="absolute inset-0 grid-lines grid-fade" />
         <div className="container relative">
           <SectionHeading eyebrow="Global presence" title="Where we work." />
-          <Reveal delay={0.1} className="mt-12 rounded-2xl border border-line/10 bg-card p-6 sm:p-10">
+          <Reveal delay={0.1} className="liquid-glass liquid-glass-dark mt-12 rounded-2xl p-6 sm:p-10">
             <GlobalNetworkMap />
           </Reveal>
           <Stagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {OFFICES.map((o) => (
-              <Item key={o.city} className="flex gap-4 rounded-2xl border border-line/10 bg-card p-6">
-                <MapPin className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
+              <Item key={o.city} className="liquid-glass liquid-glass-dark flex gap-4 rounded-2xl p-6">
+                <GlyphTile icon={MapPin} tone="blue" size="sm" />
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{o.label}</p>
                   <h3 className="mt-1 font-display text-lg font-medium">{o.city}</h3>
@@ -144,8 +155,8 @@ export default function Company() {
           <Stagger className="mt-12 grid gap-4 lg:grid-cols-3">
             {more.map((c) => (
               <Item key={c.id} id={c.id} className="flex scroll-mt-28">
-                <div className="surface-elevated flex w-full flex-col p-7">
-                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal/10 text-teal"><c.icon className="h-5 w-5" strokeWidth={1.5} /></span>
+                <div className="surface-elevated group flex w-full flex-col p-7">
+                  <GlyphTile icon={c.icon} tone="blue" />
                   <p className="eyebrow mt-6">{c.eyebrow}</p>
                   <h3 className="mt-2 font-display text-xl font-medium tracking-tight text-foreground">{c.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{c.body}</p>

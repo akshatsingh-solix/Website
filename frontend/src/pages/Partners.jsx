@@ -4,6 +4,9 @@ import { Section, SectionHeading } from "@/components/shared/Section";
 import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { BrandMark } from "@/components/shared/BrandMark";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { CheckCheck } from "lucide-react";
+import { Sigil } from "@/components/materials/Sigil";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 export default function Partners() {
   return (
@@ -21,11 +24,15 @@ export default function Partners() {
           <SectionHeading eyebrow="Our Partners" title="An ecosystem organized by what you need done." />
           <Stagger className="mt-14 grid gap-6 lg:grid-cols-2">
             {PARTNER_TIERS.map((t) => (
-              <Item key={t.id} id={t.id} className="spot relative surface-elevated scroll-mt-28 p-7 card-hover lg:[&:last-child:nth-child(odd)]:col-span-2" data-testid={`partner-tier-${t.id}`}>
-                <span className="grid h-11 w-11 place-items-center rounded-xl border border-line/10 bg-accent/50 text-teal"><t.icon className="h-5 w-5" strokeWidth={1.5} /></span>
-                <h3 className="mt-6 font-display text-2xl font-medium">{t.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>
-                <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Item key={t.id} id={t.id} className="spot group relative surface-elevated scroll-mt-28 overflow-hidden card-hover lg:[&:last-child:nth-child(odd)]:col-span-2" data-testid={`partner-tier-${t.id}`}>
+                <div className="grid sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+                  <Sigil icon={t.icon} tone={t.tone} sizes="(min-width: 1024px) 20vw, (min-width: 640px) 40vw, 100vw" className="aspect-[16/9] w-full sm:aspect-auto sm:h-full sm:min-h-[200px]" />
+                  <div className="p-7">
+                    <h3 className="font-display text-2xl font-medium">{t.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 px-7 pb-7 sm:grid-cols-3">
                   {t.partners.map((p) => <BrandMark key={p} name={p} />)}
                 </div>
               </Item>
@@ -41,7 +48,7 @@ export default function Partners() {
             <Reveal delay={0.1} className="mt-10 space-y-5">
               {PARTNER_BENEFITS.map((b) => (
                 <div key={b.title} className="flex gap-4">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <GlyphTile icon={CheckCheck} tone="red" size="sm" className="mt-0.5" />
                   <div>
                     <p className="font-medium">{b.title}</p>
                     <p className="text-sm text-muted-foreground">{b.desc}</p>

@@ -15,7 +15,9 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
 import { Picture } from "@/components/shared/Picture";
-import { pressArt } from "@/lib/art";
+import { pressGlyph } from "@/lib/art";
+import { Sigil } from "@/components/materials/Sigil";
+import { LiquidGlass } from "@/components/materials/LiquidGlass";
 
 const fmt = (d, lng = "en") => new Date(d).toLocaleDateString(lng, { month: "long", day: "numeric", year: "numeric" });
 
@@ -69,10 +71,11 @@ export default function PressRelease() {
         crumbs={[{ label: "Company", to: "/company" }, { label: "Newsroom", to: "/newsroom" }, { label: pr.category }]}
         title={pr.title}
         description={pr.summary}
-        image={pr.image || pressArt(pr.category)}
+        image={pr.image}
+        media={pr.image ? undefined : <Sigil {...pressGlyph(pr.category)} float className="aspect-[4/3] w-full rounded-3xl border border-line/15" />}
         compact
       >
-        <div className="inline-flex flex-wrap items-center gap-4 rounded-2xl border border-line/10 bg-card/80 p-4 text-sm shadow-soft backdrop-blur">
+        <LiquidGlass tone="dark" className="inline-flex flex-wrap items-center gap-4 rounded-2xl p-4 text-sm">
           <p className="inline-flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4" /> {fmt(pr.date, lng)}</p>
           {pr.registerUrl && (
             <Button asChild data-intent="empower_register" data-testid="press-register"><a href={pr.registerUrl}>{tx("Register now")} <ArrowUpRight /></a></Button>
@@ -83,14 +86,18 @@ export default function PressRelease() {
             <a className={iconCls} aria-label={tx("Share on X")} target="_blank" rel="noreferrer" href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(pr.title)}`}><Twitter className="h-4 w-4" /></a>
             <button className={iconCls} aria-label={tx("Copy link")} onClick={() => copy(url, tx("Link copied"))} data-testid="press-copy-link"><Link2 className="h-4 w-4" /></button>
           </div>
-        </div>
+        </LiquidGlass>
       </PageHero>
 
       <Section className="py-16 sm:py-20">
         <div className="container grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <Reveal className="mb-8 overflow-hidden rounded-3xl border border-line/10">
-              <Picture src={pr.image || pressArt(pr.category)} loading="eager" className="aspect-[21/9] w-full object-cover" data-testid="press-hero-image" />
+              {pr.image ? (
+                <Picture src={pr.image} loading="eager" className="aspect-[21/9] w-full object-cover" data-testid="press-hero-image" />
+              ) : (
+                <Sigil {...pressGlyph(pr.category)} sizes="(min-width: 1024px) 60vw, 100vw" className="aspect-[21/9] w-full" data-testid="press-hero-image" />
+              )}
             </Reveal>
             <ArticleBody blocks={pr.body} />
             <div className="mt-12 rounded-2xl border border-line/10 bg-card p-6" data-testid="press-boilerplate">
@@ -126,10 +133,19 @@ export default function PressRelease() {
           <Stagger className="mt-12 grid gap-4 md:grid-cols-3">
             {others.map((p) => (
               <Item key={p.id} className="flex">
-                <Link to={`/newsroom/${p.id}`} className="spot relative group flex w-full flex-col rounded-2xl border border-line/10 bg-card p-6 card-hover" data-testid={`press-related-${p.id}`}>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{tx(p.category)} · {fmt(p.date, lng)}</span>
-                  <h3 className="mt-4 font-display text-lg font-medium leading-snug transition-colors group-hover:text-primary-ink">{p.title}</h3>
-                  <p className="mt-3 text-sm text-muted-foreground">{p.summary}</p>
+                <Link to={`/newsroom/${p.id}`} className="spot relative group flex w-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-card card-hover" data-testid={`press-related-${p.id}`}>
+                  <div className="dark relative aspect-[16/8] shrink-0 overflow-hidden bg-background">
+                    {p.image ? (
+                      <Picture src={p.image} sizes="(min-width: 768px) 33vw, 100vw" className="absolute inset-0 h-full w-full object-cover transition-transform [transition-duration:1200ms] ease-out group-hover:scale-110" />
+                    ) : (
+                      <Sigil {...pressGlyph(p.category)} sizes="(min-width: 768px) 33vw, 100vw" className="absolute inset-0" />
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-teal">{tx(p.category)} · {fmt(p.date, lng)}</span>
+                    <h3 className="mt-4 font-display text-lg font-medium leading-snug transition-colors group-hover:text-primary-ink">{p.title}</h3>
+                    <p className="mt-3 text-sm text-muted-foreground">{p.summary}</p>
+                  </div>
                 </Link>
               </Item>
             ))}

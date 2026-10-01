@@ -1,6 +1,7 @@
 import { ClipboardCheck, FlaskConical, Rocket } from "lucide-react";
 import { Stagger, Item } from "@/components/shared/Reveal";
 import { useLocalized } from "@/i18n/localize";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 const STEPS = [
   { n: "01", icon: ClipboardCheck, title: "Assess", duration: "2 weeks", desc: "Data estate assessment: growth, cost, retention obligations and AI readiness, with a quantified business case.", outputs: ["Savings model", "Risk register", "Prioritized backlog"] },
@@ -15,10 +16,8 @@ export const ApproachTimeline = () => {
     <div className="absolute left-7 top-0 bottom-0 w-px bg-gradient-to-b from-teal/60 via-line/20 to-primary/70 sm:left-1/2 sm:hidden lg:left-0 lg:right-0 lg:top-7 lg:bottom-auto lg:h-px lg:w-auto lg:bg-gradient-to-r" />
     <Stagger className="grid gap-8 lg:grid-cols-3" stagger={0.12}>
       {steps.map((s, i) => (
-        <Item key={s.n} className="relative pl-20 lg:pl-0">
-          <span className="absolute left-0 top-0 grid h-14 w-14 place-items-center rounded-2xl border border-line/10 bg-accent/50 text-teal lg:relative lg:mb-6">
-            <s.icon className="h-6 w-6" strokeWidth={1.5} />
-          </span>
+        <Item key={s.n} className="group relative pl-20 lg:pl-0">
+          <GlyphTile icon={s.icon} tone={i === steps.length - 1 ? "red" : "blue"} size="lg" className="absolute left-0 top-0 lg:relative lg:mb-6" />
           <div className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs text-primary-ink">{s.n}</span>

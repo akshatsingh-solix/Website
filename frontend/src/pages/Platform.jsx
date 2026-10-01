@@ -7,6 +7,8 @@ import { Reveal, Stagger, Item, Tilt } from "@/components/shared/Reveal";
 import { CTABand } from "@/components/shared/CTABand";
 import { Button } from "@/components/ui/button";
 import { useTx } from "@/i18n/tx";
+import { GlyphImage } from "@/components/materials/Sigil";
+import { MetalIcon } from "@/components/materials/MetalIcon";
 import { FlowExplainer } from "@/components/products/FlowExplainer";
 import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
 
@@ -38,7 +40,7 @@ export default function Platform() {
               <Stagger className="mt-8 grid gap-3 sm:grid-cols-2">
                 {s.points.map((p) => (
                   <Item key={p} className="flex items-start gap-3">
-                    <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-line/10 bg-accent/50 text-teal"><Check className="h-3.5 w-3.5" /></span>
+                    <span className="glyph-tile liquid-glass liquid-glass-auto glyph-tile-blue mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full"><MetalIcon icon={Check} tone="blue" strokeWidth={2.5} className="h-3.5 w-3.5" /></span>
                     <span className="text-sm text-muted-foreground">{p}</span>
                   </Item>
                 ))}
@@ -46,10 +48,10 @@ export default function Platform() {
             </div>
             <Reveal className={i % 2 === 1 ? "lg:col-span-5 lg:col-start-1 lg:row-start-1" : "lg:col-span-5"}>
               <Tilt max={6}>
-              <div className="beam-border spot dark relative overflow-hidden rounded-3xl border border-line/10 bg-background p-8 text-foreground shadow-[0_40px_80px_-40px_rgba(13,25,45,0.55)]">
+              <div className="beam-border spot group dark relative overflow-hidden rounded-3xl border border-line/10 bg-background p-8 text-foreground shadow-[0_40px_80px_-40px_rgba(13,25,45,0.55)]">
                 <div className="absolute inset-0 grid-lines opacity-70" />
-                <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(238,36,36,0.3),transparent)]" />
-                <span className="relative grid h-14 w-14 place-items-center rounded-2xl bg-primary text-primary-foreground"><s.icon className="h-7 w-7" strokeWidth={1.25} /></span>
+                <div className={`absolute -right-16 -top-16 h-56 w-56 rounded-full ${s.tone === "blue" ? "bg-[radial-gradient(closest-side,rgba(0,136,207,0.32),transparent)]" : "bg-[radial-gradient(closest-side,rgba(238,36,36,0.3),transparent)]"}`} />
+                <GlyphImage icon={s.icon} tone={s.tone} className="relative -ml-2 -mt-2 h-24 w-24 transition-transform duration-700 group-hover:-translate-y-1" />
                 <p className="relative mt-6 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{s.highlight.eyebrow}</p>
                 <p className="relative mt-2 font-display text-3xl font-medium tracking-tight text-foreground">{s.highlight.value}</p>
                 <p className="relative mt-3 text-sm text-muted-foreground">{s.highlight.caption}</p>

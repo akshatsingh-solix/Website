@@ -69,7 +69,7 @@ export const FamilyTour = ({ family: source, product, exploreTarget = "try" }) =
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.35 }}
-              className="pointer-events-none absolute bottom-3 left-3 right-14 hidden max-w-md rounded-2xl border border-white/10 bg-ink-950/75 p-4 text-white backdrop-blur-md md:block"
+              className="pointer-events-none absolute bottom-3 left-3 right-14 hidden max-w-md rounded-2xl border border-white/10 bg-ink-950/90 p-4 text-white md:block"
               aria-hidden
             >
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/60">{tx("Stop {{n}} of {{total}}", { n: idx + 1, total: stops.length })}</p>

@@ -3,7 +3,7 @@ import { track } from "@/lib/intent";
 import { useCmsResources } from "@/lib/content";
 import { detectTopics } from "@/lib/localConcierge";
 import { useSearchParams } from "react-router-dom";
-import { Search } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { RESOURCES, RESOURCE_TYPES } from "@/data/site";
@@ -14,6 +14,7 @@ import { ResourceCard } from "@/components/home/InsightsPreview";
 import { CTABand } from "@/components/shared/CTABand";
 import { Input } from "@/components/ui/input";
 import { useTx } from "@/i18n/tx";
+import { Sigil } from "@/components/materials/Sigil";
 import { useTranslation } from "react-i18next";
 
 export default function Resources() {
@@ -50,7 +51,7 @@ export default function Resources() {
         crumbs={[{ label: "Resources" }]}
         title="Insights for people who run enterprise data."
         description="White papers, webinars, case studies and field notes from two decades of archiving, retirement, privacy and AI programs."
-        image="/Website/images/art/resources-library.svg"
+        media={<Sigil icon={BookOpen} tone="blue" float className="aspect-[4/3] w-full rounded-3xl border border-line/15" />}
         compact
       />
 

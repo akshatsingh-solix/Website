@@ -27,7 +27,7 @@ const EXCLUDE = [/components[\\/]ui[\\/]/, /components[\\/]admin[\\/]/, /pages[\
 // Must match SKIP_KEYS in src/i18n/localize.js.
 const SKIP_KEYS = new Set(["id", "slug", "to", "href", "file", "image", "icon", "accent", "span", "type", "key", "tone", "fill", "hex", "email", "phone", "year", "products", "category", "group", "meta", "readTime", "featured", "gated", "suffix", "pct", "color", "registerUrl", "links"]);
 // Components that tx() these text props themselves, so callers pass English.
-const PROP_COMPONENTS = new Set(["SectionHeading", "ChapterMark", "PageHero", "CTABand", "Field", "LeadForm"]);
+const PROP_COMPONENTS = new Set(["SectionHeading", "ChapterMark", "PageHero", "CTABand", "Field", "LeadForm", "PlatformExplorer"]);
 const PROP_NAMES = new Set(["eyebrow", "title", "description", "label", "submitLabel", "successTitle", "successDesc"]);
 const LINT_ATTRS = new Set(["placeholder", "aria-label", "title", "alt"]);
 const LINTING = process.argv.includes("--lint");

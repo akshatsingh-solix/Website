@@ -10,6 +10,7 @@ import { Reveal, Stagger, Item } from "@/components/shared/Reveal";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { useTx } from "@/i18n/tx";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 export default function Careers() {
   const tx = useTx();
@@ -39,7 +40,7 @@ export default function Careers() {
                   className="spot relative group grid w-full gap-4 rounded-2xl border border-line/10 bg-card p-6 text-left card-hover sm:grid-cols-12 sm:items-center"
                 >
                   <div className="sm:col-span-7">
-                    <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary-ink">{j.icon && <span className="grid h-6 w-6 place-items-center rounded-md bg-primary/10"><j.icon className="h-3.5 w-3.5" strokeWidth={1.75} /></span>}{j.team}</p>
+                    <p className="flex items-center gap-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-primary-ink">{j.icon && <GlyphTile icon={j.icon} tone="red" size="sm" />}{j.team}</p>
                     <h3 className="mt-1.5 font-display text-xl font-medium">{j.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{j.desc}</p>
                   </div>
@@ -66,8 +67,8 @@ export default function Careers() {
             {PERKS.map((p, i) => {
               const PerkIcon = PERK_ICONS[i] || HandHeart;
               return (
-                <div key={p} className="flex items-center gap-3 rounded-xl border border-line/10 bg-card px-4 py-3 text-sm">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-teal/10 text-teal"><PerkIcon className="h-4 w-4" strokeWidth={1.75} /></span> {p}
+                <div key={p} className="group flex items-center gap-3 rounded-xl border border-line/10 bg-card px-4 py-3 text-sm">
+                  <GlyphTile icon={PerkIcon} tone={i % 2 ? "red" : "blue"} size="sm" /> {p}
                 </div>
               );
             })}

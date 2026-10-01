@@ -144,7 +144,7 @@ export const FamilyVisual = ({ family: source, variant = "hero", active, onSelec
             >
               {on && <span className="stop-pulse absolute inset-0 rounded-full" style={{ background: color }} />}
               <span
-                className={cn("relative grid h-9 w-9 place-items-center rounded-full border text-white backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-white sm:h-10 sm:w-10", on ? "scale-110 border-transparent" : "border-white/25 bg-ink-950/70")}
+                className={cn("relative grid h-9 w-9 place-items-center rounded-full border text-white transition-all duration-300 group-hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-white sm:h-10 sm:w-10", on ? "scale-110 border-transparent" : "border-white/25 bg-ink-950/85")}
                 style={on ? { background: color, boxShadow: `0 0 0 6px ${color}33, 0 10px 30px -8px ${color}` } : undefined}
               >
                 <Icon className="h-4 w-4" strokeWidth={1.75} />
@@ -152,7 +152,7 @@ export const FamilyVisual = ({ family: source, variant = "hero", active, onSelec
                   <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-white text-ink-950"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>
                 )}
               </span>
-              <span className={cn("pointer-events-none absolute left-1/2 top-full mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium backdrop-blur-md transition-colors sm:block", on ? "bg-white text-ink-950" : "bg-ink-950/75 text-white/90")}>
+              <span className={cn("pointer-events-none absolute left-1/2 top-full mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors sm:block", on ? "bg-white text-ink-950" : "bg-ink-950/90 text-white/90")}>
                 <span className="font-mono tabular-nums opacity-60">{i + 1}</span> · {s.label}
               </span>
             </button>
@@ -168,7 +168,7 @@ export const FamilyVisual = ({ family: source, variant = "hero", active, onSelec
           onClick={() => setUserPaused((p) => !p)}
           aria-pressed={userPaused}
           aria-label={userPaused ? tx("Play animation") : tx("Pause animation")}
-          className="absolute bottom-3 right-3 z-10 grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-ink-950/60 text-white/80 backdrop-blur transition hover:bg-ink-950/80 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="absolute bottom-3 right-3 z-10 grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-ink-950/80 text-white/80 transition hover:bg-ink-950/95 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           data-testid="visual-pause"
         >
           {userPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}

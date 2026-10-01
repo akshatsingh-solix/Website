@@ -1,16 +1,16 @@
-/**
- * The site's vector illustrations (public/images/art, drawn by
- * scripts/build-art.js). Resource cards and press releases pick one by type
- * when the content itself has no cover image.
- */
-export const ART = "/Website/images/art/";
+import { Building2, CalendarDays, Handshake, Rocket, Users } from "lucide-react";
 
-const RESOURCE_COVERS = ["datasheet", "whitepaper", "webinar", "podcast", "ebook", "casestudy", "leadership", "blog", "event", "brief", "collateral"];
+// Press releases without a picture of their own lead with a sigil
+// (components/materials/Sigil) by category; resource cards take theirs from
+// the resource type's icon (components/home/InsightsPreview).
+// no-i18n
+const PRESS_GLYPHS = {
+  Product: { icon: Rocket, tone: "blue" },
+  Customer: { icon: Users, tone: "red" },
+  Partner: { icon: Handshake, tone: "blue" },
+  Event: { icon: CalendarDays, tone: "red" },
+  Company: { icon: Building2, tone: "red" },
+};
 
-/** Cover illustration for a resource type; unknown types get the white-paper stack. */
-export const resourceCover = (type) => `${ART}cover-${RESOURCE_COVERS.includes(type) ? type : "whitepaper"}.svg`;
-
-const PRESS_ART = { Product: "news-product", Customer: "news-customer", Partner: "news-partner", Event: "news-event", Company: "news-company" };
-
-/** Illustration for a press-release category; used when a release has no image of its own. */
-export const pressArt = (category) => `${ART}${PRESS_ART[category] || "news-company"}.svg`;
+/** { icon, tone } of a press-release category's sigil. */
+export const pressGlyph = (category) => PRESS_GLYPHS[category] || PRESS_GLYPHS.Company;

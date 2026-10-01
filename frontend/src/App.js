@@ -8,6 +8,7 @@ import { Layout } from "@/components/layout/Layout";
 import { AccountAuthProvider, RequireAccount } from "@/components/account/AccountAuth";
 import Home from "@/pages/Home";
 import { slowConnection } from "@/lib/net";
+import { MetalDefs } from "@/components/materials/MetalIcon";
 
 // Route-level code splitting: the homepage ships alone; every other page is
 // its own chunk, fetched on navigation and prefetched while the browser is idle.
@@ -115,6 +116,7 @@ function App() {
         </Suspense>
       </AccountAuthProvider>
       <Toaster position="bottom-center" theme="light" richColors closeButton />
+      <MetalDefs />
     </BrowserRouter>
   );
 }

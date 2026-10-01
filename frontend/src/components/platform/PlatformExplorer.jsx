@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, Layers, MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTx } from "@/i18n/tx";
-import { INDUSTRIES, PRODUCTS } from "@/data/site";
+import { INDUSTRIES, PRODUCTS, SOLUTIONS } from "@/data/site";
 import { PLATFORM_LAYERS, layerOfProduct } from "@/data/platformLayers";
 import { industryContext } from "@/data/industryContext";
 import { Section, SectionHeading } from "@/components/shared/Section";
@@ -12,6 +12,7 @@ import { LiquidGlass } from "@/components/materials/LiquidGlass";
 import { terrainSignature } from "@/components/materials/terrainSignatures";
 import { useLiveCanvas } from "@/hooks/use-live-canvas";
 import { LAYER_COLORS } from "./colors";
+import { MetalIcon } from "@/components/materials/MetalIcon";
 
 const PlatformScene = lazy(() => import("./PlatformScene"));
 
@@ -68,36 +69,70 @@ const COPY = {
 };
 
 /**
+ * The lenses the explorer can look through. An industry lights the layers
+ * where its programs usually start (data/industryContext.js) and sets the
+ * data flow to the industry's pace (its terrain signature); an outcome
+ * program lights the layers its products run on.
+ */
+const useLenses = (kind) => {
+  const tx = useTx();
+  if (kind === "solutions") {
+    return {
+      label: tx("Outcome lens"),
+      all: tx("All programs"),
+      items: SOLUTIONS.map((s) => ({
+        key: s.id,
+        label: s.title,
+        products: s.products,
+        speed: s.group === "AI Solutions" ? 0.32 : 0.14,
+        badge: tx("Runs here"),
+        hint: tx("Where {{name}} runs", { name: s.title }),
+      })),
+    };
+  }
+  return {
+    label: tx("Industry lens"),
+    all: tx("All industries"),
+    items: INDUSTRIES.map((i) => ({
+      key: i.slug,
+      label: i.name,
+      products: industryContext(i.slug)?.products || [],
+      speed: terrainSignature(i.slug).uSpeed,
+      badge: tx("Starts here"),
+      hint: tx("Where {{name}} programs usually start", { name: i.name }),
+    })),
+  };
+};
+
+/**
  * The platform explorer: the four layers of the Solix platform in 3D
  * (React Three Fiber), with every product on the layer that does its work.
  *
  *   <PlatformExplorer />                          // Platform page: industry lens chips
+ *   <PlatformExplorer lenses="solutions" />       // Solutions page: outcome lens chips
  *   <PlatformExplorer industry="healthcare" />    // industry page: lens fixed
  *   <PlatformExplorer focusProduct="ediscovery" /> // product page: its layer selected
- *
- * The industry lens lights the layers where that industry's programs
- * usually start (data/industryContext.js) and sets the data flow to the
- * industry's pace (its terrain signature).
  */
-export const PlatformExplorer = ({ industry: fixedIndustry, focusProduct, eyebrow = COPY.eyebrow, title = COPY.title, description = COPY.description, id = "explorer" }) => {
+export const PlatformExplorer = ({ industry: fixedIndustry, focusProduct, lenses: lensKind = "industries", eyebrow = COPY.eyebrow, title = COPY.title, description = COPY.description, id = "explorer" }) => {
   const tx = useTx();
   const layers = PLATFORM_LAYERS;
+  const lenses = useLenses(fixedIndustry ? "industries" : lensKind);
   const [lens, setLens] = useState(fixedIndustry || null);
-  const ctx = lens ? industryContext(lens) : null;
-  const lensIndustry = lens ? INDUSTRIES.find((i) => i.slug === lens) : null;
+  const current = lens ? lenses.items.find((l) => l.key === lens) : null;
+  const lensProducts = current?.products;
 
-  const lit = useMemo(() => new Set(ctx ? layers.filter((l) => l.products.some((p) => ctx.products.includes(p))).map((l) => l.key) : []), [ctx, layers]);
+  const lit = useMemo(() => new Set(lensProducts ? layers.filter((l) => l.products.some((p) => lensProducts.includes(p))).map((l) => l.key) : []), [lensProducts, layers]);
   const productLayer = focusProduct ? layerOfProduct(focusProduct) : null;
-  const [selected, setSelected] = useState(productLayer || (ctx && layers.find((l) => lit.has(l.key))?.key) || "activate");
+  const [selected, setSelected] = useState(productLayer || (lensProducts && layers.find((l) => lit.has(l.key))?.key) || "activate");
   const [hovered, setHovered] = useState(null);
   const layer = layers.find((l) => l.key === selected) || layers[0];
   const products = layer.products.map((s) => PRODUCTS.find((p) => p.slug === s)).filter(Boolean);
-  const speed = lens ? terrainSignature(lens).uSpeed : 0.2;
+  const speed = current ? current.speed : 0.2;
 
-  const chooseLens = (slug) => {
-    setLens(slug);
-    const c = slug ? industryContext(slug) : null;
-    const first = c && layers.find((l) => l.products.some((p) => c.products.includes(p)));
+  const chooseLens = (key) => {
+    setLens(key);
+    const next = key ? lenses.items.find((l) => l.key === key) : null;
+    const first = next && layers.find((l) => l.products.some((p) => next.products.includes(p)));
     if (first) setSelected(first.key);
   };
 
@@ -110,23 +145,23 @@ export const PlatformExplorer = ({ industry: fixedIndustry, focusProduct, eyebro
 
         {!fixedIndustry && !focusProduct && (
           <Reveal delay={0.1} className="mt-8 flex flex-wrap items-center gap-2" data-testid="explorer-lens">
-            <span className="mr-1 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{tx("Industry lens")}</span>
-            {[null, ...INDUSTRIES.map((i) => i.slug)].map((slug) => {
-              const on = lens === slug;
-              const ind = slug && INDUSTRIES.find((i) => i.slug === slug);
+            <span className="mr-1 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{lenses.label}</span>
+            {[null, ...lenses.items].map((item) => {
+              const key = item?.key || null;
+              const on = lens === key;
               return (
                 <button
-                  key={slug || "all"}
+                  key={key || "all"}
                   type="button"
                   aria-pressed={on}
-                  onClick={() => chooseLens(slug)}
-                  data-testid={`explorer-lens-${slug || "all"}`}
+                  onClick={() => chooseLens(key)}
+                  data-testid={`explorer-lens-${key || "all"}`}
                   className={cn(
                     "liquid-glass rounded-full px-3 py-1.5 text-xs transition-[transform,background-color,color] duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     on ? "liquid-glass-red bg-primary text-primary-foreground" : "liquid-glass-dark text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {ind ? ind.name : tx("All industries")}
+                  {item ? item.label : lenses.all}
                 </button>
               );
             })}
@@ -164,8 +199,8 @@ export const PlatformExplorer = ({ industry: fixedIndustry, focusProduct, eyebro
                     >
                       <span className="h-3 w-3 shrink-0 rounded-sm ring-1 ring-white/20" style={{ background: LAYER_COLORS[l.tone] }} />
                       <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">{l.label}</span>
-                      {starts && lensIndustry && (
-                        <span className="ml-1 whitespace-nowrap rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary-ink" title={tx("Where {{name}} programs usually start", { name: lensIndustry.name })}>{tx("Starts here")}</span>
+                      {starts && current && (
+                        <span className="ml-1 whitespace-nowrap rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary-ink" title={current.hint}>{current.badge}</span>
                       )}
                       <span className="ml-auto whitespace-nowrap font-mono text-[10px] text-muted-foreground">{tx("{{count}} products", { count: l.products.length })}</span>
                     </button>
@@ -182,7 +217,7 @@ export const PlatformExplorer = ({ industry: fixedIndustry, focusProduct, eyebro
               <ul className="mt-5 flex flex-wrap gap-2">
                 {products.map((p) => {
                   const here = p.slug === focusProduct;
-                  const starts = ctx?.products.includes(p.slug);
+                  const starts = lensProducts?.includes(p.slug);
                   return (
                     <li key={p.slug}>
                       <Link
@@ -194,6 +229,7 @@ export const PlatformExplorer = ({ industry: fixedIndustry, focusProduct, eyebro
                           here ? "border-primary bg-primary text-primary-foreground" : starts ? "border-primary/60 bg-primary/10 text-foreground hover:bg-primary/20" : "border-line/15 bg-line/5 text-muted-foreground hover:border-line/40 hover:text-foreground",
                         )}
                       >
+                        {!here && <MetalIcon icon={p.icon} tone={p.accent === "teal" ? "blue" : "red"} className="h-3.5 w-3.5" />}
                         {p.name}
                         {here ? <span className="font-mono text-[9px] uppercase tracking-[0.16em] opacity-80">· {tx("You are here")}</span> : <ArrowUpRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />}
                       </Link>

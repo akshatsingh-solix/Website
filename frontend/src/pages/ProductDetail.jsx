@@ -18,6 +18,9 @@ import { familyOf } from "@/data/families";
 import { useTx } from "@/i18n/tx";
 import { PlatformExplorer } from "@/components/platform/PlatformExplorer";
 import { layerOfProduct } from "@/data/platformLayers";
+import { Sigil, solutionTone } from "@/components/materials/Sigil";
+import { GlyphTile, MetalIcon } from "@/components/materials/MetalIcon";
+import { LiquidGlass } from "@/components/materials/LiquidGlass";
 
 const StepLabel = ({ n, label, className, id }) => (
     <p id={id} className={`mb-4 flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] ${className || ""}`}>
@@ -36,6 +39,7 @@ export default function ProductDetail() {
   const related = PRODUCTS.filter((p) => p.slug !== slug).slice(0, 3);
   const solutions = SOLUTIONS.filter((s) => s.products.includes(slug));
   const Icon = product.icon;
+  const tone = product.accent === "teal" ? "blue" : "red";
   const Explorer = explorerFor(slug);
   const family = familyOf(slug);
   // Icons are chosen from the English titles so every language gets the same one.
@@ -87,8 +91,9 @@ export default function ProductDetail() {
             <SectionHeading eyebrow="Measured impact" title={tx("What changes with {{name}}.", { name: product.name })} description="Indexed comparison of typical customer programs before and after deployment. Your assessment produces your own numbers." />
             <Reveal delay={0.1} className="mt-8 grid grid-cols-3 gap-3">
               {product.outcomes.map((o) => (
-                <div key={o.label} className="rounded-xl border border-line/10 bg-card p-4">
-                  <p className={`font-display text-2xl font-medium tracking-tighter ${product.accent === "teal" ? "text-teal" : "text-primary-ink"}`}>{o.value}</p>
+                <div key={o.label} className="relative overflow-hidden rounded-xl border border-line/10 bg-card p-4">
+                  <span className={`absolute inset-x-0 top-0 h-0.5 ${tone === "blue" ? "bg-teal" : "bg-primary"}`} />
+                  <p className="font-display text-2xl font-medium tracking-tighter text-gradient-accent">{o.value}</p>
                   <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{o.label}</p>
                 </div>
               ))}
@@ -108,8 +113,8 @@ export default function ProductDetail() {
             {product.features.map((f, i) => {
               const FeatureIcon = featureIcon(sourceFeatures[i]?.title || f.title);
               return (
-              <Item key={f.title} className="spot relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
-                <span className={`grid h-9 w-9 place-items-center rounded-lg border border-line/10 bg-accent/50 ${product.accent === "teal" ? "text-teal" : "text-primary-ink"}`}><FeatureIcon className="h-4 w-4" strokeWidth={1.75} /></span>
+              <Item key={f.title} className="spot group relative rounded-2xl border border-line/10 bg-card p-6 card-hover">
+                <GlyphTile icon={FeatureIcon} tone={tone} />
                 <h3 className="mt-5 font-display text-lg font-medium">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
               </Item>
@@ -123,16 +128,21 @@ export default function ProductDetail() {
         <div className="container grid items-start gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <SectionHeading eyebrow="How it works" title="Three moves. One governed path." />
-            <Reveal delay={0.1} className="mt-8 flex items-center gap-4">
-              <span className={`grid h-14 w-14 place-items-center rounded-2xl border border-line/10 bg-card ${product.accent === "teal" ? "text-teal" : "text-primary-ink"}`}><Icon className="h-7 w-7" strokeWidth={1.25} /></span>
-              <p className="text-sm text-muted-foreground">{tx("Runs on the Common Data Platform. Deploy in SOLIXCloud, your cloud, or on-premises.")}</p>
+            {/* The product's mark in liquid metal: it flows while this section holds the page's live-canvas slot. */}
+            <Reveal delay={0.1} className="group mt-8">
+              <Sigil icon={Icon} tone={tone} live float sizes="(min-width: 1024px) 30vw, 100vw" className="aspect-[4/3] w-full rounded-3xl border border-line/10 shadow-lift" data-testid="product-sigil">
+                <LiquidGlass tone="dark" className="absolute bottom-4 left-4 right-4 rounded-2xl px-4 py-3 text-xs leading-relaxed text-foreground/90 !shadow-none">
+                  {tx("Runs on the Common Data Platform. Deploy in SOLIXCloud, your cloud, or on-premises.")}
+                </LiquidGlass>
+              </Sigil>
             </Reveal>
           </div>
           <Stagger className="grid gap-4 lg:col-span-8 sm:grid-cols-3">
             {product.steps.map((s, i) => (
-              <Item key={s.title} className="relative rounded-2xl border border-line/10 bg-card p-6">
-                <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
-                <h3 className="mt-6 font-display text-2xl font-medium">{s.title}</h3>
+              <Item key={s.title} className="relative overflow-hidden rounded-2xl border border-line/10 bg-card p-6">
+                <span className={`absolute inset-x-0 top-0 h-0.5 ${tone === "blue" ? "bg-gradient-to-r from-teal to-teal/20" : "bg-gradient-to-r from-primary to-primary/20"}`} />
+                <span className="font-display text-3xl font-medium tracking-tight text-gradient-accent">0{i + 1}</span>
+                <h3 className="mt-4 font-display text-2xl font-medium">{s.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
                 {i < product.steps.length - 1 && <ArrowRight className="absolute -right-4 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-line/20 sm:block" />}
               </Item>
@@ -158,7 +168,7 @@ export default function ProductDetail() {
             <div className="mt-10 flex flex-wrap gap-3">
               {solutions.map((s) => (
                 <Link key={s.id} to={`/solutions#${s.id}`} className="group inline-flex items-center gap-3 rounded-full border border-line/10 bg-card px-5 py-3 text-sm transition-colors hover:border-primary/50" data-testid={`product-solution-${s.id}`}>
-                  <s.icon className="h-4 w-4 text-teal" strokeWidth={1.5} /> {s.title}
+                  <MetalIcon icon={s.icon} tone={solutionTone(s)} className="h-4 w-4" /> {s.title}
                   <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                 </Link>
               ))}

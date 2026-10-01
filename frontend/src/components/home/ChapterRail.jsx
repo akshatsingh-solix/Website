@@ -56,7 +56,7 @@ export const ChapterRail = () => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -16 }}
           transition={{ duration: 0.35 }}
-          className="flex flex-col gap-2.5 rounded-2xl py-2 pr-3 transition-colors duration-300 hover:bg-background/80 hover:backdrop-blur-md"
+          className="flex flex-col gap-2.5 rounded-2xl py-2 pr-3 transition-colors duration-300 hover:bg-background/95"
           aria-label={tx("Chapters")}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}

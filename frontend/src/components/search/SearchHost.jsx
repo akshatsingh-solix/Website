@@ -59,7 +59,7 @@ export const SearchButton = ({ className }) => {
     <button
       type="button"
       onClick={openSearch}
-      className={cn("group inline-flex h-9 items-center gap-2 rounded-full border border-line/15 bg-background/40 px-2.5 text-sm text-muted-foreground backdrop-blur transition-[border-color,color,background-color] duration-200 hover:border-line/35 hover:text-foreground 2xl:px-3", className)}
+      className={cn("group inline-flex h-9 items-center gap-2 rounded-full border border-line/15 bg-background/70 px-2.5 text-sm text-muted-foreground transition-[border-color,color,background-color] duration-200 hover:border-line/35 hover:text-foreground 2xl:px-3", className)}
       aria-label={tx("Search")}
       data-testid="nav-search"
     >

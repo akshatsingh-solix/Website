@@ -3,6 +3,7 @@ import { Section } from "@/components/shared/Section";
 import { Reveal } from "@/components/shared/Reveal";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { useTx } from "@/i18n/tx";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 /**
  * "Talk to a specialist" band with the lead form on the page itself, the
@@ -25,7 +26,7 @@ export const InlineLeadSection = ({ id = "talk-to-us", eyebrow = "Talk to a spec
           <ul className="mt-8 space-y-4">
             {points.map(({ Icon, text }) => (
               <li key={text} className="flex items-start gap-3 text-sm text-foreground">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line/10 bg-card text-teal"><Icon className="h-4 w-4" strokeWidth={1.5} /></span>
+                <GlyphTile icon={Icon} tone="blue" size="sm" />
                 <span className="pt-1.5">{text}</span>
               </li>
             ))}

@@ -10,6 +10,7 @@ import { Picture } from "@/components/shared/Picture";
 import { useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
 import { useDarkSurface } from "@/components/layout/navTone";
+import { GlyphTile } from "@/components/materials/MetalIcon";
 
 const POINTS = [
   { icon: Lock, title: "Trust perimeter", desc: "Access, masking and retention policies travel with every query, prompt and answer." },
@@ -224,8 +225,8 @@ export const AISection = () => {
           <SectionHeading chapter="04" eyebrow="Enterprise AI" title="AI your risk team will sign off on." description="Most AI programs stall at governance. Solix starts there. Business builders compose agents and copilots on data products IT has already curated, classified and secured." />
           <div className="mt-10 grid gap-3">
             {points.map((p, i) => (
-              <Reveal key={p.title} delay={0.08 * i} className="spot relative flex gap-4 rounded-2xl border border-line/10 bg-card/50 p-4 transition-colors duration-300 hover:bg-card">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal/15 text-teal"><p.icon className="h-5 w-5" strokeWidth={1.5} /></span>
+              <Reveal key={p.title} delay={0.08 * i} className="spot group relative flex gap-4 rounded-2xl border border-line/10 bg-card/50 p-4 transition-colors duration-300 hover:bg-card">
+                <GlyphTile icon={p.icon} tone="blue" />
                 <div>
                   <h3 className="font-display text-base font-medium sm:text-lg">{p.title}</h3>
                   <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
