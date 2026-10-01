@@ -77,7 +77,7 @@ export const OutcomePanels = ({ items, className }) => {
             )}
             {/* Closed column: icon and number on top, the title upright with its metric at the foot.
                 Hidden from assistive tech: the open panel below carries the same copy. */}
-            <div aria-hidden="true" className={cn("absolute inset-0 flex flex-col justify-between p-5 transition-opacity duration-300", on ? "pointer-events-none opacity-0" : "opacity-100")}>
+            <div aria-hidden="true" className={cn("absolute inset-0 flex flex-col justify-between px-4 py-5 transition-opacity duration-300", on ? "pointer-events-none opacity-0" : "opacity-100")}>
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal/10 text-teal transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground"><Icon className="h-5 w-5" strokeWidth={1.5} /></span>
