@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Check, ChevronDown, Loader2, MailCheck, Pause, Play, Plus, Search, Send, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -212,8 +213,11 @@ export function ContactsPanel() {
               {data.items.map((c) => (
                 <tr key={c.id} className="border-t border-line/5 align-top">
                   <td className="py-2">{can("editLeads") && c.email && !c.suppressed && <input type="checkbox" aria-label={`Select ${c.name}`} checked={selected.has(c.id)} onChange={() => toggle(c.id)} />}</td>
-                  <td className="py-2 pr-2"><p className="font-medium">{c.name}</p><p className="text-xs text-muted-foreground">{c.title || "—"}{c.persona === "target" && <span className="ml-1 text-teal">· target</span>}</p></td>
-                  <td className="py-2 pr-2 text-xs">{c.company || "—"}<p className="text-muted-foreground">{c.country}</p></td>
+                  <td className="py-2 pr-2">
+                    <p className="font-medium">{c.lead_id ? <Link to={`/admin/leads?lead=${c.lead_id}`} className="hover:underline" title="Also a website lead">{c.name}</Link> : c.name}</p>
+                    <p className="text-xs text-muted-foreground">{c.title || "—"}{c.persona === "target" && <span className="ml-1 text-teal">· target</span>}{c.lead_id && <span className="ml-1 text-teal">· lead</span>}</p>
+                  </td>
+                  <td className="py-2 pr-2 text-xs">{c.company_id ? <Link to={`/admin/radar?account=${c.company_id}`} className="hover:underline">{c.company || "Account"}</Link> : c.company || "—"}<p className="text-muted-foreground">{c.country}</p></td>
                   <td className="py-2 pr-2 text-xs">{c.email || "—"}<p className={EMAIL_TONE[c.email_status] || "text-muted-foreground"}>{(c.email_status || "").replace("_", " ")}{c.suppressed ? ` · suppressed (${c.suppressed})` : ""}</p></td>
                   <td className="py-2 pr-2 text-xs text-muted-foreground">{c.source}{c.source_url && <> · <a className="text-teal hover:underline" href={c.source_url} target="_blank" rel="noopener noreferrer">where</a></>}</td>
                   <td className="whitespace-nowrap py-2 text-right">{can("editLeads") && c.email && <>
@@ -342,7 +346,11 @@ export function RepliesPanel() {
           <ul className="divide-y divide-line/5">
             {data.items.map((r) => (
               <li key={r.id} className="py-3 text-sm">
-                <p><span className={cn("font-medium", REPLY_TONE[r.label])}>{REPLY_LABELS[r.label] || r.label}</span> · {r.contact?.name || r.email} <span className="text-muted-foreground">({r.contact?.company || "—"})</span></p>
+                <p>
+                  <span className={cn("font-medium", REPLY_TONE[r.label])}>{REPLY_LABELS[r.label] || r.label}</span> ·{" "}
+                  {r.contact?.lead_id ? <Link to={`/admin/leads?lead=${r.contact.lead_id}`} className="hover:underline">{r.contact?.name || r.email}</Link> : r.contact?.name || r.email}{" "}
+                  <span className="text-muted-foreground">({r.company_id ? <Link to={`/admin/radar?account=${r.company_id}`} className="hover:underline">{r.contact?.company || "account"}</Link> : r.contact?.company || "—"})</span>
+                </p>
                 {r.text && <p className="mt-1 line-clamp-3 text-xs text-muted-foreground">{r.text}</p>}
                 <p className="mt-1 font-mono text-[10px] text-muted-foreground">{fmtDateTime(r.received_at)} · {r.source} · {r.classified_by}{r.reason ? ` · ${r.reason}` : ""}</p>
               </li>

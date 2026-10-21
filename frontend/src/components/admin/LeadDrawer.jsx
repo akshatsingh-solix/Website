@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Bot, Check, FileText, Loader2, Mail, MousePointerClick, RefreshCw, Sparkles, UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowUpRight, Ban, Bot, CalendarCheck, Check, Crosshair, FileText, History, Loader2, Mail, MousePointerClick, RefreshCw, Send, Sparkles, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { fetchLead, formatApiError, patchLead, rescoreLead } from "@/lib/adminApi";
 import { CHANNEL_LABELS, LineBadge, SERIES, STAGE_HELP, STAGE_LABELS, StageBadge, fmtDateTime, productName, selectCls, useCan } from "@/components/admin/kit";
 import { cn } from "@/lib/utils";
+import { AccountStatus, StrengthBadge } from "@/components/admin/radarKit";
 
 const EVENT_LABELS = {
   page_view: "Viewed", engaged: "Read for a while", deep_scroll: "Read to the end", resource_view: "Opened resource",
@@ -16,6 +18,9 @@ const EVENT_LABELS = {
 };
 const FORM_LABELS = { demo: "Requested a demo", contact: "Contacted sales", trial: "Started the ECS trial", download: "Downloaded gated content", newsletter: "Subscribed to the newsletter", partner: "Applied to partner", career: "Applied for a job", event: "Registered for an event" };
 const FIT_LABELS = { business_email: "Business email", seniority: "Seniority", company_size: "Company size", phone: "Phone provided" };
+const OUTBOUND_LABELS = { enrolled: "Enrolled in", sent: "Outbound email sent:", bounced: "Outbound email bounced:" };
+const REPLY_LABELS = { interested: "Interested", meeting: "Meeting", objection: "Objection", referral: "Referral", forward: "Forwarded", ooo: "Out of office", not_interested: "Not interested", unsubscribe: "Unsubscribe", neutral: "Neutral" };
+const ENR_STATUS = { pending_approval: "waiting for approval", scheduled: "scheduled", active: "sending", paused: "paused", stopped: "stopped", replied: "replied", completed: "finished", bounced: "bounced" };
 
 const Row = ({ label, children }) => (children ? (
   <div className="grid grid-cols-3 gap-3 border-b border-line/5 py-2 text-sm">
@@ -24,10 +29,17 @@ const Row = ({ label, children }) => (children ? (
   </div>
 ) : null);
 
+const KIND_ICON = { form: FileText, stage: Sparkles, email: Mail, outbound: Send, activity: History, attended: CalendarCheck };
+
 const TimelineItem = ({ t }) => {
-  const Icon = t.kind === "form" ? FileText : t.kind === "stage" ? Sparkles : t.kind === "email" ? Mail : t.type === "chat_topic" ? Bot : t.type === "cta_click" ? MousePointerClick : UserRound;
+  const Icon = KIND_ICON[t.kind] || (t.type === "chat_topic" ? Bot : t.type === "cta_click" ? MousePointerClick : UserRound);
   let text;
-  if (t.kind === "email") text = <>{t.type === "asset_sent" ? "Emailed their copy of" : "Couldn't email"} <span className="text-foreground">{t.detail}</span>{t.meta?.attached ? " (file attached)" : ""}{t.type !== "asset_sent" && t.meta?.reason ? ` · ${t.meta.reason}` : ""}</>;
+  if (t.kind === "outbound") text = t.type === "reply"
+    ? <>Replied to outbound: <strong className="font-medium text-foreground">{REPLY_LABELS[t.meta?.label] || t.meta?.label}</strong>{t.detail ? ` · “${t.detail}”` : ""}</>
+    : <>{OUTBOUND_LABELS[t.type] || t.type} <span className="text-foreground">{t.detail}</span>{t.meta?.step ? ` (step ${t.meta.step})` : ""}</>;
+  else if (t.kind === "attended") text = <>Checked in at <span className="text-foreground">{t.detail}</span></>;
+  else if (t.kind === "activity") text = <>{t.detail}{t.by && !["system", "radar"].includes(t.by) ? ` (${t.by})` : ""}</>;
+  else if (t.kind === "email") text = <>{t.type === "asset_sent" ? "Emailed their copy of" : "Couldn't email"} <span className="text-foreground">{t.detail}</span>{t.meta?.attached ? " (file attached)" : ""}{t.type !== "asset_sent" && t.meta?.reason ? ` · ${t.meta.reason}` : ""}</>;
   else if (t.kind === "form") text = <><strong className="font-medium text-foreground">{FORM_LABELS[t.type] || t.type}</strong>{t.detail ? ` · ${t.detail}` : ""}</>;
   else if (t.kind === "stage") text = <>Stage → <strong className="font-medium text-foreground">{STAGE_LABELS[t.type] || t.type}</strong>{t.detail ? ` · ${t.detail}` : ""}{t.by && t.by !== "system" ? ` (${t.by})` : ""}</>;
   else {
@@ -37,7 +49,7 @@ const TimelineItem = ({ t }) => {
   }
   return (
     <li className="flex gap-3 py-2 text-xs text-muted-foreground">
-      <Icon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", t.kind === "form" ? "text-primary-ink" : t.kind === "stage" ? "text-amber-300" : "text-muted-foreground")} strokeWidth={1.75} />
+      <Icon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", t.kind === "form" ? "text-primary-ink" : t.kind === "stage" ? "text-amber-300" : t.kind === "outbound" || t.kind === "attended" ? "text-teal" : "text-muted-foreground")} strokeWidth={1.75} />
       <div className="min-w-0 flex-1">
         <p className="break-words">{text}</p>
         <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/80">{fmtDateTime(t.at)}</p>
@@ -103,7 +115,14 @@ export function LeadDrawer({ id, meta, onClose, onChanged }) {
         ) : (
           <>
             <SheetHeader className="text-left">
-              <div className="flex flex-wrap items-center gap-2"><StageBadge stage={lead.stage} /><LineBadge line={lead.primary_line} /></div>
+              <div className="flex flex-wrap items-center gap-2">
+                <StageBadge stage={lead.stage} /><LineBadge line={lead.primary_line} />
+                {(data.suppressed || lead.do_not_contact) && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-red-400/30 bg-red-500/10 px-2 py-0.5 text-[11px] text-red-200" data-testid="lead-dnc">
+                    <Ban className="h-3 w-3" /> Do not contact ({String(data.suppressed?.reason || lead.do_not_contact).replace("_", " ")})
+                  </span>
+                )}
+              </div>
               <SheetTitle className="font-display text-2xl font-medium">{lead.name || lead.email}</SheetTitle>
               <SheetDescription>{[lead.job_title, lead.company].filter(Boolean).join(" · ") || "No company given"} · <a href={`mailto:${lead.email}`} className="text-teal hover:underline">{lead.email}</a></SheetDescription>
               {lead.stage_reason && <p className="text-xs text-muted-foreground">{lead.stage_reason}</p>}
@@ -165,6 +184,8 @@ export function LeadDrawer({ id, meta, onClose, onChanged }) {
               lead.notes && <p className="mt-6 whitespace-pre-wrap rounded-xl border border-line/10 bg-card p-4 text-sm text-muted-foreground">{lead.notes}</p>
             )}
 
+            <Linked data={data} />
+
             <section className="mt-6">
               <p className="eyebrow mb-2">Profile & source</p>
               <dl>
@@ -194,5 +215,49 @@ export function LeadDrawer({ id, meta, onClose, onChanged }) {
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+// The same person in the Radar, Outbound and Events, each a click away.
+function Linked({ data }) {
+  const { account: a, outbound: o, events } = data;
+  if (!a && !o?.contacts?.length && !events?.length) return null;
+  return (
+    <section className="mt-6 space-y-3" data-testid="lead-linked">
+      {a && (
+        <div className="rounded-2xl border border-line/10 bg-card p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="eyebrow flex items-center gap-1.5"><Crosshair className="h-3 w-3" /> Radar account</p>
+              <p className="mt-1 truncate font-medium">{a.name}</p>
+              <p className="text-xs text-muted-foreground">{a.territory || "Unrouted"} · {a.owner_name || "Unassigned"} · score {Math.round(a.score || 0)} · {a.signal_count || 0} signal(s){a.research_score != null ? ` · deep dive ${a.research_score}/10` : ""}</p>
+              {a.competitors?.length > 0 && <p className="text-xs text-muted-foreground">Signals: {a.competitors.join(", ")}</p>}
+              {a.excluded_reason && <p className="text-xs text-red-300">No automated outreach: {a.excluded_reason}</p>}
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1"><StrengthBadge strength={a.strength} /><AccountStatus status={a.status} /></div>
+          </div>
+          <Link to={`/admin/radar?account=${a.id}`} className="mt-2 inline-flex items-center gap-1 text-xs text-teal hover:underline">Open in Radar <ArrowUpRight className="h-3 w-3" /></Link>
+        </div>
+      )}
+      {o?.contacts?.length > 0 && (
+        <div className="rounded-2xl border border-line/10 bg-card p-4">
+          <p className="eyebrow flex items-center gap-1.5"><Send className="h-3 w-3" /> Outbound</p>
+          <p className="mt-1 text-xs text-muted-foreground">Contact since {fmtDateTime(o.contacts[0].created_at)} ({o.contacts[0].source || "added by hand"}) · email {String(o.contacts[0].email_status || "unchecked").replace("_", " ")} · {o.sends} email(s) sent</p>
+          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+            {o.enrollments.map((e) => <li key={e.id}>{e.sequence_name} · <span className="text-foreground">{ENR_STATUS[e.status] || e.status}</span> · {e.step_index} sent</li>)}
+            {o.replies.map((r, i) => <li key={i}>Reply: <span className="text-foreground">{REPLY_LABELS[r.label] || r.label}</span> · {fmtDateTime(r.received_at)}</li>)}
+          </ul>
+          <Link to="/admin/outbound?tab=contacts" className="mt-2 inline-flex items-center gap-1 text-xs text-teal hover:underline">Open in Outbound <ArrowUpRight className="h-3 w-3" /></Link>
+        </div>
+      )}
+      {events?.length > 0 && (
+        <div className="rounded-2xl border border-line/10 bg-card p-4">
+          <p className="eyebrow flex items-center gap-1.5"><CalendarCheck className="h-3 w-3" /> Events</p>
+          <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
+            {events.map((r, i) => <li key={i}><span className="text-foreground">{r.event}</span> · {r.ticket_name || "pass"} · {String(r.status || "").replace("_", " ")}{r.checked_in ? " · attended" : ""}</li>)}
+          </ul>
+        </div>
+      )}
+    </section>
   );
 }
