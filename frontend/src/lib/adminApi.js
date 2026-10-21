@@ -195,3 +195,76 @@ export const fetchSeoTopics = (refresh) => adminApi.get("/admin/seo/topics", { p
 export const fetchDeepDive = (topic, refresh) => adminApi.post("/admin/seo/topics/deep-dive", { topic, refresh: !!refresh }, { timeout: 300000 }).then((r) => r.data);
 export const fetchAiVisibility = () => adminApi.get("/admin/seo/ai-visibility").then((r) => r.data);
 export const runAiVisibility = () => adminApi.post("/admin/seo/ai-visibility/run", null, { timeout: 600000 }).then((r) => r.data);
+
+// --- Radar (competitive-intent accounts) ----------------------------------------
+export const fetchRadarMeta = () => adminApi.get("/admin/radar/meta").then((r) => r.data);
+export const fetchRadarSummary = (params, opts = {}) => adminApi.get("/admin/radar/summary", { params: clean(params), ...opts }).then((r) => r.data);
+export const fetchRadarAccounts = (params, opts = {}) => adminApi.get("/admin/radar/accounts", { params: clean(params), ...opts }).then((r) => r.data);
+export const fetchRadarAccount = (id, opts = {}) => adminApi.get(`/admin/radar/accounts/${id}`, opts).then((r) => r.data);
+export const patchRadarAccount = (id, body) => adminApi.patch(`/admin/radar/accounts/${id}`, body).then((r) => r.data);
+export const createRadarAccount = (body) => adminApi.post("/admin/radar/accounts", body).then((r) => r.data);
+export const addRadarSignal = (id, body) => adminApi.post(`/admin/radar/accounts/${id}/signals`, body).then((r) => r.data);
+export const deleteRadarSignal = (id) => adminApi.delete(`/admin/radar/signals/${id}`);
+export const markRadarSeen = (body) => adminApi.post("/admin/radar/seen", body).then((r) => r.data);
+export const requestResearch = (id) => adminApi.post(`/admin/radar/accounts/${id}/research`).then((r) => r.data);
+export const fetchResearchQueue = (status = "draft") => adminApi.get("/admin/radar/research", { params: { status }, fresh: true }).then((r) => r.data);
+export const reviewResearch = (id, body) => adminApi.patch(`/admin/radar/research/${id}`, body).then((r) => r.data);
+export const promoteToLead = (id, body) => adminApi.post(`/admin/radar/accounts/${id}/promote`, body).then((r) => r.data);
+export const fetchTerritories = () => adminApi.get("/admin/radar/territories").then((r) => r.data);
+export const saveTerritories = (body) => adminApi.put("/admin/radar/territories", body).then((r) => r.data);
+export const previewRouting = (params) => adminApi.get("/admin/radar/routing/preview", { params: clean(params) }).then((r) => r.data);
+export const fetchRadarConfig = () => adminApi.get("/admin/radar/config").then((r) => r.data);
+export const saveRadarConfig = (body) => adminApi.put("/admin/radar/config", body).then((r) => r.data);
+export const runRadar = (steps) => adminApi.post("/admin/radar/run", { steps }).then((r) => r.data);
+export const fetchLegacyRadar = (owner) => adminApi.get("/admin/radar/legacy.json", { params: clean({ owner }) }).then((r) => r.data);
+export const importRadar = (file) => {
+  const form = new FormData();
+  form.append("file", file);
+  return adminApi.post("/admin/radar/import", form, { timeout: 300000 }).then((r) => r.data);
+};
+export async function exportRadarWorkbook(owner) {
+  const res = await adminApi.get("/admin/radar/export.xlsx", { params: clean({ owner }), responseType: "blob", timeout: 120000 });
+  await saveBlob(res, "Competitive_Intent_Radar.xlsx");
+}
+
+// --- EchoLocate outbound ------------------------------------------------------------
+export const fetchOutboundKpis = (days = 30, opts = {}) => adminApi.get("/admin/outbound/kpis", { params: { days }, ...opts }).then((r) => r.data);
+export const fetchContacts = (params, opts = {}) => adminApi.get("/admin/outbound/contacts", { params: clean(params), ...opts }).then((r) => r.data);
+export const createContact = (body) => adminApi.post("/admin/outbound/contacts", body).then((r) => r.data);
+export const patchContact = (id, body) => adminApi.patch(`/admin/outbound/contacts/${id}`, body).then((r) => r.data);
+export const deleteContact = (id) => adminApi.delete(`/admin/outbound/contacts/${id}`);
+export const verifyContact = (id) => adminApi.post(`/admin/outbound/contacts/${id}/verify`, null, { timeout: 90000 }).then((r) => r.data);
+export const findContactEmail = (id) => adminApi.post(`/admin/outbound/contacts/${id}/find-email`, null, { timeout: 180000 }).then((r) => r.data);
+export const importContacts = (csv) => adminApi.post("/admin/outbound/contacts/import", { csv }, { timeout: 180000 }).then((r) => r.data);
+export const fetchGate = (contactId) => adminApi.get(`/admin/compliance/gate/${contactId}`, { fresh: true }).then((r) => r.data);
+export const fetchSequences = () => adminApi.get("/admin/outbound/sequences").then((r) => r.data);
+export const createSequence = (body) => adminApi.post("/admin/outbound/sequences", body).then((r) => r.data);
+export const updateSequence = (id, body) => adminApi.put(`/admin/outbound/sequences/${id}`, body).then((r) => r.data);
+export const enrollContacts = (body) => adminApi.post("/admin/outbound/enrollments", body, { timeout: 120000 }).then((r) => r.data);
+export const fetchEnrollments = (params, opts = {}) => adminApi.get("/admin/outbound/enrollments", { params: clean(params), ...opts }).then((r) => r.data);
+export const patchEnrollment = (id, body) => adminApi.patch(`/admin/outbound/enrollments/${id}`, body).then((r) => r.data);
+export const logReply = (body) => adminApi.post("/admin/outbound/replies", body, { timeout: 60000 }).then((r) => r.data);
+export const fetchReplies = (params, opts = {}) => adminApi.get("/admin/outbound/replies", { params: clean(params), ...opts }).then((r) => r.data);
+export const fetchSends = (params) => adminApi.get("/admin/outbound/sends", { params: clean(params) }).then((r) => r.data);
+export const runOutboundTick = () => adminApi.post("/admin/outbound/tick", null, { timeout: 120000 }).then((r) => r.data);
+export const runLearning = () => adminApi.post("/admin/outbound/learn", null, { timeout: 120000 }).then((r) => r.data);
+export const connectInstantly = () => adminApi.post("/admin/outbound/instantly/connect").then((r) => r.data);
+
+// --- Compliance and operations ---------------------------------------------------------
+export const fetchOutboundSettings = () => adminApi.get("/admin/compliance/settings", { fresh: true }).then((r) => r.data);
+export const saveOutboundSettings = (body) => adminApi.put("/admin/compliance/settings", body).then((r) => r.data);
+export const fetchSuppression = (params) => adminApi.get("/admin/compliance/suppression", { params: clean(params), fresh: true }).then((r) => r.data);
+export const addSuppression = (body) => adminApi.post("/admin/compliance/suppression", body).then((r) => r.data);
+export const removeSuppression = (hash) => adminApi.delete(`/admin/compliance/suppression/${hash}`).then((r) => r.data);
+export const fetchLia = () => adminApi.get("/admin/compliance/lia", { fresh: true }).then((r) => r.data);
+export const createLia = (body) => adminApi.post("/admin/compliance/lia", body).then((r) => r.data);
+export const signLia = (id) => adminApi.post(`/admin/compliance/lia/${id}/sign`).then((r) => r.data);
+export const revokeLia = (id) => adminApi.post(`/admin/compliance/lia/${id}/revoke`).then((r) => r.data);
+export const requestErasure = (email) => adminApi.post("/admin/compliance/erasure", { email, confirm: true }, { timeout: 120000 }).then((r) => r.data);
+export const fetchErasures = () => adminApi.get("/admin/compliance/erasure", { fresh: true }).then((r) => r.data);
+export const fetchOpsHealth = (opts = {}) => adminApi.get("/admin/ops/health", { fresh: true, ...opts }).then((r) => r.data);
+export const fetchIntegrations = () => adminApi.get("/admin/ops/integrations", { fresh: true }).then((r) => r.data);
+export const saveIntegrations = (body) => adminApi.put("/admin/ops/integrations", body).then((r) => r.data);
+export const testIntegrations = () => adminApi.post("/admin/ops/integrations/test", null, { timeout: 60000 }).then((r) => r.data);
+export const retryOutbox = (id) => adminApi.post(`/admin/ops/outbox/${id}/retry`).then((r) => r.data);
+export const runOpsTick = () => adminApi.post("/admin/ops/tick", null, { timeout: 180000 }).then((r) => r.data);

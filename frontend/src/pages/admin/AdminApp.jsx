@@ -19,6 +19,8 @@ const pages = {
   Website: () => import("@/pages/admin/AdminWebsite"),
   Seo: () => import("@/pages/admin/AdminSeo"),
   Conversations: () => import("@/pages/admin/AdminConversations"),
+  Radar: () => import("@/pages/admin/AdminRadar"),
+  Outbound: () => import("@/pages/admin/AdminOutbound"),
 };
 const AdminLayout = lazy(pages.Layout);
 const AdminDashboard = lazy(pages.Dashboard);
@@ -32,6 +34,8 @@ const AdminMigrate = lazy(pages.Migrate);
 const AdminWebsite = lazy(pages.Website);
 const AdminSeo = lazy(pages.Seo);
 const AdminConversations = lazy(pages.Conversations);
+const AdminRadar = lazy(pages.Radar);
+const AdminOutbound = lazy(pages.Outbound);
 
 // Fetch the other admin pages while the browser is idle, one at a time, so
 // switching tabs later never waits on the network.
@@ -51,6 +55,8 @@ export default function AdminApp() {
           <Route element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
             <Route index element={<AdminDashboard />} />
             <Route path="leads" element={<AdminLeads />} />
+            <Route path="radar" element={<AdminRadar />} />
+            <Route path="outbound" element={<AdminOutbound />} />
             <Route path="inbox" element={<AdminSubmissions />} />
             <Route path="content" element={<AdminContent />} />
             <Route path="content/new" element={<AdminContentEditor />} />

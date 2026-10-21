@@ -98,13 +98,15 @@ const PERMS = {
   editLeads: ["admin", "sales"],
   editContent: ["admin", "editor"],
   manage: ["admin"],
+  comply: ["admin", "compliance"],
+  suppress: ["admin", "compliance", "sales"],
 };
 export const useCan = () => {
   const { user } = useAdmin();
   return (action) => !!user && (PERMS[action] || []).includes(user.role);
 };
 
-export const ROLE_LABELS = { admin: "Admin", sales: "Sales", editor: "Content editor", viewer: "Leadership (read-only)" };
+export const ROLE_LABELS = { admin: "Admin", sales: "Sales", editor: "Content editor", viewer: "Leadership (read-only)", compliance: "Compliance" };
 
 // Re-runs `refresh` every `ms` while this admin tab is visible, and as soon as
 // it becomes visible again, so new leads (e.g. from Sol chats) appear without
