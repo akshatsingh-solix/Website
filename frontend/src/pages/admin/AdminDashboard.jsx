@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { clearAdminCache, fetchLeadsMeta, fetchOverview, formatApiError } from "@/lib/adminApi";
+import { clearAdminCache, fetchLeadsMeta, fetchOutboundKpis, fetchOverview, fetchRadarSummary, formatApiError } from "@/lib/adminApi";
 import { CHANNEL_LABELS, LINE_SHORT, Panel, SERIES, STAGE_LABELS, StatTile, productName, selectCls, useLiveRefresh } from "@/components/admin/kit";
 import { cn } from "@/lib/utils";
 
@@ -148,6 +148,8 @@ export default function AdminDashboard() {
             <Link to="/admin/leads?stage=mql&owner=unassigned"><StatTile label="Unassigned MQLs" value={k.unassigned_mqls} sub={k.unassigned_mqls ? "Need an owner" : "All assigned"} testId="kpi-unassigned" /></Link>
           </div>
 
+          <CompetitiveStrip />
+
           <Panel
             title="Leads and MQLs over time"
             sub="Daily count · hover for exact values"
@@ -268,6 +270,27 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Radar + outbound at a glance; each tile opens the page behind it.
+function CompetitiveStrip() {
+  const [radar, setRadar] = useState(null);
+  const [out, setOut] = useState(null);
+  useEffect(() => {
+    fetchRadarSummary({}).then(setRadar).catch(() => {});
+    fetchOutboundKpis(7).then(setOut).catch(() => {});
+  }, []);
+  if (!radar) return null;
+  return (
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6" data-testid="competitive-strip">
+      <Link to="/admin/radar?strength=Strong"><StatTile label="Strong Radar accounts" value={radar.by_strength?.Strong ?? 0} sub={`${radar.accounts} with a competitive signal`} /></Link>
+      <Link to="/admin/radar?tab=ready"><StatTile label="Ready for outreach" value={radar.ready} sub={`of ${radar.deep_dives} deep dives`} /></Link>
+      <Link to="/admin/radar?tab=surge"><StatTile label="Surging accounts" value={radar.surging} sub="3+ signals in 7 days" /></Link>
+      <Link to="/admin/radar?tab=new"><StatTile label="New for you" value={radar.fresh.new + radar.fresh.updated} sub={`${radar.new_today} signals today`} /></Link>
+      <Link to="/admin/outbound"><StatTile label="Outbound sends (7d)" value={out?.sends ?? "—"} sub={out?.bounce_rate != null ? `${out.bounce_rate}% bounce` : "No sends yet"} /></Link>
+      <Link to="/admin/outbound?tab=replies"><StatTile label="Positive replies (7d)" value={out?.positive ?? "—"} sub={out?.pending_approval ? `${out.pending_approval} waiting for approval` : "Approvals clear"} /></Link>
     </div>
   );
 }
