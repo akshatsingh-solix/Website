@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   addRadarSignal, createContact, deleteRadarSignal, enrollContacts, fetchGate, fetchRadarAccount, fetchSequences, findContactEmail, formatApiError,
-  patchRadarAccount, promoteToLead, requestResearch, reviewResearch, verifyContact,
+  patchContact, patchRadarAccount, promoteToLead, requestResearch, reviewResearch, verifyContact,
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { StageBadge, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
@@ -109,9 +109,9 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
               )}
             </div>
 
-            <div className="mt-5 grid grid-cols-4 gap-2 text-center">
+            <div className="mt-5 grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
               {[["Score", Math.round(a.score || 0)], ["Signals", a.signal_count || 0], ["Last 30 days", a.signals_30d || 0], ["Latest", a.latest_signal_at ? fmtDate(a.latest_signal_at) : "—"]].map(([l, v]) => (
-                <div key={l} className="rounded-xl border border-line/10 bg-card p-2.5"><p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{l}</p><p className="mt-1 font-display text-lg tabular-nums">{v}</p></div>
+                <div key={l} className="min-w-0 rounded-xl border border-line/10 bg-card p-2.5"><p className="truncate font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{l}</p><p className="mt-1 truncate font-display text-lg tabular-nums">{v}</p></div>
               ))}
             </div>
 
@@ -333,11 +333,15 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
   const [promote, setPromote] = useState(null);
 
   useEffect(() => { if (!seq && sequences.length) setSeq(sequences.find((s) => s.active)?.id || ""); }, [sequences, seq]);
+  // A gate result only holds for the contact as it was checked; any edit (verify, suppress, country) hides it.
+  const gateSig = (c) => [c.email, c.email_status, c.suppressed, c.country, c.updated_at].join("|");
   const checkGate = async (c) => {
     try {
       setGates((g) => ({ ...g, [c.id]: { loading: true } }));
       const g = await fetchGate(c.id);
-      setGates((x) => ({ ...x, [c.id]: g }));
+      setGates((x) => ({ ...x, [c.id]: { ...g, sig: gateSig(c) } }));
+      const forRegion = sequences.find((s) => s.active && s.region === g.region);
+      if (forRegion) setSeq(forRegion.id);
     } catch (e) {
       toast.error(formatApiError(e));
     }
@@ -350,25 +354,26 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
       <ul className="divide-y divide-line/5 rounded-xl border border-line/10 bg-card">
         {contacts.map((c) => {
           const e = active(c.id);
-          const g = gates[c.id];
+          const g = gates[c.id]?.sig === gateSig(c) ? gates[c.id] : null;
           return (
             <li key={c.id} className="p-3 text-sm">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-medium">{c.name} {c.persona === "target" && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">target persona</span>}</p>
                   <p className="text-xs text-muted-foreground">{c.title || "No title"} · {c.email || "no email"} <span className={EMAIL_TONE[c.email_status]}>({(c.email_status || "").replace("_", " ")})</span>{c.suppressed && <span className="text-red-300"> · suppressed ({c.suppressed})</span>}</p>
-                  {e && <p className="mt-1 text-xs text-teal">In "{e.sequence_name}" · {e.status.replace("_", " ")} · step {e.step_index}/{e.steps?.length ?? "?"}</p>}
+                  {e && <p className="mt-1 text-xs text-teal">In "{e.sequence_name}" · {e.status.replace("_", " ")} · {e.step_index} of {e.steps_total ?? e.steps?.length ?? "?"} sent</p>}
                 </div>
                 {can("editLeads") && (
                   <div className="flex flex-wrap gap-1">
                     {c.email ? <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `v${c.id}`} onClick={() => act(`v${c.id}`, () => verifyContact(c.id), (r) => `Email ${String(r.email_status).replace("_", " ")}`)}><MailCheck /> Verify</Button>
                       : <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `f${c.id}`} onClick={() => act(`f${c.id}`, () => findContactEmail(c.id), (r) => (r.found ? `Found ${r.found}` : "No verified address found"))}><Search /> Find email</Button>}
+                    {c.email && !["valid", "invalid"].includes(c.email_status) && <Button size="sm" variant="ghost" className="h-7 text-xs" title="You've confirmed this address another way (e.g. Seamless or a reply)" disabled={busy === `m${c.id}`} onClick={() => act(`m${c.id}`, () => patchContact(c.id, { mark_verified: true }), "Marked verified")}><Check /> Mark verified</Button>}
                     {c.email && <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setPromote({ email: c.email, name: c.name, job_title: c.title })}><UserPlus /> To lead</Button>}
                     {!e && c.email && <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => checkGate(c)}><ShieldAlert /> Check gate</Button>}
                   </div>
                 )}
               </div>
-              {g && !g.loading && (
+              {g && !e && !g.loading && (
                 <div className={cn("mt-2 rounded-lg border p-2 text-xs", g.ok ? "border-emerald-400/30 text-emerald-200" : "border-red-400/30 text-red-200")}>
                   {g.ok ? "Clear to enroll." : <>Blocked: {g.reasons.join("; ")}</>}
                   {g.warnings?.length > 0 && <p className="mt-1 text-amber-200">Note: {g.warnings.join("; ")}</p>}

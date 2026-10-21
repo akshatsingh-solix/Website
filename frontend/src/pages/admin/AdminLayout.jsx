@@ -28,21 +28,12 @@ export default function AdminLayout() {
     <div className="dark min-h-screen bg-background text-foreground" data-testid="admin-layout">
       <header className="sticky top-0 z-40 border-b border-line/10 bg-background/85 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-6">
-            <Link to="/admin" className="flex shrink-0 items-center gap-3">
-              <Logo compact />
-              <span className="font-display text-sm font-semibold tracking-tight">Admin</span>
-            </Link>
-            <nav className="hidden items-center gap-0.5 xl:flex">
-              {links.map((l) => (
-                <NavLink key={l.to} to={l.to} end={l.end} data-testid={`admin-nav-${l.label.toLowerCase().split(" ")[0]}`} className={({ isActive }) => cn("inline-flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 text-sm transition-colors", isActive ? "bg-line/10 text-foreground" : "text-muted-foreground hover:text-foreground")}>
-                  <l.icon className="h-4 w-4" strokeWidth={1.5} /> {l.label}
-                </NavLink>
-              ))}
-            </nav>
-          </div>
+          <Link to="/admin" className="flex shrink-0 items-center gap-3">
+            <Logo compact />
+            <span className="font-display text-sm font-semibold tracking-tight">Admin</span>
+          </Link>
           <div className="flex shrink-0 items-center gap-2">
-            <span className="hidden text-right leading-tight 2xl:block">
+            <span className="hidden text-right leading-tight lg:block">
               <span className="block font-mono text-[11px] text-muted-foreground" data-testid="admin-user-email">{user?.email}</span>
               <span className="block text-[10px] uppercase tracking-[0.14em] text-muted-foreground/80">{ROLE_LABELS[user?.role] || user?.role}</span>
             </span>
@@ -50,10 +41,11 @@ export default function AdminLayout() {
             <Button variant="outline" size="sm" onClick={logout} data-testid="admin-logout-button"><LogOut /> <span className="hidden sm:inline">Sign out</span></Button>
           </div>
         </div>
-        <nav className="container flex gap-1 overflow-x-auto pb-2 xl:hidden" aria-label="Admin sections">
+        {/* Its own row at every width: twelve sections never fit beside the logo and account buttons. */}
+        <nav className="container flex gap-1 overflow-x-auto pb-2" aria-label="Admin sections">
           {links.map((l) => (
-            <NavLink key={l.to} to={l.to} end={l.end} className={({ isActive }) => cn("inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-colors", isActive ? "bg-line/10 text-foreground" : "text-muted-foreground")}>
-              <l.icon className="h-3.5 w-3.5" strokeWidth={1.5} /> {l.label}
+            <NavLink key={l.to} to={l.to} end={l.end} data-testid={`admin-nav-${l.label.toLowerCase().split(" ")[0]}`} className={({ isActive }) => cn("inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs transition-colors xl:text-sm", isActive ? "bg-line/10 text-foreground" : "text-muted-foreground hover:text-foreground")}>
+              <l.icon className="h-3.5 w-3.5 xl:h-4 xl:w-4" strokeWidth={1.5} /> {l.label}
             </NavLink>
           ))}
         </nav>

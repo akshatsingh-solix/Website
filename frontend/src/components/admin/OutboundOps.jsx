@@ -165,7 +165,7 @@ export function HealthPanel() {
   if (!h) return <Loader2 className="mx-auto my-16 h-6 w-6 animate-spin text-primary-ink" />;
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <Panel title="Watchdog" sub="Checks every 30 minutes; a failing check alerts Slack #watchdog and the alert inbox once per half day." action={can("manage") && <Button size="sm" variant="outline" disabled={busy === "tick"} onClick={() => doit("tick", runOpsTick, "Checks run")}>{busy === "tick" ? <Loader2 className="animate-spin" /> : <RefreshCw />} Run checks</Button>}>
+      <Panel title="Watchdog" sub="Checks every 30 minutes; a failing check alerts Slack #watchdog and the alert inbox once per half day." action={can("manage") && <Button size="sm" variant="outline" disabled={busy === "tick"} title="Delivers queued alerts, runs the sender for anything due, then re-runs these checks" onClick={() => doit("tick", runOpsTick, "Deliveries, sender and checks run")}>{busy === "tick" ? <Loader2 className="animate-spin" /> : <RefreshCw />} Run now</Button>}>
         <ul className="divide-y divide-line/5">
           {h.checks.map((c) => (
             <li key={c.code} className="flex items-start gap-3 py-2.5 text-sm">

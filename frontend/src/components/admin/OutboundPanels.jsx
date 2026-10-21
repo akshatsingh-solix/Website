@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   createContact, createSequence, enrollContacts, fetchContacts, fetchEnrollments, fetchOutboundKpis, fetchReplies, fetchSequences, formatApiError, importContacts,
-  logReply, patchEnrollment, updateSequence, verifyContact,
+  logReply, patchContact, patchEnrollment, updateSequence, verifyContact,
 } from "@/lib/adminApi";
 import { Panel, StatTile, ago, fmtDateTime, inputCls, selectCls, useCan, useLiveRefresh } from "@/components/admin/kit";
 
@@ -216,7 +216,10 @@ export function ContactsPanel() {
                   <td className="py-2 pr-2 text-xs">{c.company || "—"}<p className="text-muted-foreground">{c.country}</p></td>
                   <td className="py-2 pr-2 text-xs">{c.email || "—"}<p className={EMAIL_TONE[c.email_status] || "text-muted-foreground"}>{(c.email_status || "").replace("_", " ")}{c.suppressed ? ` · suppressed (${c.suppressed})` : ""}</p></td>
                   <td className="py-2 pr-2 text-xs text-muted-foreground">{c.source}{c.source_url && <> · <a className="text-teal hover:underline" href={c.source_url} target="_blank" rel="noopener noreferrer">where</a></>}</td>
-                  <td className="py-2 text-right">{can("editLeads") && c.email && <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === c.id} onClick={() => run(c.id, () => verifyContact(c.id), (r) => `Email ${String(r.email_status).replace("_", " ")}`)}><MailCheck /> Verify</Button>}</td>
+                  <td className="whitespace-nowrap py-2 text-right">{can("editLeads") && c.email && <>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === c.id} onClick={() => run(c.id, () => verifyContact(c.id), (r) => `Email ${String(r.email_status).replace("_", " ")}`)}><MailCheck /> Verify</Button>
+                    {!["valid", "invalid"].includes(c.email_status) && <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `m${c.id}`} onClick={() => run(`m${c.id}`, () => patchContact(c.id, { mark_verified: true }), "Marked verified")}><Check /> Mark verified</Button>}
+                  </>}</td>
                 </tr>
               ))}
             </tbody>
