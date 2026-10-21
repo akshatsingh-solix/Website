@@ -239,6 +239,8 @@ export default function AdminDashboard() {
             </Panel>
           </div>
 
+          {data.influence && <Influence inf={data.influence} />}
+
           <div className="grid gap-6 xl:grid-cols-3">
             <Panel title="Top content" sub="Resource views and downloads" className="xl:col-span-2" testId="panel-content">
               <table className="w-full text-sm">
@@ -291,6 +293,40 @@ function CompetitiveStrip() {
       <Link to="/admin/radar?tab=new"><StatTile label="New for you" value={radar.fresh.new + radar.fresh.updated} sub={`${radar.new_today} signals today`} /></Link>
       <Link to="/admin/outbound"><StatTile label="Outbound sends (7d)" value={out?.sends ?? "—"} sub={out?.bounce_rate != null ? `${out.bounce_rate}% bounce` : "No sends yet"} /></Link>
       <Link to="/admin/outbound?tab=replies"><StatTile label="Positive replies (7d)" value={out?.positive ?? "—"} sub={out?.pending_approval ? `${out.pending_approval} waiting for approval` : "Approvals clear"} /></Link>
+    </div>
+  );
+}
+
+const ACCOUNT_STEPS = { signal: "With a signal", contacted: "Contacted", replied: "Replied", meeting_booked: "Meeting booked", opportunity: "Opportunity", won: "Won" };
+
+// How much of the funnel the Radar and outbound produced, each number opening the leads or accounts behind it.
+function Influence({ inf }) {
+  const rows = [
+    ["From Radar accounts", "Leads whose company is on the Radar", inf.radar_accounts, "/admin/leads?linked=radar"],
+    ["Sourced by outbound", "First touch was an outbound email", inf.outbound_sourced, "/admin/leads?channel=outbound"],
+    ["Touched by outbound", "Any outbound contact, inbound first or not", inf.outbound_touched, "/admin/leads?linked=outbound"],
+  ];
+  const top = inf.account_funnel?.[0]?.count || 0;
+  return (
+    <div className="grid gap-6 xl:grid-cols-2">
+      <Panel title="Pipeline from the Radar and outbound" sub={`Leads created this period · ${inf.sends} outbound emails sent · ${inf.positive_replies} positive replies`} testId="panel-influence">
+        <table className="w-full text-sm">
+          <thead className="text-left text-xs text-muted-foreground"><tr><th className="py-1.5 font-normal">Source</th><th className="font-normal">Leads</th><th className="font-normal">SQL+</th><th className="font-normal">Won</th></tr></thead>
+          <tbody>
+            {rows.map(([label, help, r, to]) => (
+              <tr key={label} className="border-t border-line/5">
+                <td className="py-1.5"><Link to={to} className="hover:text-teal">{label}</Link><p className="text-[11px] text-muted-foreground">{help}</p></td>
+                <td className="font-mono text-xs">{r.leads}</td><td className="font-mono text-xs">{r.sqls}</td><td className="font-mono text-xs">{r.won}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Panel>
+      <Panel title="Radar accounts: signal to won" sub="Accounts with a competitive signal, by how far they have got (all time)" testId="panel-account-funnel">
+        <BarList rows={(inf.account_funnel || []).map((r) => ({ ...r, name: ACCOUNT_STEPS[r.status] || r.status }))} valueKey="count" labelKey="name" color={SERIES.sqls}
+          format={(v, r) => (r.status === "signal" || !top ? v.toLocaleString() : `${v} · ${Math.round((100 * v) / top)}%`)}
+          linkFor={(r) => (r.status === "signal" ? "/admin/radar" : `/admin/radar?status=${r.status}`)} />
+      </Panel>
     </div>
   );
 }

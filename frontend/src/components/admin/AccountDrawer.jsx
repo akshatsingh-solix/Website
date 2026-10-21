@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Check, Download, ExternalLink, FlaskConical, Loader2, MailCheck, Plus, Search, Send, ShieldAlert, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -11,7 +12,7 @@ import {
   patchContact, patchRadarAccount, promoteToLead, requestResearch, reviewResearch, verifyContact,
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
-import { StageBadge, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
+import { CHANNEL_LABELS, StageBadge, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
 import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SIGNAL_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
 import { cn } from "@/lib/utils";
 
@@ -208,9 +209,14 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                 {data.leads.length ? (
                   <ul className="divide-y divide-line/5 rounded-xl border border-line/10 bg-card">
                     {data.leads.map((l) => (
-                      <li key={l.id} className="flex items-center justify-between gap-3 p-3 text-sm">
-                        <div className="min-w-0"><p className="truncate font-medium">{l.name || l.email}</p><p className="truncate text-xs text-muted-foreground">{[l.job_title, l.email].filter(Boolean).join(" · ")}</p></div>
-                        <div className="flex items-center gap-2"><span className="font-mono text-xs tabular-nums">{Math.round(l.score || 0)}</span><StageBadge stage={l.stage} /></div>
+                      <li key={l.id}>
+                        <Link to={`/admin/leads?lead=${l.id}`} className="flex items-center justify-between gap-3 p-3 text-sm hover:bg-line/5" data-testid="account-lead-link">
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">{l.name || l.email}</p>
+                            <p className="truncate text-xs text-muted-foreground">{[l.job_title, l.email, l.owner ? `owner ${l.owner}` : "unassigned", CHANNEL_LABELS[l.channel]].filter(Boolean).join(" · ")}</p>
+                          </div>
+                          <div className="flex items-center gap-2"><span className="font-mono text-xs tabular-nums">{Math.round(l.score || 0)}</span><StageBadge stage={l.stage} /></div>
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -361,6 +367,7 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
                 <div className="min-w-0">
                   <p className="font-medium">{c.name} {c.persona === "target" && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">target persona</span>}</p>
                   <p className="text-xs text-muted-foreground">{c.title || "No title"} · {c.email || "no email"} <span className={EMAIL_TONE[c.email_status]}>({(c.email_status || "").replace("_", " ")})</span>{c.suppressed && <span className="text-red-300"> · suppressed ({c.suppressed})</span>}</p>
+                  {c.lead_id && <Link to={`/admin/leads?lead=${c.lead_id}`} className="mt-1 inline-block text-xs text-teal hover:underline">Also a website lead: open it</Link>}
                   {e && <p className="mt-1 text-xs text-teal">In "{e.sequence_name}" · {e.status.replace("_", " ")} · {e.step_index} of {e.steps_total ?? e.steps?.length ?? "?"} sent</p>}
                 </div>
                 {can("editLeads") && (

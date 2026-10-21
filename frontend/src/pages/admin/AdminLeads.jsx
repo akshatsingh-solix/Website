@@ -11,7 +11,7 @@ import { CHANNEL_LABELS, LineBadge, ScoreBar, STAGE_LABELS, StageBadge, ago, pro
 import { LeadDrawer } from "@/components/admin/LeadDrawer";
 
 const PAGE_SIZE = 25;
-const FILTER_KEYS = ["q", "line", "product", "stage", "owner", "channel", "country", "industry", "min_score", "date_field", "date_from", "date_to", "active_days"];
+const FILTER_KEYS = ["q", "line", "product", "stage", "owner", "channel", "country", "industry", "min_score", "date_field", "date_from", "date_to", "active_days", "linked"];
 const SORTS = [
   { key: "score", label: "Highest score" },
   { key: "recent", label: "Most recent activity" },
@@ -36,7 +36,7 @@ export default function AdminLeads() {
   const [data, setData] = useState({ items: [], total: 0 });
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(new Set());
-  const [openId, setOpenId] = useState(null);
+  const [openId, setOpenId] = useState(params.get("lead")); // ?lead= opens one lead (links from Radar and Outbound)
   const [showFilters, setShowFilters] = useState(false);
   const [search, setSearch] = useState(params.get("q") || "");
   const [exporting, setExporting] = useState(null);
@@ -327,7 +327,10 @@ export default function AdminLeads() {
         </div>
       </div>
 
-      <LeadDrawer id={openId} meta={meta} onClose={() => setOpenId(null)} onChanged={load} />
+      <LeadDrawer id={openId} meta={meta} onChanged={load} onClose={() => {
+        setOpenId(null);
+        if (params.get("lead")) setParams((prev) => { const next = new URLSearchParams(prev); next.delete("lead"); return next; }, { replace: true });
+      }} />
     </div>
   );
 }

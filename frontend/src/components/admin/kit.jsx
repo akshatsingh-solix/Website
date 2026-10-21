@@ -26,7 +26,7 @@ const STAGE_TONE = {
 };
 
 export const LINE_SHORT = { platform: "Platform", archiving: "Archiving", governance: "Governance & Privacy", ai: "Enterprise AI", ecs: "ECS", services: "Services" };
-export const CHANNEL_LABELS = { paid: "Paid", organic_search: "Organic search", social: "Social", email: "Email", referral: "Referral", chat: "Concierge chat", direct: "Direct" };
+export const CHANNEL_LABELS = { paid: "Paid", organic_search: "Organic search", social: "Social", email: "Email", referral: "Referral", chat: "Concierge chat", outbound: "Outbound (Radar)", direct: "Direct" };
 
 // Validated categorical slots for the dark admin surface (see dataviz palette).
 export const SERIES = { leads: "#3987e5", mqls: "#d95926", sqls: "#199e70" };
