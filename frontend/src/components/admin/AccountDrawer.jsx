@@ -13,7 +13,7 @@ import {
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { CHANNEL_LABELS, StageBadge, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
-import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SIGNAL_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
+import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SIGNAL_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
 import { cn } from "@/lib/utils";
 
 const Row = ({ label, children }) => (children || children === 0 ? (
@@ -124,6 +124,14 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
               </TabsList>
 
               <TabsContent value="overview" className="mt-4 space-y-5">
+                {a.next_action && (
+                  <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4" data-testid="account-next-step">
+                    <p className="eyebrow text-amber-200">Next step</p>
+                    <p className="mt-1 font-medium text-foreground">{a.next_action.label}</p>
+                    <p className="text-sm text-muted-foreground">{a.next_action.why}</p>
+                  </div>
+                )}
+                <ScoreBreakdown account={a} />
                 {can("editLeads") ? (
                   <section className="rounded-2xl border border-line/10 bg-card p-4" data-testid="account-workflow">
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -174,7 +182,11 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                           <li key={s.id} className="p-3 text-sm">
                             <div className="flex flex-wrap items-start justify-between gap-2">
                               <div className="min-w-0 flex-1">
-                                <p className="font-medium text-foreground"><Highlight text={s.role_title || s.title || s.person || s.record_value} hl={hl} /></p>
+                                <p className="font-medium text-foreground">
+                                  <Highlight text={s.role_title || s.title || s.person || s.record_value} hl={hl} />
+                                  {s.action === "added" && <span className="ml-2 rounded-full border border-red-400/30 bg-red-500/10 px-2 py-0.5 text-[10px] text-red-200">New since the last scan</span>}
+                                  {s.action === "removed" && <span className="ml-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[10px] text-amber-200">No longer in use</span>}
+                                </p>
                                 {s.evidence_text && <p className="mt-1 text-xs text-muted-foreground"><span className="text-foreground/70">Why it matched: </span><Highlight text={s.evidence_text} hl={hl} /></p>}
                                 <p className="mt-1 text-[11px] text-muted-foreground">{[s.competitor_product || s.problem_term, s.role_strength, s.location || s.country, s.posted_at && fmtDate(s.posted_at), `first seen ${fmtDate(s.first_seen_at)}`, s.source].filter(Boolean).join(" · ")}</p>
                               </div>
@@ -416,5 +428,27 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
         </div>
       )}
     </>
+  );
+}
+
+// Why the account scores what it does: signals by type (decayed), website visits and the deep dive.
+function ScoreBreakdown({ account: a }) {
+  const parts = Object.entries(a.score_parts || {});
+  if (!parts.length) return null;
+  const max = Math.max(1, ...parts.map(([, v]) => v));
+  return (
+    <section className="rounded-2xl border border-line/10 bg-card p-4" data-testid="score-breakdown">
+      <p className="eyebrow">Why it scores {Math.round(a.score || 0)}</p>
+      <ul className="mt-2 space-y-1.5">
+        {parts.map(([k, v]) => (
+          <li key={k} className="grid grid-cols-[minmax(120px,170px)_1fr_40px] items-center gap-3 text-xs">
+            <span className="truncate text-muted-foreground">{SCORE_PART_LABELS[k] || k}</span>
+            <span className="h-1.5 overflow-hidden rounded-full bg-line/10"><span className="block h-full rounded-full bg-teal/70" style={{ width: `${(v / max) * 100}%` }} /></span>
+            <span className="text-right font-mono tabular-nums">{Math.round(v)}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-[11px] text-muted-foreground">Signals lose half their weight every 30 days. An approved deep dive of 6 or more adds enough to clear the outreach floor of 30.</p>
+    </section>
   );
 }

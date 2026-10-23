@@ -152,7 +152,7 @@ export function RadarSetup({ onChanged }) {
           <div><p className="mb-1 text-xs text-muted-foreground">US states: <code>TX -&gt; Rep</code></p>{area("states", 12)}</div>
           <div className="space-y-3">
             <div><p className="mb-1 text-xs text-muted-foreground">Region owners: <code>Europe &amp; UK -&gt; Rep</code></p>{area("owners", 5)}</div>
-            <div><p className="mb-1 text-xs text-muted-foreground">Country overrides: <code>Germany -&gt; Rep</code></p>{area("countries", 3, "France -> Ravi Summan")}</div>
+            <div><p className="mb-1 text-xs text-muted-foreground">Country overrides: <code>Germany -&gt; Rep</code></p>{area("countries", 3, "France -> Matt Long")}</div>
           </div>
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-3">

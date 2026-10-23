@@ -200,6 +200,7 @@ export const runAiVisibility = () => adminApi.post("/admin/seo/ai-visibility/run
 export const fetchRadarMeta = () => adminApi.get("/admin/radar/meta").then((r) => r.data);
 export const fetchRadarSummary = (params, opts = {}) => adminApi.get("/admin/radar/summary", { params: clean(params), ...opts }).then((r) => r.data);
 export const fetchRadarAccounts = (params, opts = {}) => adminApi.get("/admin/radar/accounts", { params: clean(params), ...opts }).then((r) => r.data);
+export const fetchRadarReps = (days = 30) => adminApi.get("/admin/radar/reps", { params: { days }, fresh: true }).then((r) => r.data);
 export const fetchRadarAccount = (id, opts = {}) => adminApi.get(`/admin/radar/accounts/${id}`, opts).then((r) => r.data);
 export const patchRadarAccount = (id, body) => adminApi.patch(`/admin/radar/accounts/${id}`, body).then((r) => r.data);
 export const createRadarAccount = (body) => adminApi.post("/admin/radar/accounts", body).then((r) => r.data);
