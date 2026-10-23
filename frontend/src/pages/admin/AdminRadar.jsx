@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Download, Eye, FileSpreadsheet, Loader2, Play, RefreshCw, Search } from "lucide-react";
+import { Download, Eye, FileSpreadsheet, Loader2, Play, RefreshCw, Search, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -146,6 +146,11 @@ export default function AdminRadar() {
         </div>
         <div className="flex flex-wrap gap-2">
           {can("manage") && <Button variant="outline" size="sm" onClick={runNow} disabled={busy === "run"}>{busy === "run" ? <Loader2 className="animate-spin" /> : <Play />} Run now</Button>}
+          {can("manage") && (
+            <Button variant="outline" size="sm" data-testid="radar-setup-button" onClick={() => { setParam({ tab: "setup" }); requestAnimationFrame(() => document.getElementById("radar-views")?.scrollIntoView({ behavior: "smooth", block: "start" })); }}>
+              <SlidersHorizontal /> Setup
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => exportRadarWorkbook(rep).catch((e) => toast.error(formatApiError(e)))}><FileSpreadsheet /> Excel</Button>
           <Button variant="ghost" size="sm" onClick={() => load()}><RefreshCw /> Refresh</Button>
         </div>
@@ -250,7 +255,8 @@ export default function AdminRadar() {
       </div>
 
       {/* Tabs */}
-      <nav className="mt-4 flex gap-1 overflow-x-auto pb-1" aria-label="Radar views">
+      {/* Wraps on wider screens so no view (Setup is last) hides off the right edge; scrolls sideways on phones. */}
+      <nav id="radar-views" className="mt-4 flex scroll-mt-20 gap-1 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible" aria-label="Radar views">
         {TABS.filter(([k]) => k !== "setup" || can("manage")).map(([k, label]) => {
           const count = k === "all" || k === "territory" ? summary?.accounts : ["review", "reps"].includes(k) ? undefined : summary?.tabs?.[k];
           return (
