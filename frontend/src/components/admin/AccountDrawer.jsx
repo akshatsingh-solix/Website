@@ -301,6 +301,9 @@ function DeepDive({ r, hl, can, onReview, busy }) {
           {r.checks.map((c, i) => <li key={i} className={c.level === "block" ? "text-red-300" : "text-amber-200"}>{c.level === "block" ? "Must fix: " : "Check: "}{c.message}</li>)}
         </ul>
       )}
+      {(r.source_notes || []).length > 0 && (
+        <ul className="space-y-1 text-xs text-amber-200">{r.source_notes.map((n) => <li key={n}>{n}</li>)}</ul>
+      )}
       {edit ? (
         <div className="space-y-2">
           <Input className={inputCls} value={v.headline} onChange={(e) => setV({ ...v, headline: e.target.value })} placeholder="Headline" />
@@ -502,8 +505,10 @@ function PeopleFinder({ account, act, busy }) {
         <div className="mt-3">
           <p className="text-[11px] text-muted-foreground">
             {found.sources_used.web_pages} web page(s){found.available.hunter ? `, ${found.sources_used.hunter} from Hunter` : " (add HUNTER_API_KEY for work emails)"}
+            {found.hunter_domain && !(account.domains || []).includes(found.hunter_domain) ? ` (matched ${found.hunter_domain})` : ""}
             {found.email_pattern ? ` · email pattern ${found.email_pattern}` : ""}. Everyone listed is named in the linked source.
           </p>
+          {(found.problems || []).map((p) => <p key={p} className="mt-1 text-xs text-amber-200">{p}</p>)}
           {found.people.length === 0 ? <p className="mt-2 text-sm text-muted-foreground">No new people named in the sources.</p> : (
             <ul className="mt-2 divide-y divide-line/5">
               {found.people.map((p) => (
