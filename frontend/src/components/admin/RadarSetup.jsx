@@ -12,7 +12,7 @@ const toLines = (rows, fn) => rows.map(fn).join("\n");
 const parseLines = (text, fn) => text.split("\n").map((l) => l.trim()).filter(Boolean).map(fn).filter(Boolean);
 const split2 = (line, sep) => { const i = line.indexOf(sep); return i < 0 ? null : [line.slice(0, i).trim(), line.slice(i + sep.length).trim()]; };
 
-export function RadarSetup({ onChanged }) {
+export function RadarSetup({ meta, onChanged }) {
   const [cfg, setCfg] = useState(null);
   const [terr, setTerr] = useState(null);
   const [text, setText] = useState({});
@@ -108,6 +108,7 @@ export function RadarSetup({ onChanged }) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2" data-testid="radar-setup">
+      <LiveSources live={meta?.live_sources} />
       <Panel title="Import from the Leads Radar" sub="Upload radar.html (the page itself) or its JSON. Owner, Status and Notes are kept; running it again never duplicates.">
         <input ref={file} type="file" accept=".html,.htm,.json" className="hidden" onChange={(e) => doImport(e.target.files?.[0])} />
         <Button onClick={() => file.current?.click()} disabled={busy === "import"}>{busy === "import" ? <Loader2 className="animate-spin" /> : <Upload />} Choose file</Button>
@@ -178,6 +179,32 @@ export function RadarSetup({ onChanged }) {
           <Button size="sm" onClick={saveTerr} disabled={busy === "terr"}>{busy === "terr" ? <Loader2 className="animate-spin" /> : <Check />} Save territories</Button>
         </div>
       </Panel>
+    </div>
+  );
+}
+
+// Which live data sources are switched on, and what each one adds. Keys are set on the server (Render → Environment).
+const LIVE = [
+  ["web_search", "Web research", "PARALLEL_API_KEY", "Deep dives read live pages (press releases, the company's site, filings, talks) and Find people names leaders from them."],
+  ["ai_model", "AI model", "GROQ_API_KEY or OPENROUTER_API_KEY", "Writes the deep dive and pulls names and titles out of the pages. Without it, briefs are rules-based."],
+  ["hunter", "Work emails", "HUNTER_API_KEY", "Decision makers with work emails and the company's email pattern; Find email asks Hunter first."],
+  ["crustdata", "Job index", "CRUSTDATA_API_KEY", "The Leads Radar's main job-posting source (paid credits). Without it, only the job boards you list are read."],
+];
+
+function LiveSources({ live }) {
+  if (!live) return null;
+  return (
+    <div className="rounded-2xl border border-line/10 bg-card p-5 lg:col-span-2" data-testid="live-sources">
+      <p className="font-medium">Live sources</p>
+      <p className="text-xs text-muted-foreground">Everything the Radar shows comes from these. Nothing is made up: people are kept only if a source names them.</p>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        {LIVE.map(([k, label, env, what]) => (
+          <li key={k} className="rounded-xl border border-line/10 p-3 text-xs">
+            <p className="flex items-center gap-2 text-sm font-medium"><span className={live[k] ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-line/30"} />{label}<span className="text-xs font-normal text-muted-foreground">{live[k] ? "on" : `off · set ${env}`}</span></p>
+            <p className="mt-1 text-muted-foreground">{what}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

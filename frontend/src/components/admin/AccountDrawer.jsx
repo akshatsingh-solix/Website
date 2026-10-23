@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  addRadarSignal, createContact, deleteRadarSignal, enrollContacts, fetchGate, fetchRadarAccount, fetchSequences, findContactEmail, formatApiError,
+  addRadarSignal, createContact, deleteRadarSignal, enrollContacts, fetchGate, fetchRadarAccount, fetchSequences, findContactEmail, findRadarPeople, formatApiError,
   patchContact, patchRadarAccount, promoteToLead, requestResearch, reviewResearch, verifyContact,
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
@@ -320,10 +320,29 @@ function DeepDive({ r, hl, can, onReview, busy }) {
           {r.why_solix_wins && <section><p className="eyebrow mb-1">Why Solix wins</p><p className="text-muted-foreground">{r.why_solix_wins}</p></section>}
           {(r.evidence || []).length > 0 && (
             <section><p className="eyebrow mb-1">Evidence</p>
-              <ol className="space-y-1 text-xs">{r.evidence.map((e) => <li key={e.n}><span className="font-mono text-muted-foreground">[{e.n}]</span> {e.url ? <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-teal hover:underline">{e.title || e.url}</a> : e.title} {e.date && <span className="text-muted-foreground">({e.date})</span>}</li>)}</ol>
+              <ol className="space-y-1.5 text-xs">{r.evidence.map((e) => (
+                <li key={e.n}>
+                  <span className="font-mono text-muted-foreground">[{e.n}]</span> {e.url ? <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-teal hover:underline">{e.title || e.url}</a> : e.title} {e.date && <span className="text-muted-foreground">({e.date})</span>}
+                  {String(e.kind || "").startsWith("web") && <span className="ml-1 rounded border border-line/15 px-1 text-[10px] text-muted-foreground">web</span>}
+                  {e.excerpt && <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">{e.excerpt}</p>}
+                </li>
+              ))}</ol>
             </section>
           )}
-          {(r.contacts || []).length > 0 && <section><p className="eyebrow mb-1">People to reach</p><ul className="text-xs">{r.contacts.map((c) => <li key={c.name}>{c.name} · <span className="text-muted-foreground">{c.title}</span></li>)}</ul></section>}
+          {(r.contacts || []).length > 0 && (
+            <section>
+              <p className="eyebrow mb-1">People to reach</p>
+              <ul className="space-y-1 text-xs">
+                {r.contacts.map((c) => (
+                  <li key={c.name}>
+                    <span className="text-foreground">{c.name}</span> · <span className="text-muted-foreground">{c.title}</span>
+                    {c.source_url && <a href={c.source_url} target="_blank" rel="noopener noreferrer" className="ml-2 text-teal hover:underline">named in {c.source_title || "source"}</a>}
+                  </li>
+                ))}
+              </ul>
+              {r.status === "draft" && <p className="mt-1 text-[11px] text-muted-foreground">Approving this deep dive adds these people to Contacts with the page that named them.</p>}
+            </section>
+          )}
           {(r.first_touch?.subject || r.first_touch?.body) && (
             <section><p className="eyebrow mb-1">Suggested opener</p>
               <div className="rounded-xl border border-line/10 bg-card p-3"><p className="text-xs font-medium">Subject: {r.first_touch.subject}</p><pre className="mt-2 whitespace-pre-wrap font-sans text-xs text-muted-foreground">{r.first_touch.body}</pre></div>
@@ -368,7 +387,8 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
 
   return (
     <>
-      {contacts.length === 0 && <p className="text-sm text-muted-foreground">No contacts yet. Add the people from the deep dive, or anyone you know at {account.name}.</p>}
+      {can("editLeads") && <PeopleFinder account={account} act={act} busy={busy} />}
+      {contacts.length === 0 && <p className="text-sm text-muted-foreground">No contacts yet. Find people, add the ones from the deep dive, or anyone you know at {account.name}.</p>}
       <ul className="divide-y divide-line/5 rounded-xl border border-line/10 bg-card">
         {contacts.map((c) => {
           const e = active(c.id);
@@ -449,6 +469,57 @@ function ScoreBreakdown({ account: a }) {
         ))}
       </ul>
       <p className="mt-2 text-[11px] text-muted-foreground">Signals lose half their weight every 30 days. An approved deep dive of 6 or more adds enough to clear the outreach floor of 30.</p>
+    </section>
+  );
+}
+
+// Live people search: named on fetched web pages and/or found by Hunter, each with its source. Nothing is saved until "Add".
+function PeopleFinder({ account, act, busy }) {
+  const [found, setFound] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const search = async () => {
+    setLoading(true);
+    try {
+      setFound(await findRadarPeople(account.id));
+    } catch (e) {
+      toast.error(formatApiError(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+  const add = (p) => act(`p:${p.name}`, () => createContact({
+    company_id: account.id, name: p.name, title: p.title || undefined, email: p.email || undefined, linkedin_url: p.linkedin_url || undefined,
+    source: p.via === "hunter" ? "hunter" : "web_research", source_url: p.source_url || undefined,
+  }), `${p.name} added`).then((created) => created && setFound((f) => f && { ...f, people: f.people.filter((x) => x.name !== p.name) }));
+  return (
+    <section className="rounded-xl border border-line/10 bg-card p-3" data-testid="people-finder">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm"><span className="font-medium">Find people</span> <span className="text-xs text-muted-foreground">Live search of the web and Hunter for who owns IT, data, architecture and records at {account.name}.</span></p>
+        <Button size="sm" variant="outline" onClick={search} disabled={loading}>{loading ? <Loader2 className="animate-spin" /> : <Search />} {found ? "Search again" : "Find people"}</Button>
+      </div>
+      {loading && <p className="mt-2 text-xs text-muted-foreground">Searching live sources, about 10 to 30 seconds…</p>}
+      {found && (
+        <div className="mt-3">
+          <p className="text-[11px] text-muted-foreground">
+            {found.sources_used.web_pages} web page(s){found.available.hunter ? `, ${found.sources_used.hunter} from Hunter` : " (add HUNTER_API_KEY for work emails)"}
+            {found.email_pattern ? ` · email pattern ${found.email_pattern}` : ""}. Everyone listed is named in the linked source.
+          </p>
+          {found.people.length === 0 ? <p className="mt-2 text-sm text-muted-foreground">No new people named in the sources.</p> : (
+            <ul className="mt-2 divide-y divide-line/5">
+              {found.people.map((p) => (
+                <li key={p.name} className="flex flex-wrap items-start justify-between gap-2 py-2 text-sm">
+                  <div className="min-w-0">
+                    <p className="font-medium">{p.name} {p.relevant && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">relevant</span>}</p>
+                    <p className="text-xs text-muted-foreground">{p.title || "Title not given"}{p.email ? ` · ${p.email}${p.email_confidence ? ` (${p.email_confidence}%)` : ""}` : ""}</p>
+                    {p.source_url && <a href={p.source_url} target="_blank" rel="noopener noreferrer" className="text-[11px] text-teal hover:underline">Source: {p.source_title || p.source_url}</a>}
+                  </div>
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `p:${p.name}`} onClick={() => add(p)}><UserPlus /> Add</Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </section>
   );
 }
