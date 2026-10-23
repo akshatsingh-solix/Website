@@ -201,6 +201,8 @@ export const fetchRadarMeta = () => adminApi.get("/admin/radar/meta").then((r) =
 export const fetchRadarSummary = (params, opts = {}) => adminApi.get("/admin/radar/summary", { params: clean(params), ...opts }).then((r) => r.data);
 export const fetchRadarAccounts = (params, opts = {}) => adminApi.get("/admin/radar/accounts", { params: clean(params), ...opts }).then((r) => r.data);
 export const fetchRadarReps = (days = 30) => adminApi.get("/admin/radar/reps", { params: { days }, fresh: true }).then((r) => r.data);
+// Live web research and Hunter: takes a few seconds, so a longer timeout.
+export const findRadarPeople = (id) => adminApi.post(`/admin/radar/accounts/${id}/people`, null, { timeout: 120000 }).then((r) => r.data);
 export const fetchRadarAccount = (id, opts = {}) => adminApi.get(`/admin/radar/accounts/${id}`, opts).then((r) => r.data);
 export const patchRadarAccount = (id, body) => adminApi.patch(`/admin/radar/accounts/${id}`, body).then((r) => r.data);
 export const createRadarAccount = (body) => adminApi.post("/admin/radar/accounts", body).then((r) => r.data);

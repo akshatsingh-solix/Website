@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/shared/Logo";
 import { useAdmin } from "@/components/admin/AdminAuth";
 import { formatApiError } from "@/lib/adminApi";
+import { api } from "@/lib/api";
 
 export default function AdminLogin() {
   const { user, login } = useAdmin();
@@ -16,6 +17,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  useEffect(() => { api.get("/", { noRetry: true }).catch(() => {}); }, []); // wake the API early
 
   if (user) return <Navigate to={location.state?.from || "/admin"} replace />;
 
