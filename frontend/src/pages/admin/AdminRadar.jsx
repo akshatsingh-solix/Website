@@ -5,24 +5,25 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { exportRadarWorkbook, fetchRadarAccount, fetchRadarAccounts, fetchRadarMeta, fetchRadarSummary, fetchResearchQueue, formatApiError, markRadarSeen, runRadar } from "@/lib/adminApi";
+import { exportRadarWorkbook, fetchRadarAccount, fetchRadarAccounts, fetchRadarMeta, fetchRadarReps, fetchRadarSummary, fetchResearchQueue, formatApiError, markRadarSeen, runRadar } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { Panel, ago, fmtDate, selectCls, useCan, useLiveRefresh } from "@/components/admin/kit";
-import { AccountStatus, BASIS_LABELS, DiveBadge, FreshTag, RepRule, SIGNAL_LABELS, STATUS_LABELS, STRENGTHS, STRENGTH_COLOR, StrengthBadge } from "@/components/admin/radarKit";
+import { AccountStatus, BASIS_LABELS, DiveBadge, FreshTag, NextStep, RepRule, SIGNAL_LABELS, STATUS_LABELS, STRENGTHS, STRENGTH_COLOR, Sparkline, StrengthBadge } from "@/components/admin/radarKit";
 import { RadarScope } from "@/components/admin/RadarScope";
 import { AccountDrawer } from "@/components/admin/AccountDrawer";
 import { RadarSetup } from "@/components/admin/RadarSetup";
 
 const PAGE = 40;
-const FILTERS = ["q", "competitor", "strength", "territory", "owner", "status", "line", "ready_only"];
+const FILTERS = ["q", "competitor", "strength", "country", "state", "territory", "owner", "status", "line", "ready_only"];
 const TABS = [
-  ["all", "All accounts"], ["new", "New for you"], ["territory", "By territory"], ["ready", "Ready"], ["dives", "Deep dives"], ["review", "Review"],
+  ["all", "All accounts"], ["new", "New for you"], ["todo", "To do"], ["territory", "By territory"], ["reps", "Reps"], ["ready", "Ready"], ["dives", "Deep dives"], ["review", "Review"],
   ["jobs", "Competitor jobs"], ["problems", "Problem signals"], ["dns", "DNS"], ["news", "Filings & news"], ["tenders", "Tenders"], ["website", "Website intent"],
   ["surge", "Surging"], ["excluded", "Excluded"], ["setup", "Setup"],
 ];
 const TAB_HINT = {
   all: "Strongest first. Open an account to see every signal, the deep dive, contacts and history.",
   new: "Accounts you haven't opened yet, plus ones with new signals since you last looked. Opening an account or downloading its brief marks it seen.",
+  todo: "Accounts with a next step waiting: book the meeting, assign an owner, review a deep dive, act on a surge, add people, start outreach, or request or refresh a deep dive.",
   ready: "Approved deep dives scoring 6 or more, with no exclusion. These are the ones to work today.",
   dives: "Accounts with a Master Prospector deep dive, highest score first.",
   jobs: "Postings that name a competitor product. Hiring someone to run the tool means it's installed, and often painful.",
@@ -42,6 +43,7 @@ export default function AdminRadar() {
   const [limit, setLimit] = useState(PAGE);
   const [search, setSearch] = useState(params.get("q") || "");
   const [review, setReview] = useState([]);
+  const [reps, setReps] = useState(null);
   const [busy, setBusy] = useState(null);
 
   const tab = params.get("tab") || "all";
@@ -62,7 +64,7 @@ export default function AdminRadar() {
   const load = useCallback(async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
     try {
-      const listTab = ["territory", "setup", "review"].includes(tab) ? "all" : tab;
+      const listTab = ["territory", "reps", "setup", "review"].includes(tab) ? "all" : tab;
       const [s, list] = await Promise.all([
         fetchRadarSummary(filters, { fresh: silent }),
         fetchRadarAccounts({ ...filters, tab: listTab, page_size: 500, sort: tab === "dives" ? "dives" : "strength" }, { fresh: silent }),
@@ -70,6 +72,7 @@ export default function AdminRadar() {
       setSummary(s);
       setData(list);
       if (tab === "review") setReview(await fetchResearchQueue("draft"));
+      if (tab === "reps") setReps(await fetchRadarReps(30));
     } catch (e) {
       if (!silent) toast.error(formatApiError(e));
     } finally {
@@ -118,6 +121,7 @@ export default function AdminRadar() {
   };
 
   const items = data.items;
+  const trendFor = (product) => summary?.trend?.series?.find((x) => x.product === product)?.counts;
   const rep = filters.owner;
   const repName = meta?.team?.find((m) => m.email === rep)?.name || rep;
   const ownerOptions = meta?.team || [];
@@ -171,7 +175,7 @@ export default function AdminRadar() {
           <option value="unassigned">Unassigned</option>
           {ownerOptions.map((m) => <option key={m.email} value={m.email}>{m.name}</option>)}
         </select>
-        <span className="text-xs text-muted-foreground">{rep ? `Showing ${repName}'s accounts and territory.` : "to see only your accounts and territory"}</span>
+        <span className="text-xs text-muted-foreground">{rep ? `Showing ${repName}'s accounts and territory${meta?.rep_patch?.[repName] ? ` (${meta.rep_patch[repName]})` : ""}.` : "to see only your accounts and territory"}</span>
         {rep && rep !== "unassigned" && (
           <Button size="sm" variant="outline" className="ml-auto" disabled={busy === `brief:${rep}`} onClick={() => repBrief(rep, repName)}>
             {busy === `brief:${rep}` ? <Loader2 className="animate-spin" /> : <Download />} Download all {items.length} of {String(repName).split(" ")[0]}'s leads in one brief
@@ -214,14 +218,17 @@ export default function AdminRadar() {
                 const max = Math.max(1, ...summary.competitors.map((x) => x.signals));
                 const key = meta?.competitors?.find((m) => m.product === c.product)?.key;
                 return (
-                  <button key={c.product} type="button" onClick={() => key && setParam({ competitor: filters.competitor === key ? "" : key })} className={cn("grid w-full grid-cols-[minmax(110px,180px)_1fr_40px] items-center gap-3 text-left text-sm", filters.competitor === key && "text-teal")}>
+                  <button key={c.product} type="button" onClick={() => key && setParam({ competitor: filters.competitor === key ? "" : key })} className={cn("grid w-full grid-cols-[minmax(110px,180px)_1fr_auto] items-center gap-3 text-left text-sm", filters.competitor === key && "text-teal")}>
                     <span className="truncate">{c.product}</span>
                     <span className="h-2 overflow-hidden rounded-full bg-line/10"><span className="block h-full rounded-full bg-red-400/80" style={{ width: `${(c.signals / max) * 100}%` }} /></span>
-                    <span className="text-right font-mono text-xs tabular-nums">{c.signals}</span>
+                    <span className="flex items-center justify-end gap-2 font-mono text-xs tabular-nums">
+                      {trendFor(c.product) && <Sparkline counts={trendFor(c.product)} className="hidden text-red-300/80 sm:block" />}{c.signals}
+                    </span>
                   </button>
                 );
               })}
               {summary && !summary.competitors.length && <p className="text-sm text-muted-foreground">Nothing to show for these filters.</p>}
+              {summary?.trend?.series?.length > 0 && <p className="pt-1 text-[11px] text-muted-foreground">Lines show new signals per week over the last 12 weeks.</p>}
             </div>
           </Panel>
         </div>
@@ -231,10 +238,12 @@ export default function AdminRadar() {
       <div className="mt-6 flex flex-wrap items-center gap-2 rounded-2xl border border-line/10 bg-card/60 p-3">
         <div className="relative min-w-[200px] flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search company, domain, competitor, rep…" className="h-9 border-line/15 bg-background pl-9 text-sm" data-testid="radar-search" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search company, job title, person, place, competitor, rep…" className="h-9 border-line/15 bg-background pl-9 text-sm" data-testid="radar-search" />
         </div>
         {sel("competitor", "All competitors", meta?.competitors?.map((c) => <option key={c.key} value={c.key}>{c.product}</option>))}
         {sel("strength", "All strengths", STRENGTHS.map((s) => <option key={s} value={s}>{s}</option>))}
+        {sel("country", "All countries", meta?.countries?.map((c) => <option key={c} value={c}>{c}</option>))}
+        {sel("state", "All states", meta?.states?.map((s) => <option key={s} value={s}>{s}</option>))}
         {sel("territory", "All territories", meta?.territories?.map((t) => <option key={t} value={t}>{t}</option>))}
         {sel("status", "All statuses", Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>))}
         {Object.keys(filters).length > 0 && <Button size="sm" variant="ghost" onClick={() => { setSearch(""); setParams(new URLSearchParams(tab !== "all" ? { tab } : {})); }}>Clear filters</Button>}
@@ -243,7 +252,7 @@ export default function AdminRadar() {
       {/* Tabs */}
       <nav className="mt-4 flex gap-1 overflow-x-auto pb-1" aria-label="Radar views">
         {TABS.filter(([k]) => k !== "setup" || can("manage")).map(([k, label]) => {
-          const count = k === "all" || k === "territory" ? summary?.accounts : k === "review" ? undefined : summary?.tabs?.[k];
+          const count = k === "all" || k === "territory" ? summary?.accounts : ["review", "reps"].includes(k) ? undefined : summary?.tabs?.[k];
           return (
             <button key={k} type="button" onClick={() => setParam({ tab: k === "all" ? "" : k })} className={cn("inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs", tab === k ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:text-foreground")}>
               {label}{count !== undefined && <span className={cn("font-mono tabular-nums", k === "new" && count > 0 && tab !== k ? "text-sky-300" : "opacity-70")}>{count}</span>}
@@ -271,6 +280,8 @@ export default function AdminRadar() {
                 </Panel>
               ))}
             </div>
+          ) : tab === "reps" ? (
+            <RepScorecard rows={reps} patch={meta?.rep_patch} onPick={(owner) => setParam({ owner, tab: "" })} />
           ) : tab === "review" ? (
             <Panel title="Deep dives waiting for review" sub="Drafts never mark an account ready. Open one, check the sources, then approve, edit or reject.">
               {review.length ? (
@@ -298,7 +309,7 @@ export default function AdminRadar() {
                         <li key={a.id}>
                           <button type="button" onClick={() => openAccount(a.id)} className={cn("grid w-full gap-2 rounded-2xl border bg-card p-4 text-left transition-colors hover:border-line/30 sm:grid-cols-[1fr_auto]", a.fresh !== "seen" ? "border-sky-400/25" : "border-line/10")}>
                             <div className="min-w-0">
-                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}</p>
+                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}<NextStep action={a.next_action} /></p>
                               <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                                 {(a.signal_types || []).map((t) => <span key={t}>{SIGNAL_LABELS[t] || t}</span>)}
                                 {(a.competitors || []).length > 0 && <span className="text-red-300/90">{a.competitors.join(", ")}</span>}
@@ -323,5 +334,34 @@ export default function AdminRadar() {
 
       <AccountDrawer id={openId} meta={meta} onClose={() => setParam({ account: "" })} onChanged={() => load({ silent: true })} />
     </div>
+  );
+}
+
+// Per rep: their accounts, what's hot and waiting, how far accounts got, and outbound activity (last 30 days).
+function RepScorecard({ rows, patch, onPick }) {
+  if (!rows) return <div className="grid place-items-center py-16"><Loader2 className="h-6 w-6 animate-spin text-primary-ink" /></div>;
+  const cols = [["accounts", "Accounts"], ["strong", "Strong"], ["surging", "Surging"], ["new_7d", "New 7d"], ["to_do", "To do"], ["ready", "Ready"], ["contacted", "Contacted"],
+    ["replied", "Replied"], ["meetings", "Meetings"], ["won", "Won"], ["website_leads", "Web leads"], ["sends", "Emails 30d"], ["positive_replies", "Positive 30d"]];
+  return (
+    <Panel title="Rep scorecard" sub="Accounts each rep owns from the Radar, what's waiting on them, and how far their accounts have got. Funnel columns count accounts that reached that status or beyond.">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[760px] text-sm" data-testid="rep-scorecard">
+          <thead className="text-left text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+            <tr><th className="py-2 pr-3 font-normal">Rep</th>{cols.map(([k, l]) => <th key={k} className="px-2 py-2 text-right font-normal">{l}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.reps.map((r) => (
+              <tr key={r.owner || "unassigned"} className="border-t border-line/5">
+                <td className="min-w-[200px] py-2 pr-3">
+                  <button type="button" className="text-left hover:text-teal" onClick={() => onPick(r.owner || "unassigned")}>{r.rep}</button>
+                  {(patch?.[r.rep] || r.patch) && <p className="text-[11px] text-muted-foreground">{patch?.[r.rep] || r.patch}</p>}
+                </td>
+                {cols.map(([k]) => <td key={k} className={cn("px-2 py-2 text-right font-mono text-xs tabular-nums", k === "to_do" && r[k] > 0 && "text-amber-200", r[k] === 0 && "text-muted-foreground/60")}>{r[k]}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Panel>
   );
 }

@@ -76,3 +76,27 @@ export const Highlight = ({ text, hl }) => {
 export const RepRule = ({ className }) => (
   <p className={cn("text-xs italic text-muted-foreground", className)}>Rep rule: never name the competitor in the first message. Talk about the problem the signal points to.</p>
 );
+
+// What the score is made of (radar_model.rollup score_parts).
+export const SCORE_PART_LABELS = {
+  competitor_job: "Competitor job postings", problem_job: "Problem signals", dns: "DNS records", cert: "Certificates", linkedin: "LinkedIn",
+  news: "News", filing: "Filings", tender: "Tenders", website: "Website visits", deep_dive: "Deep dive", other: "Other signals",
+};
+
+// The one thing to do next on an account (radar_model.next_action).
+export const NextStep = ({ action, className }) => (action ? (
+  <span className={`inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] text-amber-200 ${className || ""}`} title={action.why}>
+    Next: {action.label}
+  </span>
+) : null);
+
+// Twelve weekly counts as a tiny line (competitor trend).
+export const Sparkline = ({ counts, className }) => {
+  const max = Math.max(1, ...counts);
+  const pts = counts.map((v, i) => `${(i / Math.max(1, counts.length - 1)) * 60},${16 - (v / max) * 14}`).join(" ");
+  return (
+    <svg viewBox="0 0 60 18" className={className} aria-hidden="true" width="60" height="18">
+      <polyline points={pts} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+};
