@@ -186,7 +186,7 @@ export function RadarSetup({ meta, onChanged }) {
 // Which live data sources are switched on, and what each one adds. Keys are set on the server (Render → Environment).
 const LIVE = [
   ["web_search", "Web research", "FIRECRAWL_API_KEY", "Firecrawl searches the web and reads leadership pages in full; deep dives cite them and Find people names leaders from them. Parallel (PARALLEL_API_KEY) is the backup. Repeat searches within a day cost nothing."],
-  ["ai_model", "AI model", "GROQ_API_KEY or OPENROUTER_API_KEY", "Writes the deep dive and pulls names and titles out of the pages. Without it, briefs are rules-based."],
+  ["ai_model", "AI model", "OPENAI_API_KEY (providers in LLM_PII_PROVIDERS)", "Writes the deep dive and pulls names and titles out of the pages. Free tiers never see prospect data. Without it, briefs are rules-based."],
   ["hunter", "Work emails", "HUNTER_API_KEY", "Decision makers with work emails and the company's email pattern; Find email asks Hunter first."],
   ["crustdata", "Job index", "CRUSTDATA_API_KEY", "The Leads Radar's main job-posting source (paid credits). Without it, only the job boards you list are read."],
 ];
