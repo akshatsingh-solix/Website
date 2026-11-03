@@ -2,6 +2,8 @@ import { Suspense, lazy, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AdminAuthProvider, RequireAdmin } from "@/components/admin/AdminAuth";
 import { ServerWakeNotice } from "@/components/admin/ServerWakeNotice";
+import { AdminThemeProvider } from "@/components/admin/theme";
+import { AdminBackdrop } from "@/components/admin/Backdrop";
 
 // Everything under /admin lives in this chunk, so public visitors never
 // download the admin sign-in, API client or pages.
@@ -48,8 +50,10 @@ const prefetchAdmin = () => {
 export default function AdminApp() {
   useEffect(prefetchAdmin, []);
   return (
+    <AdminThemeProvider>
     <AdminAuthProvider>
-      <Suspense fallback={<div className="min-h-screen bg-muted/30" aria-busy="true" />}>
+      <AdminBackdrop />
+      <Suspense fallback={<div className="min-h-screen" aria-busy="true" />}>
         <Routes>
           <Route path="login" element={<AdminLogin />} />
           <Route element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
@@ -72,5 +76,6 @@ export default function AdminApp() {
       </Suspense>
       <ServerWakeNotice />
     </AdminAuthProvider>
+    </AdminThemeProvider>
   );
 }

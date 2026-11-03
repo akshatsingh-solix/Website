@@ -273,7 +273,7 @@ export default function AdminSubmissions() {
       </div>
 
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="dark max-h-[90vh] overflow-y-auto border-line/10 bg-background sm:max-w-xl" data-testid="admin-lead-dialog">
+        <DialogContent className="max-h-[90vh] overflow-y-auto border-line/10 bg-background sm:max-w-xl" data-testid="admin-lead-dialog">
           {selected && (
             <>
               <DialogHeader>

@@ -44,7 +44,7 @@ export const RequireAdmin = ({ children }) => {
   const location = useLocation();
   if (user === null) {
     return (
-      <div className="grid min-h-screen place-items-center bg-background" data-testid="admin-loading">
+      <div className="grid min-h-screen place-items-center" data-testid="admin-loading">
         <Loader2 className="h-6 w-6 animate-spin text-primary-ink" />
       </div>
     );

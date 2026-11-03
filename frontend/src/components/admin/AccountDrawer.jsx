@@ -87,7 +87,7 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
 
   return (
     <Sheet open={!!id} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="dark w-full overflow-y-auto border-line/10 bg-background text-foreground sm:max-w-2xl" data-testid="account-drawer">
+      <SheetContent className="w-full overflow-y-auto border-line/10 bg-background text-foreground sm:max-w-2xl" data-testid="account-drawer">
         {!a ? (
           <div className="grid h-full place-items-center"><Loader2 className="h-6 w-6 animate-spin text-primary-ink" /></div>
         ) : (

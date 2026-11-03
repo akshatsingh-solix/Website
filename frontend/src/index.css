@@ -692,3 +692,106 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Admin atmosphere. Scoped to html.admin-ui (set by components/admin/theme.jsx)
+ * so none of this reaches the public site. Night is the default; Day drops
+ * the `dark` class and the remaps below darken the tints that were tuned for
+ * a navy ground.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  html.admin-ui.dark {
+    --background: 220 55% 7%;
+    --card: 216 45% 13%;
+    --popover: 218 48% 11%;
+    --muted: 218 45% 11%;
+    --secondary: 218 48% 11%;
+  }
+  html.admin-ui:not(.dark) {
+    --background: 210 40% 97%;
+    --card: 0 0% 100%;
+  }
+  html.admin-ui body { background: hsl(var(--background)); }
+  html.admin-ui.dark ::-webkit-scrollbar-track { background: hsl(var(--background)); }
+  html.admin-ui.dark ::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 0.12); border-color: hsl(var(--background)); }
+
+  .admin-backdrop-base {
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgb(0 136 207 / 0.16), transparent 60%),
+      hsl(var(--background));
+  }
+  .admin-blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(90px);
+    opacity: 0.55;
+    will-change: transform;
+  }
+  .admin-blob-a { left: -12%; top: -18%; width: 58vw; height: 58vw; background: radial-gradient(circle, rgb(0 136 207 / 0.55), transparent 65%); animation: aurora-drift-1 26s ease-in-out infinite; }
+  .admin-blob-b { right: -16%; top: 18%; width: 46vw; height: 46vw; background: radial-gradient(circle, rgb(238 36 36 / 0.32), transparent 65%); animation: aurora-drift-2 30s ease-in-out infinite; }
+  .admin-blob-c { left: 22%; bottom: -30%; width: 60vw; height: 50vw; background: radial-gradient(circle, rgb(20 184 166 / 0.28), transparent 65%); animation: aurora-drift-1 34s ease-in-out infinite reverse; }
+  html.admin-ui:not(.dark) .admin-blob { opacity: 0.35; }
+  .admin-grid {
+    background-image:
+      linear-gradient(to right, rgb(var(--line) / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--line) / 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(70% 60% at 50% 30%, #000, transparent 75%);
+  }
+  .admin-waves { animation: admin-wave-drift 38s linear infinite; }
+  .admin-vignette { background: radial-gradient(120% 90% at 50% 40%, transparent 55%, hsl(var(--background) / 0.75)); }
+  @keyframes admin-wave-drift { to { transform: translateX(-50%); } }
+
+  /* Glass surface: translucent card, hairline rim lit from the top. */
+  .admin-glass {
+    position: relative;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.72), hsl(var(--card) / 0.5));
+    border: 1px solid rgb(var(--line) / 0.08);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.06),
+      0 24px 60px -32px rgb(0 0 0 / 0.65);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  }
+  html.admin-ui:not(.dark) .admin-glass {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.86), rgb(255 255 255 / 0.66));
+    border-color: rgb(13 25 45 / 0.08);
+    box-shadow: inset 0 1px 0 0 #fff, 0 18px 50px -30px rgb(13 25 45 / 0.35);
+  }
+  .admin-lift { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease; }
+  .admin-lift:hover { transform: translateY(-3px); }
+  .admin-tile-glow {
+    position: absolute;
+    right: -30%;
+    top: -60%;
+    width: 80%;
+    height: 120%;
+    border-radius: 9999px;
+    filter: blur(40px);
+    opacity: 0.22;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .admin-lift:hover .admin-tile-glow { opacity: 0.4; }
+  .admin-spark-dot { filter: drop-shadow(0 0 4px currentColor); }
+
+  /* Table rows answer the pointer across every admin table. */
+  html.admin-ui main tbody tr { transition: background-color 0.2s ease; }
+  html.admin-ui main tbody tr:hover { background-color: rgb(var(--line) / 0.03); }
+
+  /* Sliding gradient underline under the sticky header. */
+  .admin-header-rim {
+    background: linear-gradient(90deg, transparent, rgb(0 136 207 / 0.55), rgb(238 36 36 / 0.55), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 9s linear infinite;
+  }
+
+  /* Day: tints written for a navy ground, re-inked for white. */
+  html.admin-ui:not(.dark) :is(.text-red-200, .text-red-300, .text-red-400) { color: #b91c1c; }
+  html.admin-ui:not(.dark) :is(.text-amber-100, .text-amber-200, .text-amber-300) { color: #92400e; }
+  html.admin-ui:not(.dark) :is(.text-emerald-200, .text-emerald-300, .text-emerald-400) { color: #047857; }
+  html.admin-ui:not(.dark) :is(.text-sky-200, .text-sky-300) { color: #0369a1; }
+  html.admin-ui:not(.dark) :is(.text-indigo-200, .text-indigo-300) { color: #4338ca; }
+  html.admin-ui:not(.dark) :is(.text-orange-200, .text-orange-300) { color: #c2410c; }
+  html.admin-ui:not(.dark) :is(.text-violet-200, .text-violet-300) { color: #6d28d9; }
+}
