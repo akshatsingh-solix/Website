@@ -2,22 +2,24 @@
 /**
  * Builds Sol's knowledge base from the site's own content.
  *
- *   node scripts/sol-knowledge.js     # writes ../backend/sol_knowledge.json
+ *   node scripts/sol-knowledge.js     # writes public/sol_knowledge.json
  *
  * Reads the English data consts in src/data/* (products, solutions,
  * industries, resources + article bodies, newsroom, company, careers,
  * partners, services, platform) without running them, and writes one
  * retrieval chunk per page section, each with the site URL it came from.
  * The backend indexes these for the AI concierge, so Sol answers from what
- * the site says and links to the page that says it. Re-run after editing
- * site content; CI checks the file is current.
+ * the site says and links to the page that says it. The file ships with
+ * the site at <site>/sol_knowledge.json (the deploy regenerates it), and the
+ * backend, a separate repository, pulls it from there via its
+ * SITE_KNOWLEDGE_URL setting. Nothing is copied between repositories.
  */
 const fs = require("fs");
 const path = require("path");
 const parser = require("@babel/parser");
 
 const DATA = path.join(__dirname, "..", "src", "data");
-const OUT = path.join(__dirname, "..", "..", "backend", "sol_knowledge.json");
+const OUT = path.join(__dirname, "..", "public", "sol_knowledge.json");
 
 // Evaluates literal data only. Icons, imports and helper calls become
 // undefined; `...OTHER_EN.map(...)` spreads are skipped.
@@ -193,7 +195,7 @@ const out = JSON.stringify({ version: 1, chunks }, null, 1) + "\n";
 if (process.argv.includes("--check")) {
   const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, "utf8") : "";
   if (current !== out) {
-    console.error("sol-knowledge: backend/sol_knowledge.json is out of date. Run: node frontend/scripts/sol-knowledge.js");
+    console.error("sol-knowledge: public/sol_knowledge.json is out of date. Run: node frontend/scripts/sol-knowledge.js");
     process.exit(1);
   }
   console.log(`sol-knowledge: up to date (${chunks.length} chunks)`);
