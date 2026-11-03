@@ -49,7 +49,7 @@ function BuiltinDialog({ open, onOpenChange, onDone }) {
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="dark max-w-2xl border-line/10 bg-background text-foreground" data-testid="builtin-dialog">
+      <DialogContent className="max-w-2xl border-line/10 bg-background text-foreground" data-testid="builtin-dialog">
         <DialogHeader>
           <DialogTitle className="font-display text-xl font-medium">Manage the site's original content</DialogTitle>
           <DialogDescription>Brings every article, resource and press release that ships with the website into this list, published with its original date. From then on you can edit, unpublish or archive them like anything else; unpublishing one removes it from the site. Translations keep working until you change the English text.</DialogDescription>

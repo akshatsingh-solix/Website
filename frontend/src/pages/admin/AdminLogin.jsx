@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+import { EASE, LiveDot } from "@/components/admin/motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,21 +37,25 @@ export default function AdminLogin() {
     }
   };
 
-  const cls = "h-11 rounded-lg border-line/15 bg-background px-4 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0";
+  const cls = "h-11 rounded-xl border-line/15 bg-background/60 px-4 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-0";
+
+  const rise = (i) => ({ initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, ease: EASE, delay: 0.08 * i } });
 
   return (
-    <div className="dark relative grid min-h-screen place-items-center overflow-hidden bg-background px-4 text-foreground" data-testid="admin-login-page">
-      <div className="absolute inset-0 grid-lines opacity-50" />
-      <div className="absolute -left-40 top-1/3 h-[480px] w-[480px] rounded-full bg-primary/10 blur-3xl" />
-      <div className="relative w-full max-w-md">
-        <div className="mb-8 flex items-center justify-between">
+    <div className="relative grid min-h-screen place-items-center overflow-hidden px-4 text-foreground" data-testid="admin-login-page">
+      <motion.div className="relative w-full max-w-md" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, ease: EASE }}>
+        <motion.div className="mb-8 flex items-center justify-between" {...rise(0)}>
           <Logo />
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5 text-teal" /> Admin</span>
-        </div>
-        <div className="rounded-3xl border border-line/10 bg-card/80 p-8 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] backdrop-blur">
-          <h1 className="font-display text-3xl font-medium tracking-tight">Sign in to the leads dashboard.</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Restricted to Solix administrators.</p>
-          <form onSubmit={onSubmit} className="mt-8 space-y-5" data-testid="admin-login-form">
+          <span className="inline-flex items-center gap-2 rounded-full border border-line/10 bg-line/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5 text-teal" /> Admin</span>
+        </motion.div>
+        <div className="spot admin-glass relative overflow-hidden rounded-3xl p-8 sm:p-10">
+          <span className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-primary/25 blur-3xl" aria-hidden="true" />
+          <motion.p className="relative mb-4 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground" {...rise(1)}><LiveDot /> Leads, Radar and outbound, live</motion.p>
+          <motion.h1 className="relative font-display text-3xl font-medium tracking-tight sm:text-4xl" {...rise(2)}>
+            Sign in to the <span className="bg-gradient-to-r from-[#38bdf8] via-[#3987e5] to-[#ee2424] bg-clip-text text-transparent">command centre</span>.
+          </motion.h1>
+          <motion.p className="relative mt-2 text-sm text-muted-foreground" {...rise(3)}>Restricted to Solix administrators.</motion.p>
+          <motion.form onSubmit={onSubmit} className="relative mt-8 space-y-5" data-testid="admin-login-form" {...rise(4)}>
             <div className="space-y-2">
               <Label htmlFor="admin-email" className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Email</Label>
               <Input id="admin-email" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} className={cls} data-testid="admin-email-input" required />
@@ -58,13 +64,15 @@ export default function AdminLogin() {
               <Label htmlFor="admin-password" className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Password</Label>
               <Input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className={cls} data-testid="admin-password-input" required />
             </div>
-            {error && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300" data-testid="admin-login-error">{error}</p>}
-            <Button type="submit" size="lg" className="w-full" disabled={busy} data-testid="admin-login-submit">
+            {error && (
+              <motion.p initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: [0, -6, 6, -3, 3, 0] }} transition={{ duration: 0.45 }} className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300" data-testid="admin-login-error">{error}</motion.p>
+            )}
+            <Button type="submit" size="lg" className="btn-sheen w-full rounded-full shadow-[0_12px_40px_-12px_rgba(238,36,36,0.8)]" disabled={busy} data-testid="admin-login-submit">
               {busy ? <Loader2 className="animate-spin" /> : <>Sign in <ArrowRight /></>}
             </Button>
-          </form>
+          </motion.form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

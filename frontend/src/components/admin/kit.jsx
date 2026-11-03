@@ -1,7 +1,10 @@
 // Shared admin building blocks: labels, badges, score bars, tiles, role checks.
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAdmin } from "@/components/admin/AdminAuth";
+import { CountUp, EASE, Reveal, Sparkline } from "@/components/admin/motion";
 
 export const STAGE_LABELS = {
   lead: "Lead", mql: "MQL", sal: "SAL", sql: "SQL", opportunity: "Opportunity", won: "Won", lost: "Lost", disqualified: "Disqualified",
@@ -60,29 +63,57 @@ export const LineBadge = ({ line }) =>
 
 /** Score as a number plus a bar against the MQL threshold. */
 export const ScoreBar = ({ score = 0, threshold = 45 }) => {
+  const reduce = useReducedMotion();
   const pct = Math.min(100, (score / Math.max(threshold * 1.6, 1)) * 100);
   const mark = Math.min(100, (threshold / Math.max(threshold * 1.6, 1)) * 100);
+  const hot = score >= threshold;
   return (
     <div className="flex min-w-[110px] items-center gap-2" title={`Score ${Math.round(score)} (MQL at ${threshold})`}>
       <span className="w-8 text-right font-mono text-xs tabular-nums text-foreground">{Math.round(score)}</span>
       <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-line/10">
-        <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pct}%`, background: score >= threshold ? SERIES.mqls : SERIES.leads }} />
+        <motion.span
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{ background: hot ? `linear-gradient(90deg, ${SERIES.leads}, ${SERIES.mqls})` : SERIES.leads, boxShadow: hot ? `0 0 10px ${SERIES.mqls}` : "none" }}
+          initial={reduce ? false : { width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.9, ease: EASE }}
+        />
         <span className="absolute inset-y-[-2px] w-px bg-foreground/60" style={{ left: `${mark}%` }} />
       </span>
     </div>
   );
 };
 
-export const StatTile = ({ label, value, sub, testId }) => (
-  <div className="rounded-2xl border border-line/10 bg-card p-5" data-testid={testId}>
-    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
-    <p className="mt-2 font-display text-3xl font-medium tracking-tight tabular-nums text-foreground">{value ?? "—"}</p>
-    {sub && <p className="mt-1 text-xs text-muted-foreground">{sub}</p>}
+/**
+ * KPI tile: glass card with a counting value, an optional sparkline and a
+ * soft accent glow that brightens on hover. `accent` is any CSS colour.
+ */
+export const StatTile = ({ label, value, sub, testId, spark, accent = SERIES.leads, icon: Icon, delta }) => (
+  <div className="spot admin-glass admin-lift relative h-full overflow-hidden rounded-2xl p-5" data-testid={testId}>
+    <span className="admin-tile-glow" style={{ background: accent }} aria-hidden="true" />
+    <div className="relative flex items-start justify-between gap-2">
+      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+      {Icon && (
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-line/10 bg-line/5" style={{ color: accent }}>
+          <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+        </span>
+      )}
+    </div>
+    <div className="relative mt-2 flex items-baseline gap-2">
+      <CountUp value={value} className="font-display text-3xl font-medium tracking-tight text-foreground" />
+      {delta != null && delta !== 0 && (
+        <span className={cn("rounded-full px-1.5 py-0.5 font-mono text-[10px]", delta > 0 ? "bg-emerald-400/10 text-emerald-300" : "bg-red-400/10 text-red-300")}>
+          {delta > 0 ? "▲" : "▼"} {Math.abs(delta)}%
+        </span>
+      )}
+    </div>
+    {sub && <p className="relative mt-1 text-xs text-muted-foreground">{sub}</p>}
+    {spark && <Sparkline data={spark} color={accent} height={30} className="relative mt-3" />}
   </div>
 );
 
 export const Panel = ({ title, sub, action, children, className, testId }) => (
-  <section className={cn("min-w-0 rounded-2xl border border-line/10 bg-card p-5 sm:p-6", className)} data-testid={testId}>
+  <Reveal as="section" className={cn("admin-glass min-w-0 rounded-2xl p-5 sm:p-6", className)} data-testid={testId}>
     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
       <div>
         <h2 className="font-display text-base font-medium text-foreground">{title}</h2>
@@ -91,8 +122,42 @@ export const Panel = ({ title, sub, action, children, className, testId }) => (
       {action}
     </div>
     {children}
-  </section>
+  </Reveal>
 );
+
+/** Horizontal single-series bar list with values; readable as a table too. Bars grow in. */
+export const BarList = ({ rows, valueKey, labelKey, color = SERIES.leads, format = (v) => v, testId, linkFor }) => {
+  const reduce = useReducedMotion();
+  const max = Math.max(1, ...rows.map((r) => r[valueKey] || 0));
+  if (!rows.length) return <p className="py-6 text-center text-sm text-muted-foreground">No data in this period yet.</p>;
+  return (
+    <ul className="space-y-3" data-testid={testId}>
+      {rows.map((r, i) => {
+        const label = r[labelKey];
+        const inner = (
+          <>
+            <div className="flex items-baseline justify-between gap-3 text-sm">
+              <span className="truncate text-foreground">{label}</span>
+              <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{format(r[valueKey] || 0, r)}</span>
+            </div>
+            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-line/[0.07]">
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: `linear-gradient(90deg, ${color}99, ${color})`, boxShadow: `0 0 12px -2px ${color}` }}
+                initial={reduce ? false : { width: 0 }}
+                whileInView={{ width: `${((r[valueKey] || 0) / max) * 100}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.9, ease: EASE, delay: 0.05 * i }}
+              />
+            </div>
+          </>
+        );
+        const to = linkFor?.(r);
+        return <li key={label}>{to ? <Link to={to} className="block rounded-md transition-opacity hover:opacity-80">{inner}</Link> : inner}</li>;
+      })}
+    </ul>
+  );
+};
 
 const PERMS = {
   editLeads: ["admin", "sales"],

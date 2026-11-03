@@ -262,7 +262,7 @@ export function DrillProvider({ snap, sample, children }) {
     <Ctx.Provider value={setItem}>
       {children}
       <Sheet open={!!item} onOpenChange={(o) => !o && setItem(null)}>
-        <SheetContent className="dark w-full overflow-y-auto border-line/10 bg-background text-foreground sm:max-w-2xl" data-testid="seo-drill">
+        <SheetContent className="w-full overflow-y-auto border-line/10 bg-background text-foreground sm:max-w-2xl" data-testid="seo-drill">
           {item && (
             <>
               <SheetHeader className="pr-10 text-left">
