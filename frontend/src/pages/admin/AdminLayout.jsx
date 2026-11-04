@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog, Radar, MessagesSquare, Crosshair, Send, Search, Moon, Sun, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SolixMark } from "@/components/shared/Logo";
+import { MarkHubLockup, useMarkHubChrome } from "@/components/admin/MarkHubBrand";
 import { useAdmin } from "@/components/admin/AdminAuth";
 import { ROLE_LABELS } from "@/components/admin/kit";
 import { useAdminTheme } from "@/components/admin/theme";
@@ -51,6 +51,7 @@ export default function AdminLayout() {
   const reduce = useReducedMotion();
   const now = useClock();
   const [palette, setPalette] = useState(false);
+  useMarkHubChrome();
 
   useEffect(() => {
     const onKey = (e) => {
@@ -74,14 +75,8 @@ export default function AdminLayout() {
       <header className="sticky top-0 z-40">
         <div className="border-b border-line/[0.06] bg-background/55 backdrop-blur-2xl backdrop-saturate-150">
           <div className="container flex h-16 items-center justify-between gap-4">
-            <Link to="/admin" className="flex shrink-0 items-center gap-3">
-              <SolixMark className="h-8 w-8 shrink-0 transition-transform duration-300 hover:rotate-[-8deg]" />
-              <span className="flex flex-col leading-none">
-                <span className="font-display text-sm font-semibold tracking-tight">Solix Admin</span>
-                <span className="mt-1 hidden items-center gap-1.5 font-mono text-[10px] text-muted-foreground sm:inline-flex">
-                  <LiveDot className="h-1.5 w-1.5 [&>span]:h-1.5 [&>span]:w-1.5" /> Live · {now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
-                </span>
-              </span>
+            <Link to="/admin" className="flex shrink-0 items-center" aria-label="MarkHub for Solix: admin home">
+              <MarkHubLockup compact />
             </Link>
 
             <button
@@ -95,6 +90,9 @@ export default function AdminLayout() {
             </button>
 
             <div className="flex shrink-0 items-center gap-1.5">
+              <span className="mr-1 hidden items-center gap-1.5 font-mono text-[10px] text-muted-foreground xl:inline-flex">
+                <LiveDot className="h-1.5 w-1.5 [&>span]:h-1.5 [&>span]:w-1.5" /> Live · {now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+              </span>
               <button type="button" onClick={() => setPalette(true)} className="grid h-9 w-9 place-items-center rounded-full border border-line/10 text-muted-foreground transition-colors hover:text-foreground md:hidden" aria-label="Search sections">
                 <Search className="h-4 w-4" />
               </button>

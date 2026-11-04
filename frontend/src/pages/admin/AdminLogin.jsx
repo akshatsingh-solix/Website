@@ -6,7 +6,7 @@ import { EASE, LiveDot } from "@/components/admin/motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Logo } from "@/components/shared/Logo";
+import { MarkHubLockup, useMarkHubChrome } from "@/components/admin/MarkHubBrand";
 import { useAdmin } from "@/components/admin/AdminAuth";
 import { formatApiError } from "@/lib/adminApi";
 import { api } from "@/lib/api";
@@ -20,6 +20,7 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   useEffect(() => { api.get("/", { noRetry: true }).catch(() => {}); }, []); // wake the API early
+  useMarkHubChrome();
 
   if (user) return <Navigate to={location.state?.from || "/admin"} replace />;
 
@@ -45,7 +46,7 @@ export default function AdminLogin() {
     <div className="relative grid min-h-screen place-items-center overflow-hidden px-4 text-foreground" data-testid="admin-login-page">
       <motion.div className="relative w-full max-w-md" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, ease: EASE }}>
         <motion.div className="mb-8 flex items-center justify-between" {...rise(0)}>
-          <Logo />
+          <MarkHubLockup />
           <span className="inline-flex items-center gap-2 rounded-full border border-line/10 bg-line/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5 text-teal" /> Admin</span>
         </motion.div>
         <div className="spot admin-glass relative overflow-hidden rounded-3xl p-8 sm:p-10">
