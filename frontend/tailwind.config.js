@@ -14,6 +14,7 @@ module.exports = {
         display: ["Outfit", "ui-sans-serif", "system-ui", "sans-serif"],
         sans: ["'IBM Plex Sans'", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
+        markhub: ["'Barlow Semi Condensed'", "'Arial Narrow'", "ui-sans-serif", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

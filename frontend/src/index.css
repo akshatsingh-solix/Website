@@ -711,6 +711,9 @@
     --background: 210 40% 97%;
     --card: 0 0% 100%;
   }
+  /* MarkHub's shared stem: Pilot Lime on dark grounds, Deep Signal on light. */
+  .markhub-signal { fill: #BEEE33; }
+  html.admin-ui:not(.dark) .markhub-signal { fill: #476E00; }
   html.admin-ui body { background: hsl(var(--background)); }
   html.admin-ui.dark ::-webkit-scrollbar-track { background: hsl(var(--background)); }
   html.admin-ui.dark ::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 0.12); border-color: hsl(var(--background)); }
