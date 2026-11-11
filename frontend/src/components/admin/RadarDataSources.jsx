@@ -54,6 +54,17 @@ export function RadarDataSources() {
     if (off.has(p.name)) off.delete(p.name); else off.add(p.name);
     save({ disabled: [...off] }, `off:${p.name}`);
   };
+  // A provider's free allowance per month (or per day for daily-capped ones); empty restores the built-in figure.
+  const setAllowance = (p) => {
+    const daily = p.monthly_cap == null && p.daily_cap != null;
+    const raw = window.prompt(`${p.label}: free allowance per ${daily ? "day" : "month"} (units this source counts). Leave empty for the default.`, String((daily ? p.daily_cap : p.monthly_cap) ?? ""));
+    if (raw === null) return;
+    const n = raw.trim() === "" ? null : Number(raw);
+    if (n !== null && (!Number.isFinite(n) || n < 0)) return toast.error("Enter a whole number, or leave it empty.");
+    const limits = { ...(data.config.limits || {}) };
+    if (n === null) delete limits[p.pool]; else limits[p.pool] = { [daily ? "daily" : "monthly"]: Math.round(n) };
+    save({ limits }, `lim:${p.name}`);
+  };
   const test = async (p) => {
     setTests((t) => ({ ...t, [p.name]: { running: true } }));
     try {
@@ -114,6 +125,7 @@ export function RadarDataSources() {
                             <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={`Move ${p.label} up`} disabled={idx <= 0 || !!busy} onClick={() => move(cap, idx, -1)}><ArrowUp className="h-3.5 w-3.5" /></Button>
                             <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={`Move ${p.label} down`} disabled={idx < 0 || idx >= enabled.length - 1 || !!busy} onClick={() => move(cap, idx, 1)}><ArrowDown className="h-3.5 w-3.5" /></Button>
                           </>}
+                          {!p.keyless && <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `lim:${p.name}`} onClick={() => setAllowance(p)} title="Set this source's free allowance">Allowance</Button>}
                           <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={!p.configured || t?.running} onClick={() => test(p)}>{t?.running ? <Loader2 className="animate-spin" /> : <FlaskConical />} Test</Button>
                           <label className="flex items-center gap-1 text-xs text-muted-foreground"><input type="checkbox" checked={p.enabled} disabled={busy === `off:${p.name}`} onChange={() => toggle(p)} /> On</label>
                         </div>
