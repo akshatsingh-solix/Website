@@ -179,7 +179,7 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
               </TabsContent>
 
               <TabsContent value="signals" className="mt-4 space-y-5">
-                {[["Competitor job postings", ["competitor_job"]], ["Problem signals (no competitor named)", ["problem_job"]], ["Website visits by this organisation", ["visit"]], ["DNS and certificates", ["dns", "cert"]], ["Filings, tenders, public spend and news", ["filing", "tender", "spend", "news"]], ["LinkedIn", ["linkedin"]]].map(([title, types]) => {
+                {[["Competitor job postings", ["competitor_job"]], ["Problem signals (no competitor named)", ["problem_job"]], ["Researching competitors (intent data)", ["intent"]], ["Website visits by this organisation", ["visit"]], ["DNS and certificates", ["dns", "cert"]], ["Filings, tenders, public spend and news", ["filing", "tender", "spend", "news"]], ["LinkedIn", ["linkedin"]]].map(([title, types]) => {
                   const rows = signalsBy(types);
                   if (!rows.length) return null;
                   return (

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchRadarConfig, fetchTerritories, formatApiError, importRadar, previewRouting, runRadar, saveRadarConfig, saveTerritories } from "@/lib/adminApi";
+import { fetchRadarConfig, fetchTerritories, formatApiError, importRadar, importRadarIntent, previewRouting, runRadar, saveRadarConfig, saveTerritories } from "@/lib/adminApi";
 import { Panel, inputCls } from "@/components/admin/kit";
 import { RadarDataSources } from "@/components/admin/RadarDataSources";
 
@@ -21,6 +21,8 @@ export function RadarSetup({ meta, onChanged }) {
   const [preview, setPreview] = useState({ company: "", country: "United States", location: "" });
   const [route, setRoute] = useState(null);
   const file = useRef(null);
+  const intentFile = useRef(null);
+  const [intentSource, setIntentSource] = useState("G2 Buyer Intent");
 
   useEffect(() => {
     Promise.all([fetchRadarConfig(), fetchTerritories()]).then(([c, t]) => {
@@ -50,6 +52,21 @@ export function RadarSetup({ meta, onChanged }) {
     } finally {
       setBusy(null);
       if (file.current) file.current.value = "";
+    }
+  };
+
+  const doIntent = async (f) => {
+    if (!f) return;
+    setBusy("intent");
+    try {
+      const r = await importRadarIntent(await f.text(), intentSource || "Intent data");
+      toast.success(`Intent imported: ${r.signals_new} new research signal(s) on ${r.accounts} account(s)${r.signals_seen ? `, ${r.signals_seen} already known` : ""}${r.skipped ? `, ${r.skipped} row(s) without a company or topic skipped` : ""}.`);
+      onChanged?.();
+    } catch (e) {
+      toast.error(formatApiError(e));
+    } finally {
+      setBusy(null);
+      if (intentFile.current) intentFile.current.value = "";
     }
   };
 
@@ -114,6 +131,15 @@ export function RadarSetup({ meta, onChanged }) {
       <Panel title="Import from the Leads Radar" sub="Upload radar.html (the page itself) or its JSON. Owner, Status and Notes are kept; running it again never duplicates.">
         <input ref={file} type="file" accept=".html,.htm,.json" className="hidden" onChange={(e) => doImport(e.target.files?.[0])} />
         <Button onClick={() => file.current?.click()} disabled={busy === "import"}>{busy === "import" ? <Loader2 className="animate-spin" /> : <Upload />} Choose file</Button>
+      </Panel>
+
+      <Panel title="Companies researching competitors (intent data)" sub="Only a competitor can see who visits its own website. Intent providers collect who researches a competitor or a topic across their networks, lawfully: import their CSV export here. Each row becomes a Researching signal on the account (re-importing never duplicates)." className="lg:col-span-2" testId="intent-import">
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="text-xs text-muted-foreground">Source<Input className={inputCls} value={intentSource} onChange={(e) => setIntentSource(e.target.value)} placeholder="G2 Buyer Intent, Bombora, TrustRadius…" /></label>
+          <input ref={intentFile} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => doIntent(e.target.files?.[0])} />
+          <Button variant="outline" onClick={() => intentFile.current?.click()} disabled={busy === "intent"}>{busy === "intent" ? <Loader2 className="animate-spin" /> : <Upload />} Import CSV export</Button>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">Needs a header row with a <b>company</b> (or <b>domain</b>) column and a <b>topic</b> (or product, keyword, activity) column; score, date, country and employees are used when present. A topic that names a competitor product (e.g. &ldquo;OpenText Documentum&rdquo;) becomes that competitor&rsquo;s signal. Sources: G2 Buyer Intent (companies viewing competitor and comparison pages on G2), Bombora Company Surge, TrustRadius, Gartner Digital Markets, 6sense, Demandbase, ZoomInfo. Visitors to <i>your</i> site who read about a competitor show up on their own, on the Website intent tab.</p>
       </Panel>
 
       <Panel title="Run" sub="The daily run also happens automatically at 05:00 UTC inside the API.">

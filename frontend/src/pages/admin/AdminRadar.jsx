@@ -17,7 +17,7 @@ const PAGE = 40;
 const FILTERS = ["q", "competitor", "strength", "segment", "country", "state", "territory", "owner", "status", "line", "ready_only"];
 const TABS = [
   ["all", "All accounts"], ["new", "New for you"], ["todo", "To do"], ["territory", "By territory"], ["reps", "Reps"], ["ready", "Ready"], ["dives", "Deep dives"], ["review", "Review"],
-  ["jobs", "Competitor jobs"], ["problems", "Problem signals"], ["dns", "DNS"], ["news", "Filings & news"], ["tenders", "Tenders"], ["website", "Website intent"],
+  ["jobs", "Competitor jobs"], ["problems", "Problem signals"], ["dns", "DNS"], ["news", "Filings & news"], ["tenders", "Tenders"], ["website", "Website intent"], ["intent", "Researching"],
   ["surge", "Surging"], ["excluded", "Excluded"], ["setup", "Setup"],
 ];
 const TAB_HINT = {
@@ -30,7 +30,8 @@ const TAB_HINT = {
   problems: "Postings about archiving, retention or retirement work with no competitor named.",
   surge: "Three or more new signals in the last seven days.",
   excluded: "Existing customers, accounts in a live deal, or excluded by hand. They stay visible but never get automated outreach.",
-  website: "Accounts whose people are also on the website (matched by email domain).",
+  website: "Accounts whose people are on the website: leads matched by email domain, and organisations identified from consenting visitors' networks (with any competitor they read about).",
+  intent: "Companies researching a competitor or the problem, from intent data you import (G2 Buyer Intent, Bombora, TrustRadius, 6sense…) in Setup.",
 };
 
 export default function AdminRadar() {
