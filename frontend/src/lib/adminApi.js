@@ -222,6 +222,7 @@ export const runRadar = (steps) => adminApi.post("/admin/radar/run", { steps }).
 export const fetchRadarProviders = () => adminApi.get("/admin/radar/providers", { fresh: true }).then((r) => r.data);
 export const saveRadarProviders = (body) => adminApi.put("/admin/radar/providers", body).then((r) => r.data);
 export const testRadarProvider = (name) => adminApi.post(`/admin/radar/providers/${encodeURIComponent(name)}/test`, null, { timeout: 90000 }).then((r) => r.data);
+export const importRadarIntent = (csv, source) => adminApi.post("/admin/radar/intent/import", { csv, source }, { timeout: 300000 }).then((r) => r.data);
 export const enrichRadarAccount = (id) => adminApi.post(`/admin/radar/accounts/${id}/enrich`, null, { timeout: 120000 }).then((r) => r.data);
 export const fetchLegacyRadar = (owner) => adminApi.get("/admin/radar/legacy.json", { params: clean({ owner }) }).then((r) => r.data);
 export const importRadar = (file) => {

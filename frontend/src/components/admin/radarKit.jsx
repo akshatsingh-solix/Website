@@ -29,7 +29,7 @@ const STATUS_TONE = {
 };
 export const SIGNAL_LABELS = {
   competitor_job: "Competitor job", problem_job: "Problem signal", dns: "DNS record", cert: "Certificate", linkedin: "LinkedIn", news: "News",
-  filing: "SEC filing", tender: "Public tender", website: "Website intent", visit: "Website visits", spend: "Public spend",
+  filing: "SEC filing", tender: "Public tender", website: "Website intent", visit: "Website visits", spend: "Public spend", intent: "Researching",
 };
 // Company size from headcount (or revenue): both mid-market and enterprise are targets.
 export const SEGMENT_LABELS = { enterprise: "Enterprise", mid_market: "Mid-market", smb: "Small business" };
@@ -85,7 +85,7 @@ export const RepRule = ({ className }) => (
 // What the score is made of (radar_model.rollup score_parts).
 export const SCORE_PART_LABELS = {
   competitor_job: "Competitor job postings", problem_job: "Problem signals", dns: "DNS records", cert: "Certificates", linkedin: "LinkedIn",
-  news: "News", filing: "Filings", tender: "Tenders", website: "Website leads", visit: "Website visits (by organisation)", spend: "Public spend", deep_dive: "Deep dive",
+  news: "News", filing: "Filings", tender: "Tenders", website: "Website leads", visit: "Website visits (by organisation)", spend: "Public spend", intent: "Researching (intent data)", deep_dive: "Deep dive",
   other: "Other signals",
 };
 
