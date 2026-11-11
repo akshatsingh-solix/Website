@@ -8,13 +8,13 @@ import { Input } from "@/components/ui/input";
 import { exportRadarWorkbook, fetchRadarAccount, fetchRadarAccounts, fetchRadarMeta, fetchRadarReps, fetchRadarSummary, fetchResearchQueue, formatApiError, markRadarSeen, runRadar } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { Panel, ago, fmtDate, selectCls, useCan, useLiveRefresh } from "@/components/admin/kit";
-import { AccountStatus, BASIS_LABELS, DiveBadge, FreshTag, NextStep, RepRule, SIGNAL_LABELS, STATUS_LABELS, STRENGTHS, STRENGTH_COLOR, Sparkline, StrengthBadge } from "@/components/admin/radarKit";
+import { AccountStatus, BASIS_LABELS, DiveBadge, FreshTag, NextStep, RepRule, SEGMENT_LABELS, SegmentBadge, SIGNAL_LABELS, Sparkline, STATUS_LABELS, STRENGTH_COLOR, StrengthBadge, STRENGTHS } from "@/components/admin/radarKit";
 import { RadarScope } from "@/components/admin/RadarScope";
 import { AccountDrawer } from "@/components/admin/AccountDrawer";
 import { RadarSetup } from "@/components/admin/RadarSetup";
 
 const PAGE = 40;
-const FILTERS = ["q", "competitor", "strength", "country", "state", "territory", "owner", "status", "line", "ready_only"];
+const FILTERS = ["q", "competitor", "strength", "segment", "country", "state", "territory", "owner", "status", "line", "ready_only"];
 const TABS = [
   ["all", "All accounts"], ["new", "New for you"], ["todo", "To do"], ["territory", "By territory"], ["reps", "Reps"], ["ready", "Ready"], ["dives", "Deep dives"], ["review", "Review"],
   ["jobs", "Competitor jobs"], ["problems", "Problem signals"], ["dns", "DNS"], ["news", "Filings & news"], ["tenders", "Tenders"], ["website", "Website intent"],
@@ -247,6 +247,7 @@ export default function AdminRadar() {
         </div>
         {sel("competitor", "All competitors", meta?.competitors?.map((c) => <option key={c.key} value={c.key}>{c.product}</option>))}
         {sel("strength", "All strengths", STRENGTHS.map((s) => <option key={s} value={s}>{s}</option>))}
+        {sel("segment", "All sizes", [["target", "Mid-market and enterprise"], ...Object.entries(SEGMENT_LABELS), ["unknown", "Size unknown"]].map(([k, v]) => <option key={k} value={k}>{v}{summary?.by_segment?.[k] != null ? ` (${summary.by_segment[k]})` : ""}</option>))}
         {sel("country", "All countries", meta?.countries?.map((c) => <option key={c} value={c}>{c}</option>))}
         {sel("state", "All states", meta?.states?.map((s) => <option key={s} value={s}>{s}</option>))}
         {sel("territory", "All territories", meta?.territories?.map((t) => <option key={t} value={t}>{t}</option>))}
@@ -315,7 +316,7 @@ export default function AdminRadar() {
                         <li key={a.id}>
                           <button type="button" onClick={() => openAccount(a.id)} className={cn("grid w-full gap-2 rounded-2xl border bg-card p-4 text-left transition-colors hover:border-line/30 sm:grid-cols-[1fr_auto]", a.fresh !== "seen" ? "border-sky-400/25" : "border-line/10")}>
                             <div className="min-w-0">
-                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}<NextStep action={a.next_action} /></p>
+                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}<NextStep action={a.next_action} /></p>
                               <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                                 {(a.signal_types || []).map((t) => <span key={t}>{SIGNAL_LABELS[t] || t}</span>)}
                                 {(a.competitors || []).length > 0 && <span className="text-red-300/90">{a.competitors.join(", ")}</span>}

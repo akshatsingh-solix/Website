@@ -29,8 +29,13 @@ const STATUS_TONE = {
 };
 export const SIGNAL_LABELS = {
   competitor_job: "Competitor job", problem_job: "Problem signal", dns: "DNS record", cert: "Certificate", linkedin: "LinkedIn", news: "News",
-  filing: "SEC filing", tender: "Public tender", website: "Website intent",
+  filing: "SEC filing", tender: "Public tender", website: "Website intent", visit: "Website visits", spend: "Public spend",
 };
+// Company size from headcount (or revenue): both mid-market and enterprise are targets.
+export const SEGMENT_LABELS = { enterprise: "Enterprise", mid_market: "Mid-market", smb: "Small business" };
+const SEGMENT_TONE = { enterprise: "border-teal/40 bg-teal/10 text-teal", mid_market: "border-sky-400/40 bg-sky-400/10 text-sky-200", smb: "border-line/15 bg-line/5 text-muted-foreground" };
+export const SegmentBadge = ({ segment, employees }) =>
+  segment ? <Badge className={SEGMENT_TONE[segment]} title={employees ? `${Number(employees).toLocaleString()} employees` : undefined}>{SEGMENT_LABELS[segment] || segment}</Badge> : null;
 export const BASIS_LABELS = { named: "named account", state: "US state", country: "country", needs_routing: "needs routing", manual: "set by hand" };
 
 export const StrengthBadge = ({ strength = "Unrated" }) => <Badge className={STRENGTH_TONE[strength] || STRENGTH_TONE.Unrated}>{strength}</Badge>;
@@ -80,7 +85,8 @@ export const RepRule = ({ className }) => (
 // What the score is made of (radar_model.rollup score_parts).
 export const SCORE_PART_LABELS = {
   competitor_job: "Competitor job postings", problem_job: "Problem signals", dns: "DNS records", cert: "Certificates", linkedin: "LinkedIn",
-  news: "News", filing: "Filings", tender: "Tenders", website: "Website visits", deep_dive: "Deep dive", other: "Other signals",
+  news: "News", filing: "Filings", tender: "Tenders", website: "Website leads", visit: "Website visits (by organisation)", spend: "Public spend", deep_dive: "Deep dive",
+  other: "Other signals",
 };
 
 // The one thing to do next on an account (radar_model.next_action).

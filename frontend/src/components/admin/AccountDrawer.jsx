@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  addRadarSignal, createContact, deleteRadarSignal, enrollContacts, fetchGate, fetchRadarAccount, fetchSequences, findContactEmail, findRadarPeople, formatApiError,
+  addRadarSignal, createContact, deleteRadarSignal, enrichRadarAccount, enrollContacts, fetchGate, fetchRadarAccount, fetchSequences, findContactEmail, findRadarPeople, formatApiError,
   patchContact, patchRadarAccount, promoteToLead, requestResearch, reviewResearch, verifyContact,
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { CHANNEL_LABELS, StageBadge, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
-import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SIGNAL_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
+import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SEGMENT_LABELS, SegmentBadge, SIGNAL_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
 import { cn } from "@/lib/utils";
 
 const Row = ({ label, children }) => (children || children === 0 ? (
@@ -93,7 +93,7 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
         ) : (
           <>
             <SheetHeader className="text-left">
-              <div className="flex flex-wrap items-center gap-2"><StrengthBadge strength={a.strength} /><AccountStatus status={a.status} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}</div>
+              <div className="flex flex-wrap items-center gap-2"><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} /><AccountStatus status={a.status} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}</div>
               <SheetTitle className="font-display text-2xl font-medium">{a.name}</SheetTitle>
               <SheetDescription>
                 {a.territory} · {a.owner_name || "Unassigned"}{a.route_basis ? ` (${BASIS_LABELS[a.route_basis] || a.route_basis})` : ""}{a.domains?.length ? ` · ${a.domains.join(", ")}` : ""}
@@ -162,16 +162,24 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                   <Row label="Product fit">{a.primary_product && `${a.primary_product.replace(/-/g, " ")} (${a.primary_line})`}</Row>
                   <Row label="Countries">{(a.countries || []).join(", ")}</Row>
                   <Row label="States">{(a.states || []).join(", ")}</Row>
+                  <Row label="Size">{(a.segment || a.employees) && [SEGMENT_LABELS[a.segment], a.employees && `${Number(a.employees).toLocaleString()} employees`, a.revenue_band].filter(Boolean).join(" · ")}</Row>
+                  <Row label="HQ">{[a.hq?.location || a.hq?.city, a.hq?.state, a.hq?.country].filter(Boolean).join(", ")}</Row>
                   <Row label="Industry">{a.industry}</Row>
                   <Row label="Existing customer">{a.is_customer ? "Yes" : null}</Row>
                   <Row label="First seen">{a.first_seen_at && fmtDateTime(a.first_seen_at)}</Row>
                 </dl>
+                {can("editLeads") && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line/10 bg-card p-3 text-xs text-muted-foreground">
+                    <span>Size, HQ and website from public registers (Wikidata, GLEIF, SEC, Companies House) and any company-data key set up. Never overwrites what you typed.{a.firmographics?.at ? ` Last looked up ${fmtDate(a.firmographics.at)}.` : ""}</span>
+                    <Button size="sm" variant="outline" disabled={busy === "enrich"} onClick={() => act("enrich", () => enrichRadarAccount(a.id), "Company details looked up")}>{busy === "enrich" ? <Loader2 className="animate-spin" /> : <Search />} Look up size and HQ</Button>
+                  </div>
+                )}
                 {can("editLeads") && <AccountDetails account={a} onSave={(body) => act("details", () => patchRadarAccount(a.id, body), "Details saved")} busy={busy === "details"} />}
                 <RepRule />
               </TabsContent>
 
               <TabsContent value="signals" className="mt-4 space-y-5">
-                {[["Competitor job postings", ["competitor_job"]], ["Problem signals (no competitor named)", ["problem_job"]], ["DNS and certificates", ["dns", "cert"]], ["Filings, tenders and news", ["filing", "tender", "news"]], ["LinkedIn", ["linkedin"]]].map(([title, types]) => {
+                {[["Competitor job postings", ["competitor_job"]], ["Problem signals (no competitor named)", ["problem_job"]], ["Website visits by this organisation", ["visit"]], ["DNS and certificates", ["dns", "cert"]], ["Filings, tenders, public spend and news", ["filing", "tender", "spend", "news"]], ["LinkedIn", ["linkedin"]]].map(([title, types]) => {
                   const rows = signalsBy(types);
                   if (!rows.length) return null;
                   return (
@@ -476,7 +484,9 @@ function ScoreBreakdown({ account: a }) {
   );
 }
 
-// Live people search: named on fetched web pages and/or found by Hunter, each with its source. Nothing is saved until "Add".
+// Live people search: leadership pages, public LinkedIn profiles found through search engines, and every contact-data
+// source set up (Hunter, Tomba, Snov.io, People Data Labs, Apollo, Companies House), each with its source. Nothing is saved until "Add".
+const VIA_LABELS = { hunter: "Hunter", linkedin_xray: "LinkedIn", tomba: "Tomba", snov: "Snov.io", pdl: "People Data Labs", apollo: "Apollo", companies_house: "Companies House", web: "Web" };
 function PeopleFinder({ account, act, busy }) {
   const [found, setFound] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -492,19 +502,21 @@ function PeopleFinder({ account, act, busy }) {
   };
   const add = (p) => act(`p:${p.name}`, () => createContact({
     company_id: account.id, name: p.name, title: p.title || undefined, email: p.email || undefined, linkedin_url: p.linkedin_url || undefined,
-    source: p.via === "hunter" ? "hunter" : "web_research", source_url: p.source_url || undefined,
+    source: p.via && p.via !== "linkedin_xray" ? p.via : "web_research", source_url: p.source_url || undefined,
   }), `${p.name} added`).then((created) => created && setFound((f) => f && { ...f, people: f.people.filter((x) => x.name !== p.name) }));
   return (
     <section className="rounded-xl border border-line/10 bg-card p-3" data-testid="people-finder">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm"><span className="font-medium">Find people</span> <span className="text-xs text-muted-foreground">Live search of the web and Hunter for who owns IT, data, architecture and records at {account.name}.</span></p>
+        <p className="text-sm"><span className="font-medium">Find people</span> <span className="text-xs text-muted-foreground">Live search of the web, public LinkedIn profiles and every contact source set up, for who owns IT, data, architecture and records at {account.name} now.</span></p>
         <Button size="sm" variant="outline" onClick={search} disabled={loading}>{loading ? <Loader2 className="animate-spin" /> : <Search />} {found ? "Search again" : "Find people"}</Button>
       </div>
       {loading && <p className="mt-2 text-xs text-muted-foreground">Searching live sources, about 10 to 30 seconds…</p>}
       {found && (
         <div className="mt-3">
           <p className="text-[11px] text-muted-foreground">
-            {found.sources_used.web_pages} web page(s){found.available.hunter ? `, ${found.sources_used.hunter} from Hunter` : " (add HUNTER_API_KEY for work emails)"}
+            {found.sources_used.web_pages} web page(s){found.available.hunter ? `, ${found.sources_used.hunter} from Hunter` : ""}
+            {found.sources_used.linkedin_xray ? `, ${found.sources_used.linkedin_xray} public LinkedIn profile(s)` : ""}{found.sources_used.other ? `, ${found.sources_used.other} from other contact sources` : ""}
+            {!found.available.hunter && !found.available.contacts ? " (add a contact-data key such as HUNTER_API_KEY or TOMBA_KEY for work emails)" : ""}
             {found.hunter_domain && !(account.domains || []).includes(found.hunter_domain) ? ` (matched ${found.hunter_domain})` : ""}
             {found.email_pattern ? ` · email pattern ${found.email_pattern}` : ""}. Everyone listed is named in the linked source.
           </p>
@@ -514,9 +526,10 @@ function PeopleFinder({ account, act, busy }) {
               {found.people.map((p) => (
                 <li key={p.name} className="flex flex-wrap items-start justify-between gap-2 py-2 text-sm">
                   <div className="min-w-0">
-                    <p className="font-medium">{p.name} {p.relevant && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">relevant</span>}</p>
+                    <p className="font-medium">{p.name} {p.relevant && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">relevant</span>}{p.current && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-emerald-300" title="A source shows they work there now">works there now</span>}</p>
                     <p className="text-xs text-muted-foreground">{p.title || "Title not given"}{p.email ? ` · ${p.email}${p.email_confidence ? ` (${p.email_confidence}%)` : ""}` : ""}</p>
                     {p.source_url && <a href={p.source_url} target="_blank" rel="noopener noreferrer" className="text-[11px] text-teal hover:underline">Source: {p.source_title || p.source_url}</a>}
+                    {(p.also_via || []).length > 0 && <span className="ml-2 text-[11px] text-muted-foreground">also found by {p.also_via.map((v) => VIA_LABELS[v] || v).join(", ")}</span>}
                   </div>
                   <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `p:${p.name}`} onClick={() => add(p)}><UserPlus /> Add</Button>
                 </li>

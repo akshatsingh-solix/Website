@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchRadarConfig, fetchTerritories, formatApiError, importRadar, previewRouting, runRadar, saveRadarConfig, saveTerritories } from "@/lib/adminApi";
 import { Panel, inputCls } from "@/components/admin/kit";
+import { RadarDataSources } from "@/components/admin/RadarDataSources";
 
 // Plain-text editors: one row per line, so a whole territory plan can be pasted from a sheet.
 const toLines = (rows, fn) => rows.map(fn).join("\n");
@@ -109,24 +110,26 @@ export function RadarSetup({ meta, onChanged }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2" data-testid="radar-setup">
       <LiveSources live={meta?.live_sources} />
+      <RadarDataSources />
       <Panel title="Import from the Leads Radar" sub="Upload radar.html (the page itself) or its JSON. Owner, Status and Notes are kept; running it again never duplicates.">
         <input ref={file} type="file" accept=".html,.htm,.json" className="hidden" onChange={(e) => doImport(e.target.files?.[0])} />
         <Button onClick={() => file.current?.click()} disabled={busy === "import"}>{busy === "import" ? <Loader2 className="animate-spin" /> : <Upload />} Choose file</Button>
       </Panel>
 
-      <Panel title="Run" sub="The daily run also happens automatically at 05:00 UTC (GitHub Actions).">
+      <Panel title="Run" sub="The daily run also happens automatically at 05:00 UTC inside the API.">
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["collect", "score", "research"])}><Play /> Collect, score, research</Button>
+          <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["collect", "enrich", "score", "research"])}><Play /> Collect, size, score, research</Button>
+          <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["enrich", "score"])}>Size and locate accounts</Button>
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["score"])}>Rescore only</Button>
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["research"])}>Deep dives only</Button>
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["digest"])}>Send digests</Button>
         </div>
       </Panel>
 
-      <Panel title="Sources" sub="Free sources first. Crustdata is optional and capped per run." className="lg:col-span-2">
+      <Panel title="Sources" sub="Free sources first, each paced to its allowance (see Data sources). Crustdata is optional and capped per run." className="lg:col-span-2">
         <div className="grid gap-4 lg:grid-cols-2">
           <div>
-            <p className="mb-1 text-xs text-muted-foreground">Job boards, one per line: <code>Company, domain, ats, board</code>. ats is greenhouse, lever, ashby or workday (board = the career site URL for workday).</p>
+            <p className="mb-1 text-xs text-muted-foreground">Job boards, one per line: <code>Company, domain, ats, board</code>. ats is greenhouse, lever, ashby, smartrecruiters, recruitee, workable, personio or workday (board = the career site URL for workday). Boards found by the ATS X-ray are added here automatically.</p>
             {area("targets", 9, "Acme Mutual, acmemutual.com, greenhouse, acmemutual\nGlobex Bank, globex.com, workday, https://globex.wd5.myworkdayjobs.com/Careers")}
           </div>
           <div>
@@ -136,12 +139,23 @@ export function RadarSetup({ meta, onChanged }) {
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {Object.entries(cfg.collectors).map(([k, on]) => (
-            <label key={k} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={on} onChange={(e) => setCfg({ ...cfg, collectors: { ...cfg.collectors, [k]: e.target.checked } })} /> {({ ats: "Job boards", crustdata: "Crustdata (paid)", dns: "DNS + certificates", news: "News", filings: "SEC filings", tenders: "EU tenders" })[k] || k}</label>
+            <label key={k} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={on} onChange={(e) => setCfg({ ...cfg, collectors: { ...cfg.collectors, [k]: e.target.checked } })} /> {({ ats: "Job boards", crustdata: "Crustdata (paid)", dns: "DNS + certificates", news: "News", filings: "SEC filings", tenders: "EU tenders", jobs_api: "Job market (free job APIs)", ats_xray: "ATS X-ray (find new boards)", subdomains: "Subdomains + passive DNS", public_sector: "US/UK tenders + public spend", visitors: "Website visitor companies" })[k] || k}</label>
           ))}
           <label className="text-xs text-muted-foreground">Crustdata credit cap per run<Input type="number" className={inputCls} value={cfg.credit_cap} onChange={(e) => setCfg({ ...cfg, credit_cap: Number(e.target.value) })} /></label>
           <label className="text-xs text-muted-foreground">Deep dives per run<Input type="number" className={inputCls} value={cfg.research_per_run} onChange={(e) => setCfg({ ...cfg, research_per_run: Number(e.target.value) })} /></label>
           <label className="text-xs text-muted-foreground">Re-research after (days)<Input type="number" className={inputCls} value={cfg.refresh_days} onChange={(e) => setCfg({ ...cfg, refresh_days: Number(e.target.value) })} /></label>
-          <label className="text-xs text-muted-foreground">Min. employees (Crustdata)<Input type="number" className={inputCls} value={cfg.min_employees} onChange={(e) => setCfg({ ...cfg, min_employees: Number(e.target.value) })} /></label>
+          <label className="text-xs text-muted-foreground">Min. employees (job sources)<Input type="number" className={inputCls} value={cfg.min_employees} onChange={(e) => setCfg({ ...cfg, min_employees: Number(e.target.value) })} /></label>
+          <label className="text-xs text-muted-foreground">Mid-market from (employees)<Input type="number" className={inputCls} value={cfg.segments?.mid_market_min ?? 200} onChange={(e) => setCfg({ ...cfg, segments: { ...cfg.segments, mid_market_min: Number(e.target.value) } })} /></label>
+          <label className="text-xs text-muted-foreground">Enterprise from (employees)<Input type="number" className={inputCls} value={cfg.segments?.enterprise_min ?? 1000} onChange={(e) => setCfg({ ...cfg, segments: { ...cfg.segments, enterprise_min: Number(e.target.value) } })} /></label>
+          <label className="text-xs text-muted-foreground">Accounts sized per run<Input type="number" className={inputCls} value={cfg.enrich_per_run ?? 40} onChange={(e) => setCfg({ ...cfg, enrich_per_run: Number(e.target.value) })} /></label>
+          <label className="text-xs text-muted-foreground">ATS X-ray phrases per run<Input type="number" className={inputCls} value={cfg.xray_terms_per_run ?? 5} onChange={(e) => setCfg({ ...cfg, xray_terms_per_run: Number(e.target.value) })} /></label>
+          <div className="flex flex-wrap items-center gap-3 text-sm sm:col-span-2">
+            <span className="text-xs text-muted-foreground">Deep dives first for</span>
+            {[["enterprise", "Enterprise"], ["mid_market", "Mid-market"], ["smb", "Small business"]].map(([k, label]) => (
+              <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={(cfg.target_segments || []).includes(k)} onChange={(e) => setCfg({ ...cfg, target_segments: e.target.checked ? [...(cfg.target_segments || []), k] : (cfg.target_segments || []).filter((x) => x !== k) })} /> {label}</label>
+            ))}
+          </div>
+          <label className="text-xs text-muted-foreground sm:col-span-2">Extra job-search phrases, comma separated<Input className={inputCls} value={(cfg.job_terms || []).join(", ")} onChange={(e) => setCfg({ ...cfg, job_terms: e.target.value.split(",").map((x) => x.trim()).filter(Boolean) })} placeholder="records retention, SAP decommissioning" /></label>
           <label className="flex items-center gap-2 text-sm sm:col-span-2"><input type="checkbox" checked={!!cfg.reps_see_own_only} onChange={(e) => setCfg({ ...cfg, reps_see_own_only: e.target.checked })} /> Sales users see only their own accounts</label>
         </div>
         <div className="mt-4 flex justify-end"><Button size="sm" onClick={saveSources} disabled={busy === "sources"}>{busy === "sources" ? <Loader2 className="animate-spin" /> : <Check />} Save sources</Button></div>
@@ -185,9 +199,10 @@ export function RadarSetup({ meta, onChanged }) {
 
 // Which live data sources are switched on, and what each one adds. Keys are set on the server (Render → Environment).
 const LIVE = [
-  ["web_search", "Web research", "FIRECRAWL_API_KEY", "Firecrawl searches the web and reads leadership pages in full; deep dives cite them and Find people names leaders from them. Parallel (PARALLEL_API_KEY) is the backup. Repeat searches within a day cost nothing."],
+  ["web_search", "Web research", "any web-search key (FIRECRAWL_API_KEY, TAVILY_API_KEY, SERPER_API_KEY, BRAVE_API_KEY…)", "Searches the web and reads leadership pages in full; deep dives cite them, Find people names leaders from them and the ATS X-ray finds new job boards. Up to ten search providers take over from each other. Repeat searches within a day cost nothing."],
   ["ai_model", "AI model", "OPENAI_API_KEY (providers in LLM_PII_PROVIDERS)", "Writes the deep dive and pulls names and titles out of the pages. Free tiers never see prospect data. Without it, briefs are rules-based."],
   ["hunter", "Work emails", "HUNTER_API_KEY", "Decision makers with work emails and the company's email pattern; Find email asks Hunter first."],
+  ["contacts", "More contact sources", "TOMBA_KEY, SNOV_CLIENT_ID, PDL_API_KEY, APOLLO_API_KEY or COMPANIES_HOUSE_API_KEY", "People who work at the account now, merged with Hunter and public LinkedIn profiles; finders take over when Hunter's searches run out."],
   ["crustdata", "Job index", "CRUSTDATA_API_KEY", "The Leads Radar's main job-posting source (paid credits). Without it, only the job boards you list are read."],
 ];
 
@@ -200,7 +215,7 @@ function LiveSources({ live }) {
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
         {LIVE.map(([k, label, env, what]) => (
           <li key={k} className="rounded-xl border border-line/10 p-3 text-xs">
-            <p className="flex items-center gap-2 text-sm font-medium"><span className={live[k] ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-line/30"} />{label}<span className="text-xs font-normal text-muted-foreground">{live[k] ? (k === "web_search" && live.web_provider ? `on · ${live.web_provider === "firecrawl" ? "Firecrawl" : "Parallel"}` : "on") : `off · set ${env}`}</span></p>
+            <p className="flex items-center gap-2 text-sm font-medium"><span className={live[k] ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-line/30"} />{label}<span className="text-xs font-normal text-muted-foreground">{live[k] ? (k === "web_search" && live.chains?.web_search ? `on · ${live.chains.web_search} provider${live.chains.web_search === 1 ? "" : "s"}` : "on") : `off · set ${env}`}</span></p>
             <p className="mt-1 text-muted-foreground">{what}</p>
           </li>
         ))}
