@@ -1,9 +1,10 @@
-import { lazy, memo, Suspense, useRef } from "react";
+import { memo, Suspense, useRef } from "react";
+import { lazyWithRetry } from "@/lib/lazyWithRetry";
 import { cn } from "@/lib/utils";
 import { useLiveCanvas } from "@/hooks/use-live-canvas";
 import { DEFAULT_SIGNATURE } from "./terrainSignatures";
 
-const TerrainScene = lazy(() => import("./TerrainScene"));
+const TerrainScene = lazyWithRetry(() => import("./TerrainScene"));
 
 // The terrain's palette as soft CSS light: what shows while the scene
 // compiles, and all there is for static-tier visitors.

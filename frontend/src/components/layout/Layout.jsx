@@ -1,6 +1,6 @@
 import { Suspense, useRef } from "react";
 import { useLocation, useOutlet } from "react-router-dom";
-import { AnimatePresence, MotionConfig, motion, useIsPresent } from "framer-motion";
+import { MotionConfig, motion, useIsPresent } from "framer-motion";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
@@ -10,6 +10,8 @@ import { ConsentBanner } from "@/components/shared/ConsentBanner";
 import { EmpowerPromo } from "@/components/shared/EmpowerPromo";
 import { useIntentTracking } from "@/lib/useIntentTracking";
 import { RouteCurtain, ROUTE_SWAP_EVENT } from "@/components/motion/RouteCurtain";
+import { SafePresence } from "@/components/motion/SafePresence";
+import { RouteErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { Intro } from "@/components/motion/Intro";
 import { usePointerSpotlight } from "@/components/motion/spotlight";
@@ -40,7 +42,8 @@ export const Layout = () => {
       <ScrollProgress />
       <Navbar />
       <main>
-        <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.dispatchEvent(new Event(ROUTE_SWAP_EVENT))}>
+        {/* SafePresence: if a page's exit ever stalls, the next page still shows (no half-faded screen). */}
+        <SafePresence swapKey={location.pathname} mode="wait" initial={false} onExitComplete={() => window.dispatchEvent(new Event(ROUTE_SWAP_EVENT))}>
           <motion.div
             key={location.pathname}
             variants={pageTransitionVariants}
@@ -48,11 +51,13 @@ export const Layout = () => {
             animate="animate"
             exit="exit"
           >
-            <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" />}>
-              <FrozenOutlet />
-            </Suspense>
+            <RouteErrorBoundary minHeight="min-h-[70vh]">
+              <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" />}>
+                <FrozenOutlet />
+              </Suspense>
+            </RouteErrorBoundary>
           </motion.div>
-        </AnimatePresence>
+        </SafePresence>
       </main>
       <Footer />
       <RouteCurtain />

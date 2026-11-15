@@ -1,9 +1,10 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { lazyWithRetry } from "@/lib/lazyWithRetry";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTx } from "@/i18n/tx";
 
-const CommandPalette = lazy(() => import("./CommandPalette"));
+const CommandPalette = lazyWithRetry(() => import("./CommandPalette"));
 const OPEN_EVENT = "solix:open-search";
 
 export const openSearch = () => window.dispatchEvent(new Event(OPEN_EVENT));

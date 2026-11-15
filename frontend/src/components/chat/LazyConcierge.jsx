@@ -1,6 +1,7 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { lazyWithRetry } from "@/lib/lazyWithRetry";
 
-const ConciergeWidget = lazy(() => import("./ConciergeWidget"));
+const ConciergeWidget = lazyWithRetry(() => import("./ConciergeWidget"));
 
 /**
  * Loads the chat widget (and its built-in answer engine) once the page is

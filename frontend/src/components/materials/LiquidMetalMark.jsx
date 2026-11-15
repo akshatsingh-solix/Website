@@ -1,4 +1,5 @@
-import { lazy, Suspense, useRef } from "react";
+import { Suspense, useRef } from "react";
+import { lazyWithRetry } from "@/lib/lazyWithRetry";
 import { cn } from "@/lib/utils";
 import { useLiveCanvas } from "@/hooks/use-live-canvas";
 
@@ -7,7 +8,7 @@ import { useLiveCanvas } from "@/hooks/use-live-canvas";
 // bevel by solving a Poisson equation over it, and chrome stripes with a red
 // and blue dispersion flow across that bevel - packaged by its authors under
 // a permissive licence, with colour tint and far cheaper image processing.
-const LiquidMetal = lazy(() => import("@paper-design/shaders-react").then((m) => ({ default: m.LiquidMetal })));
+const LiquidMetal = lazyWithRetry(() => import("@paper-design/shaders-react").then((m) => ({ default: m.LiquidMetal })));
 
 export const BOLT_MASK = `${process.env.PUBLIC_URL || ""}/brand/solix-bolt-mask.svg`;
 
