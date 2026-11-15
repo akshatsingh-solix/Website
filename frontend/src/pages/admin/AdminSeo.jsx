@@ -1,4 +1,5 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { lazyWithRetry } from "@/lib/lazyWithRetry";
 import { useSearchParams } from "react-router-dom";
 import { Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
@@ -14,13 +15,13 @@ import { SampleBadge } from "@/components/admin/seo/ui";
 import Overview from "@/components/admin/seo/Overview";
 
 const views = {
-  traffic: lazy(() => import("@/components/admin/seo/Traffic")),
-  keywords: lazy(() => import("@/components/admin/seo/Keywords")),
-  competitors: lazy(() => import("@/components/admin/seo/Competitors")),
-  ai: lazy(() => import("@/components/admin/seo/AiSearch")),
-  topics: lazy(() => import("@/components/admin/seo/Topics")),
-  content: lazy(() => import("@/components/admin/seo/ContentPlan")),
-  settings: lazy(() => import("@/components/admin/seo/SeoSettings")),
+  traffic: lazyWithRetry(() => import("@/components/admin/seo/Traffic")),
+  keywords: lazyWithRetry(() => import("@/components/admin/seo/Keywords")),
+  competitors: lazyWithRetry(() => import("@/components/admin/seo/Competitors")),
+  ai: lazyWithRetry(() => import("@/components/admin/seo/AiSearch")),
+  topics: lazyWithRetry(() => import("@/components/admin/seo/Topics")),
+  content: lazyWithRetry(() => import("@/components/admin/seo/ContentPlan")),
+  settings: lazyWithRetry(() => import("@/components/admin/seo/SeoSettings")),
 };
 
 const TABS = {

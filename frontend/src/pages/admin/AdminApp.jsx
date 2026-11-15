@@ -1,9 +1,10 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AdminAuthProvider, RequireAdmin } from "@/components/admin/AdminAuth";
 import { ServerWakeNotice } from "@/components/admin/ServerWakeNotice";
 import { AdminThemeProvider } from "@/components/admin/theme";
 import { AdminBackdrop } from "@/components/admin/Backdrop";
+import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 
 // Everything under /admin lives in this chunk, so public visitors never
 // download the admin sign-in, API client or pages.

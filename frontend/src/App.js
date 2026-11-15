@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import i18n from "@/i18n";
@@ -9,6 +9,8 @@ import { AccountAuthProvider, RequireAccount } from "@/components/account/Accoun
 import Home from "@/pages/Home";
 import { slowConnection } from "@/lib/net";
 import { MetalDefs } from "@/components/materials/MetalIcon";
+import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
+import { RouteErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 // Route-level code splitting: the homepage ships alone; every other page is
 // its own chunk, fetched on navigation and prefetched while the browser is idle.
@@ -84,6 +86,8 @@ function App() {
   return (
     <BrowserRouter basename="/Website">
       <AccountAuthProvider>
+        {/* Last line of defence: the admin, sign-in and site layouts have their own boundaries inside. */}
+        <RouteErrorBoundary minHeight="min-h-screen">
         <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/admin/*" element={<AdminApp />} />
@@ -114,6 +118,7 @@ function App() {
             </Route>
           </Routes>
         </Suspense>
+        </RouteErrorBoundary>
       </AccountAuthProvider>
       <Toaster position="bottom-center" theme="light" richColors closeButton />
       <MetalDefs />

@@ -1,4 +1,5 @@
-import { lazy, Suspense, useMemo, useRef, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
+import { lazyWithRetry } from "@/lib/lazyWithRetry";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Layers, MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,7 +15,7 @@ import { useLiveCanvas } from "@/hooks/use-live-canvas";
 import { LAYER_COLORS } from "./colors";
 import { MetalIcon } from "@/components/materials/MetalIcon";
 
-const PlatformScene = lazy(() => import("./PlatformScene"));
+const PlatformScene = lazyWithRetry(() => import("./PlatformScene"));
 
 // The 3D stage: mounts near the viewport, runs while it holds the page's
 // live-canvas slot, a still frame for reduced motion, and on the static

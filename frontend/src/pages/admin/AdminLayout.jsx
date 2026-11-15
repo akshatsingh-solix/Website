@@ -9,6 +9,8 @@ import { ROLE_LABELS } from "@/components/admin/kit";
 import { useAdminTheme } from "@/components/admin/theme";
 import { EASE, LiveDot } from "@/components/admin/motion";
 import { clearAdminCache } from "@/lib/adminApi";
+import { SafePresence } from "@/components/motion/SafePresence";
+import { RouteErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@/components/ui/command";
 
 const links = [
@@ -156,7 +158,8 @@ export default function AdminLayout() {
 
       <main className="container py-8 sm:py-10">
         {/* Only the page area waits for a page's code; the navigation stays put. */}
-        <AnimatePresence mode="wait" initial={false}>
+        {/* SafePresence: if a section's exit ever stalls, the next section still shows instead of a blank page. */}
+        <SafePresence swapKey={section} mode="wait" initial={false}>
           <motion.div
             key={section}
             initial={reduce ? false : { opacity: 0, y: 14 }}
@@ -164,11 +167,13 @@ export default function AdminLayout() {
             exit={reduce ? undefined : { opacity: 0, y: -8 }}
             transition={{ duration: 0.34, ease: EASE }}
           >
-            <Suspense fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
-              <Outlet />
-            </Suspense>
+            <RouteErrorBoundary>
+              <Suspense fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
+                <Outlet />
+              </Suspense>
+            </RouteErrorBoundary>
           </motion.div>
-        </AnimatePresence>
+        </SafePresence>
       </main>
 
       <CommandDialog open={palette} onOpenChange={setPalette} title="Jump to" contentClassName="admin-glass max-w-xl rounded-2xl border-line/10 bg-popover/80 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)]">
