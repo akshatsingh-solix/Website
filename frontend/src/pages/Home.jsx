@@ -6,7 +6,6 @@ import { AISection } from "@/components/home/AISection";
 import { IndustriesStrip } from "@/components/home/IndustriesStrip";
 import { InsightsPreview } from "@/components/home/InsightsPreview";
 import { CTABand } from "@/components/shared/CTABand";
-import { ChapterRail } from "@/components/home/ChapterRail";
 
 /**
  * The homepage is a storyboard of a few dense frames rather than a long
@@ -15,7 +14,7 @@ import { ChapterRail } from "@/components/home/ChapterRail";
  *   Hero  - pinned, three beats over the rendered governed core: data
  *           streams in, one governed core, activated (the Solix bolt).
  *           The light page then rises over it as a sheet.
- *   01 The case      - cost chart, scale counters, facts, sectors (one bento)
+ *   The case      - cost chart, scale counters, facts, sectors (one bento)
  *   02 The platform  - six eras of a record's life on the platform layer
  *                      stack, pinned (navy moment)
  *   03 What you get  - outcomes or products, one toggle
@@ -29,7 +28,6 @@ export default function Home() {
     <div data-testid="home-page">
       <Hero />
       <div className="relative z-10 -mt-[14vh] rounded-t-[2.5rem] bg-background shadow-[0_-40px_80px_-40px_rgba(0,0,0,0.55)] sm:rounded-t-[3.5rem]">
-        <ChapterRail />
         <ProofFrame />
         <PlatformFrame />
         <OfferingsFrame />

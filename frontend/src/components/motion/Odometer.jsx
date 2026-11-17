@@ -3,6 +3,8 @@ import { useInView, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+// Neighbouring digits fade at the reel's edges instead of showing as hard slivers.
+const MASK = "linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%)";
 
 /**
  * Mechanical counter: each digit is a reel that spins down to its value when
@@ -19,14 +21,14 @@ export const Odometer = ({ value, suffix = "", prefix = "", className, duration 
   return (
     <span ref={ref} className={cn("inline-flex items-baseline tabular-nums", className)}>
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true" className="inline-flex">
+      <span aria-hidden="true" className="inline-flex items-center">
         <span className="whitespace-pre">{prefix}</span>
         {chars.map((c, i) => {
           const d = Number(c);
           if (Number.isNaN(d) || c === " ") return <span key={i}>{c}</span>;
           const settle = chars.length - i;
           return (
-            <span key={i} className="relative inline-block h-[1em] overflow-hidden leading-none" style={{ width: "0.62em" }}>
+            <span key={i} className="relative inline-block h-[1.12em] overflow-hidden leading-[1.12] [clip-path:inset(0)]" style={{ width: "0.62em", WebkitMaskImage: MASK, maskImage: MASK }}>
               <span
                 className="absolute inset-x-0 top-0 flex flex-col"
                 style={{
@@ -36,7 +38,7 @@ export const Odometer = ({ value, suffix = "", prefix = "", className, duration 
                 }}
               >
                 {[...DIGITS, ...DIGITS, ...DIGITS].map((n, k) => (
-                  <span key={k} className="block h-[1em] text-center leading-none">{n}</span>
+                  <span key={k} className="block h-[1.12em] text-center leading-[1.12]">{n}</span>
                 ))}
               </span>
             </span>

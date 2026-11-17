@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight, Calendar, Copy, Download, Link2, Linkedin, Loader2, Mail, Twitter } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Calendar, Copy, Download, Link2, Linkedin, Loader2, Mail } from "lucide-react";
+import { XLogo } from "@/components/shared/XLogo";
 import { localizeBlocks, markdownToBlocks } from "@/lib/markdown";
 import { usePressReleases } from "@/lib/press";
 import { toast } from "sonner";
@@ -83,7 +84,7 @@ export default function PressRelease() {
           <Button variant={pr.registerUrl ? "outline" : "default"} onClick={downloadPdf} disabled={busy} data-testid="press-download-pdf">{busy ? <Loader2 className="animate-spin" /> : <Download />} {tx("Download PDF")}</Button>
           <div className="flex gap-2" data-testid="press-share">
             <a className={iconCls} aria-label={tx("Share on LinkedIn")} target="_blank" rel="noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}><Linkedin className="h-4 w-4" /></a>
-            <a className={iconCls} aria-label={tx("Share on X")} target="_blank" rel="noreferrer" href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(pr.title)}`}><Twitter className="h-4 w-4" /></a>
+            <a className={iconCls} aria-label={tx("Share on X")} target="_blank" rel="noreferrer" href={`https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(pr.title)}`}><XLogo className="h-3.5 w-3.5" /></a>
             <button className={iconCls} aria-label={tx("Copy link")} onClick={() => copy(url, tx("Link copied"))} data-testid="press-copy-link"><Link2 className="h-4 w-4" /></button>
           </div>
         </LiquidGlass>
