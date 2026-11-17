@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge, ago, fmtDateTime, inputCls, useLiveRefresh } from "@/components/admin/kit";
-import { fetchChat, fetchChats, fetchSolStatus, formatApiError } from "@/lib/adminApi";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SolControlTab, SolKnowledgeTab, SolQualityTab } from "@/components/admin/SolControl";
+import { fetchChat, fetchChats, fetchSolConfig, fetchSolProfile, formatApiError } from "@/lib/adminApi";
 
 const PAGE_SIZE = 25;
 const LEAD_LABEL = { demo: "Demo booked", contact: "Expert question", chat: "Contact shared" };
@@ -16,11 +18,16 @@ const plain = (text) => text.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\[([^\]]
 
 const Transcript = ({ sessionId, onClose }) => {
   const [messages, setMessages] = useState(null);
+  const [profile, setProfile] = useState(null);
   useEffect(() => {
     if (!sessionId) return;
     setMessages(null);
+    setProfile(null);
     fetchChat(sessionId).then(setMessages).catch((e) => toast.error(formatApiError(e)));
+    fetchSolProfile(sessionId).then(setProfile).catch(() => {});
   }, [sessionId]);
+  const facts = profile && [["Problem", profile.problem], ["Industry", profile.industry], ["Systems", profile.systems?.join(", ")], ["Goals", profile.goals?.join(", ")],
+    ["Data volume", profile.data_volume], ["Timeline", profile.timeline], ["Stage", profile.stage]].filter(([, v]) => v);
 
   return (
     <Dialog open={!!sessionId} onOpenChange={(o) => !o && onClose()}>
@@ -29,6 +36,11 @@ const Transcript = ({ sessionId, onClose }) => {
           <DialogTitle>Conversation</DialogTitle>
           <DialogDescription className="font-mono text-xs">{sessionId}</DialogDescription>
         </DialogHeader>
+        {facts?.length > 0 && (
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 rounded-xl border border-line/10 bg-muted/40 px-4 py-3 text-xs" data-testid="admin-chat-profile">
+            {facts.flatMap(([k, v]) => [<dt key={`${k}-k`} className="text-muted-foreground">{k}</dt>, <dd key={`${k}-v`}>{v}</dd>])}
+          </dl>
+        )}
         {!messages ? (
           <Loader2 className="mx-auto my-8 h-5 w-5 animate-spin text-muted-foreground" />
         ) : (
@@ -41,6 +53,8 @@ const Transcript = ({ sessionId, onClose }) => {
                   <span>{fmtDateTime(m.created_at)}</span>
                   {m.page && <span className="font-mono">on {m.page}</span>}
                   {m.model && <span className="font-mono">{m.provider}/{m.model}</span>}
+                  {m.latency_ms && <span>{(m.latency_ms / 1000).toFixed(1)} s</span>}
+                  {m.guard && <span className="text-amber-600">guard: {[].concat(m.guard).join(", ")}</span>}
                   {m.tools?.length > 0 && <span className="font-mono">used {m.tools.join(", ")}</span>}
                 </p>
                 <p className="whitespace-pre-wrap leading-relaxed">{plain(m.content)}</p>
@@ -53,7 +67,7 @@ const Transcript = ({ sessionId, onClose }) => {
   );
 };
 
-export default function AdminConversations() {
+const ConversationsTab = () => {
   const [data, setData] = useState({ total: 0, items: [] });
   const [status, setStatus] = useState(null);
   const [page, setPage] = useState(1);
@@ -76,20 +90,18 @@ export default function AdminConversations() {
   }, [page, query]);
   useEffect(() => { load(); }, [load]);
   useLiveRefresh(() => load({ silent: true }));
-  useEffect(() => { fetchSolStatus().then(setStatus).catch(() => {}); }, []);
+  useEffect(() => { fetchSolConfig().then(setStatus).catch(() => {}); }, []);
 
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
 
+  const ai = status && status.answer_chain.length > 0;
   return (
-    <div data-testid="admin-conversations-page">
-      <p className="eyebrow mb-2">Sol concierge</p>
-      <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">What visitors ask Sol, and how it answers.</h1>
-
+    <div>
       {status && (
-        <p className={cn("mt-4 rounded-xl border px-4 py-3 text-sm", status.ai ? "border-emerald-500/30 bg-emerald-500/5" : "border-amber-500/30 bg-amber-500/5")} data-testid="admin-sol-status">
-          {status.ai
-            ? <>AI answers are on via <strong>{status.providers.join(" → ")}</strong> (tried in that order), grounded in {status.knowledge_chunks} pieces of site content.</>
-            : <>No AI provider is configured, so Sol answers with its built-in script. Add a free <span className="font-mono">GEMINI_API_KEY</span> or <span className="font-mono">GROQ_API_KEY</span> to the backend to turn on AI answers.</>}
+        <p className={cn("mt-2 rounded-xl border px-4 py-3 text-sm", ai ? "border-emerald-500/30 bg-emerald-500/5" : "border-amber-500/30 bg-amber-500/5")} data-testid="admin-sol-status">
+          {ai
+            ? <>AI answers are on via <strong>{status.answer_chain.join(" → ")}</strong> (tried in that order), grounded in {status.knowledge.documents} pages and content items ({status.knowledge.chunks} passages).</>
+            : <>No AI provider is switched on, so Sol answers with its built-in script. Add a provider key to the backend, or a local model, then switch it on under Control.</>}
         </p>
       )}
 
@@ -136,6 +148,28 @@ export default function AdminConversations() {
       )}
 
       <Transcript sessionId={open} onClose={() => setOpen(null)} />
+    </div>
+  );
+};
+
+export default function AdminConversations() {
+  const [tab, setTab] = useState("conversations");
+  return (
+    <div data-testid="admin-conversations-page">
+      <p className="eyebrow mb-2">Sol concierge</p>
+      <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">What visitors ask Sol, and how it answers.</h1>
+      <Tabs value={tab} onValueChange={setTab} className="mt-6">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="conversations">Conversations</TabsTrigger>
+          <TabsTrigger value="control" data-testid="sol-tab-control">Control</TabsTrigger>
+          <TabsTrigger value="knowledge" data-testid="sol-tab-knowledge">Knowledge</TabsTrigger>
+          <TabsTrigger value="quality" data-testid="sol-tab-quality">Quality</TabsTrigger>
+        </TabsList>
+        <TabsContent value="conversations"><ConversationsTab /></TabsContent>
+        <TabsContent value="control" className="mt-4">{tab === "control" && <SolControlTab />}</TabsContent>
+        <TabsContent value="knowledge" className="mt-4">{tab === "knowledge" && <SolKnowledgeTab />}</TabsContent>
+        <TabsContent value="quality" className="mt-4">{tab === "quality" && <SolQualityTab />}</TabsContent>
+      </Tabs>
     </div>
   );
 }

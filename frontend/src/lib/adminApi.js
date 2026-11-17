@@ -85,6 +85,22 @@ export const fetchNotifications = () => adminApi.get("/admin/notifications", { f
 export const fetchChats = (params, opts = {}) => adminApi.get("/admin/chats", { params, ...opts }).then((r) => r.data);
 export const fetchChat = (sessionId) => adminApi.get(`/admin/chats/${sessionId}`).then((r) => r.data);
 export const fetchSolStatus = () => adminApi.get("/chat/status").then((r) => r.data);
+// --- Sol control (Admin > Conversations): routing, knowledge, learning, quality ---
+export const fetchSolConfig = (opts = {}) => adminApi.get("/admin/sol/config", opts).then((r) => r.data);
+export const saveSolConfig = (body) => adminApi.put("/admin/sol/config", body).then((r) => r.data);
+export const testSolProvider = (body) => adminApi.post("/admin/sol/test", body, { timeout: 60000 }).then((r) => r.data);
+export const reindexSol = () => adminApi.post("/admin/sol/reindex").then((r) => r.data);
+export const clearSolCache = () => adminApi.post("/admin/sol/cache/clear").then((r) => r.data);
+export const fetchSolGaps = (status = "open") => adminApi.get("/admin/sol/gaps", { params: { status } }).then((r) => r.data);
+export const learnSolGap = (id, body) => adminApi.post(`/admin/sol/gaps/${id}/learn`, body).then((r) => r.data);
+export const dismissSolGap = (id) => adminApi.post(`/admin/sol/gaps/${id}/dismiss`).then((r) => r.data);
+export const fetchSolLearned = () => adminApi.get("/admin/sol/learned").then((r) => r.data);
+export const addSolLearned = (body) => adminApi.post("/admin/sol/learned", body).then((r) => r.data);
+export const patchSolLearned = (id, body) => adminApi.patch(`/admin/sol/learned/${id}`, body).then((r) => r.data);
+export const deleteSolLearned = (id) => adminApi.delete(`/admin/sol/learned/${id}`);
+export const researchSol = (body) => adminApi.post("/admin/sol/research", body, { timeout: 90000 }).then((r) => r.data);
+export const fetchSolInsights = (days = 7) => adminApi.get("/admin/sol/insights", { params: { days } }).then((r) => r.data);
+export const fetchSolProfile = (sessionId) => adminApi.get(`/admin/sol/profile/${sessionId}`).then((r) => r.data);
 
 // --- Leads, reports, views, scoring, users ---------------------------------
 const clean = (params) => Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== "all"));
