@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Briefcase, CalendarClock, Cloud, Factory, FlaskConical, HardDrive, HeartPulse, Landmark, PlugZap, RadioTower, ShoppingBag, TrendingDown, Umbrella, Zap } from "lucide-react";
-import { LOGOS, STATS } from "@/data/site";
+import { Link } from "react-router-dom";
+import { CalendarClock, HardDrive, PlugZap, TrendingDown } from "lucide-react";
+import { INDUSTRIES, STATS } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { useTx } from "@/i18n/tx";
 import { useLocalized } from "@/i18n/localize";
@@ -13,9 +14,6 @@ import { GlyphTile, MetalIcon } from "@/components/materials/MetalIcon";
 
 // One icon per STATS entry, in order: connectors, cost, years, petabytes.
 const STAT_ICONS = [PlugZap, TrendingDown, CalendarClock, HardDrive];
-// LOGOS are illustrative example-industry names, not real customers; each
-// gets a generic category icon, never a brand mark.
-const SECTOR_ICONS = [Landmark, HeartPulse, Zap, ShoppingBag, Umbrella, RadioTower, Factory, Cloud, FlaskConical, Briefcase];
 
 /**
  * Chapter 01 in a single frame: the problem and the proof side by side.
@@ -91,19 +89,15 @@ export const ProofFrame = () => {
           <Reveal delay={0.25} className="lg:col-span-12">
             <div className="relative overflow-hidden rounded-3xl border border-line/10 bg-muted/40 py-5" data-testid="logo-marquee">
               <p className="mb-3 text-center font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted-foreground">
-                {tx("Representative industries Solix serves")} <span className="opacity-70">· {tx("illustrative examples")}</span>
+                {tx("Built for the most regulated industries")}
               </p>
-              <VelocityMarquee className="mask-fade-x" baseVelocity={-1.4}>
-                {LOGOS.map((l, i) => {
-                  const Icon = SECTOR_ICONS[i % SECTOR_ICONS.length];
-                  return (
-                    <span key={`${l}-${i}`} className="group mx-6 inline-flex shrink-0 items-center gap-3 font-display text-2xl font-medium tracking-[-0.02em] text-foreground/30 transition-colors duration-500 hover:text-foreground sm:text-3xl">
-                      <MetalIcon icon={Icon} tone={i % 2 ? "red" : "blue"} className="h-5 w-5 shrink-0 opacity-70 transition-opacity duration-500 group-hover:opacity-100 sm:h-6 sm:w-6" strokeWidth={1.5} />
-                      {l}
-                      <span className="ml-6 text-base text-primary/40" aria-hidden="true">✦</span>
-                    </span>
-                  );
-                })}
+              <VelocityMarquee className="mask-fade-x" baseVelocity={-1.2}>
+                {INDUSTRIES.map((ind, i) => (
+                  <Link key={ind.slug} to={`/industries/${ind.slug}`} className="group mx-7 inline-flex shrink-0 items-center gap-3 font-display text-2xl font-medium tracking-[-0.02em] text-foreground/35 transition-colors duration-500 hover:text-foreground sm:text-3xl">
+                    <MetalIcon icon={ind.icon} tone={i % 2 ? "red" : "blue"} className="h-5 w-5 shrink-0 opacity-70 transition-opacity duration-500 group-hover:opacity-100 sm:h-6 sm:w-6" strokeWidth={1.5} />
+                    {ind.name}
+                  </Link>
+                ))}
               </VelocityMarquee>
             </div>
           </Reveal>

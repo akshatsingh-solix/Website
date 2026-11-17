@@ -98,66 +98,66 @@ const Floater = ({ children, depth, mx, my, className, delay, fade }) => {
   );
 };
 
-/** Live telemetry: a counter that never stops ticking, written straight to the DOM. */
-const LiveCount = ({ start, rate }) => {
-  const ref = useRef(null);
+/**
+ * The rotating verb. Its box eases to the width of the word on show, so the
+ * sentence closes up around short words instead of leaving a gap sized for
+ * the longest one.
+ */
+const RotatingWord = ({ words, index }) => {
+  const measure = useRef([]);
+  const [widths, setWidths] = useState([]);
   useEffect(() => {
-    let n = start;
-    let t = 0;
-    const tick = () => {
-      n += Math.round(rate * (0.6 + Math.random() * 0.8));
-      if (ref.current) ref.current.textContent = n.toLocaleString("en-US");
-      t = setTimeout(tick, 140 + Math.random() * 160);
-    };
-    tick();
-    return () => clearTimeout(t);
-  }, [start, rate]);
-  return <span ref={ref} className="tabular-nums text-foreground" />;
-};
-
-/**
- * Heads-up frame over the stage: corner brackets, a coordinate readout and
- * live counters, so the first screen reads like the platform's own console.
- */
-const HudFrame = ({ fade }) => {
-  const tx = useTx();
-  const corner = "absolute h-5 w-5 border-line/35";
+    const read = () => setWidths(measure.current.map((el) => (el ? el.offsetWidth : 0)));
+    read();
+    if (document.fonts?.ready) document.fonts.ready.then(read);
+    window.addEventListener("resize", read);
+    return () => window.removeEventListener("resize", read);
+  }, [words.join("|")]); // eslint-disable-line react-hooks/exhaustive-deps
+  const width = widths[index];
   return (
-    <motion.div style={{ opacity: fade }} className="pointer-events-none absolute inset-x-5 bottom-5 top-[7.5rem] hidden lg:block xl:inset-x-8 short:!hidden" aria-hidden="true">
-      <span className={cn(corner, "left-0 top-0 border-l border-t")} />
-      <span className={cn(corner, "right-0 top-0 border-r border-t")} />
-      <span className={cn(corner, "bottom-0 left-0 border-b border-l")} />
-      <span className={cn(corner, "bottom-0 right-0 border-b border-r")} />
-      <div className="absolute left-7 top-0 -translate-y-1/2 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-        37.3875° N · 121.9636° W · {tx("Santa Clara")}
-      </div>
-      <div className="absolute bottom-0 left-7 flex translate-y-1/2 gap-6 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-        <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal" /> {tx("Records governed today")} <LiveCount start={1284229} rate={37} /></span>
-        <span className="hidden items-center gap-2 xl:flex"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" /> {tx("Policy checks")} <LiveCount start={98311} rate={4} /></span>
-      </div>
-    </motion.div>
+    <motion.span
+      className="relative inline-block h-[1.625em] overflow-hidden align-top font-medium text-teal"
+      animate={width ? { width } : undefined}
+      transition={{ duration: 0.45, ease }}
+    >
+      {words.map((w, k) => (
+        <span key={w} ref={(el) => { measure.current[k] = el; }} aria-hidden="true" className="invisible absolute left-0 top-0 whitespace-nowrap">{w}</span>
+      ))}
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={words[index]}
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "-100%", opacity: 0 }}
+          transition={{ duration: 0.45, ease }}
+          className="inline-block whitespace-nowrap leading-[1.625]"
+          data-testid="hero-rotating-word"
+        >
+          {words[index]}
+        </motion.span>
+      </AnimatePresence>
+    </motion.span>
   );
 };
 
 /**
- * A beat's copy block: in and out with the scroll, 1:1 (no spring, so the
- * words stay locked to the touchpad). It is centred in the band between the
- * header and the story scrubber; `hero-beat` keeps it from ever spilling
- * under either when the viewport is short.
+ * A beat's copy block. Only one beat is ever on screen: the scroll picks
+ * the beat, and the outgoing copy fully leaves before the next arrives
+ * (AnimatePresence mode="wait"), so headlines never stack on each other.
+ * It is centred in the band between the header and the story scrubber;
+ * `hero-beat` keeps it from spilling under either on short viewports.
  */
-const BeatCopy = ({ progress, range, children, className, testId }) => {
-  const [a, b] = range;
-  const fadeIn = a === 0 ? [0, 0] : [a - 0.04, a + 0.02];
-  const fadeOut = b === 1 ? [1, 1] : [b - 0.04, b + 0.02];
-  const opacity = useTransform(progress, [fadeIn[0], fadeIn[1], fadeOut[0], fadeOut[1]], [a === 0 ? 1 : 0, 1, 1, b === 1 ? 1 : 0]);
-  const y = useTransform(progress, [fadeIn[0], fadeIn[1], fadeOut[0], fadeOut[1]], [a === 0 ? 0 : 60, 0, 0, b === 1 ? 0 : -60]);
-  const pointerEvents = useTransform(opacity, (o) => (o > 0.5 ? "auto" : "none"));
-  return (
-    <motion.div style={{ opacity, y, pointerEvents }} className={cn("hero-beat absolute inset-x-0 bottom-24 top-20 flex md:bottom-28 lg:top-24", className)} data-testid={testId}>
-      <div className="container">{children}</div>
-    </motion.div>
-  );
-};
+const BeatCopy = ({ children, className, testId }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 36 }}
+    animate={{ opacity: 1, y: 0, transition: { duration: 0.6, ease } }}
+    exit={{ opacity: 0, y: -24, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
+    className={cn("hero-beat absolute inset-x-0 bottom-24 top-20 flex md:bottom-28 lg:top-24", className)}
+    data-testid={testId}
+  >
+    <div className="container">{children}</div>
+  </motion.div>
+);
 
 export const Hero = () => {
   const { t } = useTranslation();
@@ -180,7 +180,15 @@ export const Hero = () => {
   const imgOpacity = useTransform(progress, [0, 0.45, 0.8, 1], [1, 0.85, 0.45, 0.35]);
   const cueFade = useTransform(progress, [0, 0.06], [1, 0]);
   const [beat, setBeat] = useState(0);
-  useMotionValueEvent(progress, "change", (v) => setBeat(v < 0.32 ? 0 : v < 0.66 ? 1 : 2));
+  // A little hysteresis around each boundary, so a resting touchpad never flickers between beats.
+  useMotionValueEvent(progress, "change", (v) =>
+    setBeat((cur) => {
+      const next = v < 0.31 ? 0 : v < 0.65 ? 1 : 2;
+      if (next === cur) return cur;
+      const edge = next > cur ? [0.31, 0.65][next - 1] : [0.31, 0.65][cur - 1];
+      return Math.abs(v - edge) < 0.015 ? cur : next;
+    }),
+  );
 
   // Pointer position, -0.5..0.5, for the floating cards.
   const mx = useMotionValue(0);
@@ -215,7 +223,6 @@ export const Hero = () => {
         </div>
         <div className="pointer-events-none absolute inset-y-0 left-0 w-full bg-gradient-to-r from-background/90 via-background/55 to-transparent lg:w-[60%]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
-        <HudFrame fade={cardsFade} />
 
         {/* The cards share the copy's band, so they clear the header, the scrubber and the chat button. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-28 top-[7.5rem]">
@@ -225,8 +232,10 @@ export const Hero = () => {
         </div>
 
         <div className="relative h-full">
+          <AnimatePresence mode="wait" initial={false}>
           {/* Beat 1: the promise. */}
-          <BeatCopy progress={progress} range={BEATS[0].range} className="top-24 lg:top-[7.5rem]">
+          {beat === 0 && (
+          <BeatCopy key="signal" className="top-24 lg:top-[7.5rem]" testId="hero-beat-signal">
             <div className="max-w-2xl lg:max-w-[46rem]">
               <motion.p initial={{ opacity: 0, y: 12 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, ease }} className="eyebrow mb-7 inline-flex items-center gap-3 rounded-full border border-line/15 bg-background/60 py-1.5 pl-1.5 pr-4 short:mb-4">
                 <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] tracking-[0.14em] text-primary-foreground">AI</span>
@@ -237,25 +246,8 @@ export const Hero = () => {
               </h1>
               <motion.p initial={{ opacity: 0, y: 20 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8, ease, delay: 0.7 }} className="mt-8 max-w-xl text-base leading-relaxed text-foreground/80 short:mt-5 md:text-lg">
                 Solix{" "}
-                <span className="relative inline-grid h-[1.625em] overflow-hidden align-top font-medium text-teal">
-                  {/* Invisible copies of every word reserve exactly the longest one's width in the current language. */}
-                  {WORD_KEYS.map((k) => (
-                    <span key={k} aria-hidden="true" className="invisible col-start-1 row-start-1 whitespace-nowrap">{t(`hero.words.${k}`)}</span>
-                  ))}
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={WORD_KEYS[i]}
-                      initial={{ y: "100%", opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: "-100%", opacity: 0 }}
-                      transition={{ duration: 0.4, ease }}
-                      className="absolute left-0 top-0 whitespace-nowrap leading-[1.625]"
-                      data-testid="hero-rotating-word"
-                    >
-                      {t(`hero.words.${WORD_KEYS[i]}`)}
-                    </motion.span>
-                  </AnimatePresence>
-                </span>{" "}
+                <RotatingWord words={WORD_KEYS.map((k) => t(`hero.words.${k}`))} index={i} />
+                {" "}
                 {t("hero.body")}
               </motion.p>
               <motion.div initial={{ opacity: 0, y: 16 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, ease, delay: 0.85 }} className="mt-10 flex flex-wrap items-center gap-3 short:mt-6">
@@ -280,9 +272,11 @@ export const Hero = () => {
               </motion.dl>
             </div>
           </BeatCopy>
+          )}
 
           {/* Beat 2: many systems, one governed core. */}
-          <BeatCopy progress={progress} range={BEATS[1].range} testId="hero-beat-govern">
+          {beat === 1 && (
+          <BeatCopy key="govern" testId="hero-beat-govern">
             <div className="max-w-xl">
               <p className="mb-6 flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] short:mb-4"><span className="text-primary-ink">02</span><span className="h-px w-10 bg-gradient-to-r from-primary/70 to-teal/60" /><span className="text-muted-foreground">{tx("Govern")}</span></p>
               <h2 className="text-balance font-display text-[clamp(2.2rem,min(1.6rem+3.4vw,9vh),5rem)] font-medium leading-[0.98] tracking-[-0.035em]">{tx("Hundreds of systems.")} <span className="text-gradient-accent">{tx("One governed core.")}</span></h2>
@@ -294,9 +288,11 @@ export const Hero = () => {
               </div>
             </div>
           </BeatCopy>
+          )}
 
           {/* Beat 3: activated. */}
-          <BeatCopy progress={progress} range={BEATS[2].range} testId="hero-beat-activate">
+          {beat === 2 && (
+          <BeatCopy key="activate" testId="hero-beat-activate">
             <div className="max-w-xl">
               <p className="mb-6 flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] short:mb-4"><span className="text-primary-ink">03</span><span className="h-px w-10 bg-gradient-to-r from-primary/70 to-teal/60" /><span className="text-muted-foreground">{tx("Activate")}</span></p>
               <h2 className="text-balance font-display text-[clamp(2.2rem,min(1.6rem+3.4vw,9vh),5rem)] font-medium leading-[0.98] tracking-[-0.035em]">{tx("Governed once.")} <span className="text-gradient-accent">{tx("Activated everywhere.")}</span></h2>
@@ -311,6 +307,8 @@ export const Hero = () => {
               </div>
             </div>
           </BeatCopy>
+          )}
+          </AnimatePresence>
         </div>
 
         {/* Story scrubber: three beats on a track that fills with the scroll. */}

@@ -86,9 +86,12 @@ export const OutcomePanels = ({ items, className }) => {
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <GlyphTile icon={Icon} tone={solutionTone(s)} />
-                  <span className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground">0{i + 1}</span>
                 </div>
                 <p className="mt-5 font-mono text-[10px] font-semibold uppercase leading-relaxed tracking-[0.16em] text-muted-foreground">{tx(s.group)}</p>
+              </div>
+              {/* The programme's render, ghosted, so the column reads as a product and not an empty card. */}
+              <div className="pointer-events-none flex flex-1 items-center justify-center py-4">
+                <GlyphImage icon={Icon} tone={solutionTone(s)} className="h-24 w-24 opacity-35 grayscale transition-[opacity,filter,transform] duration-500 group-hover:-translate-y-1 group-hover:opacity-90 group-hover:grayscale-0" />
               </div>
               <div>
                 <p className="hyphens-auto break-words font-display text-base font-medium leading-snug tracking-tight text-foreground">{s.title}</p>
@@ -98,7 +101,7 @@ export const OutcomePanels = ({ items, className }) => {
             {/* Open panel. */}
             <div className={cn("relative flex h-full w-full min-w-[400px] flex-col p-9 transition-opacity duration-500", on ? "opacity-100 delay-150" : "pointer-events-none opacity-0")}>
               <div className="flex items-start justify-between gap-4">
-                <span className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground">0{i + 1} / 0{items.length}</span>
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{tx(s.group)}</span>
                 {/* The programme's glyph in liquid metal, standing off the panel. */}
                 <GlyphImage icon={Icon} tone={solutionTone(s)} className="-mr-3 -mt-3 h-28 w-28 transition-transform duration-700 group-hover:-translate-y-1" />
               </div>

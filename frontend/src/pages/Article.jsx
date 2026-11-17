@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowRight, Calendar, Check, Clock, Download, Link2, Linkedin, Loader2, Lock, PlayCircle, Twitter } from "lucide-react";
+import { ArrowRight, Calendar, Check, Clock, Download, Link2, Linkedin, Loader2, Lock, PlayCircle } from "lucide-react";
+import { XLogo } from "@/components/shared/XLogo";
 import { toast } from "sonner";
 import { RESOURCES } from "@/data/site";
 import { ARTICLES } from "@/data/articles";
@@ -35,7 +36,7 @@ const Share = ({ title }) => {
   return (
     <div className="flex gap-2" data-testid="article-share">
       <a className={cls} aria-label={tx("Share on LinkedIn")} target="_blank" rel="noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}><Linkedin className="h-4 w-4" /></a>
-      <a className={cls} aria-label={tx("Share on X")} target="_blank" rel="noreferrer" href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}><Twitter className="h-4 w-4" /></a>
+      <a className={cls} aria-label={tx("Share on X")} target="_blank" rel="noreferrer" href={`https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}><XLogo className="h-3.5 w-3.5" /></a>
       <button className={cls} aria-label={tx("Copy link")} onClick={copy} data-testid="article-copy-link"><Link2 className="h-4 w-4" /></button>
     </div>
   );

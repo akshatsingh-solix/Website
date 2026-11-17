@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTx } from "@/i18n/tx";
-import { ArrowRight, ArrowUp, Linkedin, Twitter, Youtube, Check, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowUp, Linkedin, Youtube, Check, Loader2 } from "lucide-react";
+import { XLogo } from "@/components/shared/XLogo";
 import { toast } from "sonner";
 import { NAV, OFFICES } from "@/data/site";
 import { Button } from "@/components/ui/button";
@@ -135,7 +136,7 @@ export const Footer = () => {
             <div className="flex gap-2">
               {[
                 { Icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/solix-technologies" },
-                { Icon: Twitter, label: "X", href: "https://x.com/solixtech" },
+                { Icon: XLogo, label: "X", href: "https://x.com/solixtech" },
                 { Icon: Youtube, label: "YouTube", href: "https://www.youtube.com/@solixtechnologies" },
               ].map(({ Icon, label, href }) => (
                 <a
@@ -147,7 +148,7 @@ export const Footer = () => {
                   data-testid={`footer-social-${label.toLowerCase()}`}
                   className="grid h-10 w-10 place-items-center rounded-full border border-line/10 text-muted-foreground transition-[color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-line/30 hover:text-foreground"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={Icon === XLogo ? "h-3.5 w-3.5" : "h-4 w-4"} />
                 </a>
               ))}
             </div>

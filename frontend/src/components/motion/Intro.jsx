@@ -23,8 +23,10 @@ const subscribe = (fn) => { subs.add(fn); return () => subs.delete(fn); };
 
 const shouldPlay = () => {
   if (typeof window === "undefined") return false;
+  // A fake loading counter is latency the visitor pays for nothing: the
+  // site opens straight onto the hero. Kept behind ?intro=1 for events.
   const forced = /[?&]intro=1\b/.test(window.location.search);
-  if (forced) return true;
+  if (!forced) return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   if (navigator.webdriver || slowConnection()) return false;
   try {

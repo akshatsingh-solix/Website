@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { SOURCE } from "@/data/site";
 import { useTx } from "@/i18n/tx";
 import { SolixMark } from "@/components/shared/Logo";
-import { ScrambleText } from "./Scramble";
 
 /**
  * Page-to-page transition: a navy curtain rises over the leaving page,
@@ -14,8 +13,8 @@ import { ScrambleText } from "./Scramble";
  */
 export const ROUTE_SWAP_EVENT = "solix:route-swap";
 /** Seconds until the curtain fully covers the viewport. The leaving page exits over exactly this long. */
-export const CURTAIN_COVER = 0.42;
-const TOTAL = 1.08;
+export const CURTAIN_COVER = 0.3;
+const TOTAL = 0.74;
 const EASE = [0.76, 0, 0.24, 1];
 
 export const curtainEnabled = () =>
@@ -66,12 +65,11 @@ const CurtainRun = ({ label, onDone }) => {
       <motion.div
         className="relative flex flex-col items-center gap-5"
         initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: [0, 1, 1, 0], y: [24, 0, 0, -30] }}
-        transition={{ duration: TOTAL, times: [0.18, 0.4, 0.55, 0.78] }}
+        animate={{ opacity: [0, 1, 1, 0], y: [16, 0, 0, -20] }}
+        transition={{ duration: TOTAL, times: [0.15, 0.36, 0.55, 0.75] }}
       >
-        <SolixMark className="h-12 w-12 animate-[spin_2.4s_cubic-bezier(0.65,0,0.35,1)_infinite]" />
+        <SolixMark className="h-10 w-10" />
         <p className="font-display text-3xl font-medium tracking-tight sm:text-5xl">{tx(label)}</p>
-        <ScrambleText text="SOLIX · SIGNAL" className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground" duration={520} />
       </motion.div>
     </motion.div>
   );

@@ -950,10 +950,6 @@ const INDUSTRIES_EN = [
   { slug: "insurance", image: "/Website/images/ind-insurance.jpg", icon: Umbrella, name: "Insurance", headline: "Policies and claims preserved for the life of the promise.", desc: "Retire legacy policy administration systems, meet retention rules and enable underwriting AI.", challenges: ["Long-tail policy and claims retention", "Multiple PAS platforms after acquisitions", "Underwriting AI needs historical claims"], results: ["Retired legacy PAS with full claim history access", "Retention by product line and jurisdiction", "Claims history lake for pricing models"] },
 ];
 
-const LOGOS_EN = [
-  "Meridian Bank", "Northwind Health", "Atlas Energy", "Helios Retail", "Vantage Insurance", "Orion Telecom", "Summit Manufacturing", "Civic Cloud", "Aurora Pharma", "Keystone Capital",
-];
-
 const TESTIMONIALS_EN = [
   { quote: "We retired forty legacy applications in eighteen months and every record is still one search away. Solix turned a compliance liability into a governed asset our AI teams can finally use.", role: "Chief Data Officer", org: "Top-20 US Bank" },
   { quote: "Our S/4HANA migration was half the size it would have been. Archive-first with Solix paid for itself before we even cut over.", role: "VP, Enterprise Applications", org: "Global Manufacturer" },
@@ -1091,7 +1087,6 @@ export const STATS = localizedSource(STATS_EN);
 export const PRODUCTS = localizedSource(PRODUCTS_EN);
 export const SOLUTIONS = localizedSource(SOLUTIONS_EN);
 export const INDUSTRIES = localizedSource(INDUSTRIES_EN);
-export const LOGOS = localizedSource(LOGOS_EN);
 export const TESTIMONIALS = localizedSource(TESTIMONIALS_EN);
 export const RESOURCES = localizedSource(RESOURCES_EN);
 export const RESOURCE_TYPES = localizedSource(RESOURCE_TYPES_EN);
@@ -1107,4 +1102,4 @@ export const SERVICES = localizedSource(SERVICES_EN);
 export const PARTNER_BENEFITS = localizedSource(PARTNER_BENEFITS_EN);
 export const INTERESTS = localizedSource(INTERESTS_EN);
 export const CHAT_SUGGESTIONS = localizedSource(CHAT_SUGGESTIONS_EN);
-export const SOURCE = { NAV: NAV_EN, STATS: STATS_EN, PRODUCTS: PRODUCTS_EN, SOLUTIONS: SOLUTIONS_EN, INDUSTRIES: INDUSTRIES_EN, LOGOS: LOGOS_EN, TESTIMONIALS: TESTIMONIALS_EN, RESOURCES: RESOURCES_EN, RESOURCE_TYPES: RESOURCE_TYPES_EN, TIMELINE: TIMELINE_EN, VALUES: VALUES_EN, LEADERSHIP: LEADERSHIP_EN, OFFICES: OFFICES_EN, JOBS: JOBS_EN, PERKS: PERKS_EN, PARTNER_TIERS: PARTNER_TIERS_EN, PLATFORM_SECTIONS: PLATFORM_SECTIONS_EN, SERVICES: SERVICES_EN, PARTNER_BENEFITS: PARTNER_BENEFITS_EN, INTERESTS: INTERESTS_EN, CHAT_SUGGESTIONS: CHAT_SUGGESTIONS_EN };
+export const SOURCE = { NAV: NAV_EN, STATS: STATS_EN, PRODUCTS: PRODUCTS_EN, SOLUTIONS: SOLUTIONS_EN, INDUSTRIES: INDUSTRIES_EN, TESTIMONIALS: TESTIMONIALS_EN, RESOURCES: RESOURCES_EN, RESOURCE_TYPES: RESOURCE_TYPES_EN, TIMELINE: TIMELINE_EN, VALUES: VALUES_EN, LEADERSHIP: LEADERSHIP_EN, OFFICES: OFFICES_EN, JOBS: JOBS_EN, PERKS: PERKS_EN, PARTNER_TIERS: PARTNER_TIERS_EN, PLATFORM_SECTIONS: PLATFORM_SECTIONS_EN, SERVICES: SERVICES_EN, PARTNER_BENEFITS: PARTNER_BENEFITS_EN, INTERESTS: INTERESTS_EN, CHAT_SUGGESTIONS: CHAT_SUGGESTIONS_EN };
