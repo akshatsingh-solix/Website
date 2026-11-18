@@ -9,6 +9,7 @@ import { fetchNotifications, fetchSettings, formatApiError, saveSettings } from 
 import { TeamCard } from "@/components/admin/TeamCard";
 import { PasswordCard, ScoringCard, UsersCard } from "@/components/admin/SettingsCards";
 import { useCan } from "@/components/admin/kit";
+import { AccessCard } from "@/components/admin/AccessCard";
 
 const STATUS = { sent: "text-emerald-300 border-emerald-500/30 bg-emerald-500/10", failed: "text-red-300 border-red-500/30 bg-red-500/10", skipped: "text-amber-300 border-amber-500/30 bg-amber-500/10" };
 
@@ -48,6 +49,8 @@ export default function AdminSettings() {
           <PasswordCard />
         </div>
       </div>
+
+      {can("manage") && <div className="mt-6"><AccessCard /></div>}
 
       {can("manage") && <div className="mt-6 grid gap-6 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-5">

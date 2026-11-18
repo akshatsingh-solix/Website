@@ -12,7 +12,8 @@ import {
   patchContact, patchRadarAccount, promoteToLead, requestResearch, reviewResearch, verifyContact,
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
-import { CHANNEL_LABELS, StageBadge, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
+import { CHANNEL_LABELS, StageBadge, canAccess, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
+import { useAdmin } from "@/components/admin/AdminAuth";
 import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SEGMENT_LABELS, SegmentBadge, SIGNAL_LABELS, SIZE_SOURCE_LABELS, SIZE_STATUS_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ const EMAIL_TONE = { valid: "text-emerald-300", mx_only: "text-amber-300", catch
 
 export function AccountDrawer({ id, meta, onClose, onChanged }) {
   const can = useCan();
+  const { user } = useAdmin();
   const hl = useHighlighter(meta?.highlight);
   const [data, setData] = useState(null);
   const [form, setForm] = useState({ owner: "", status: "new", notes: "", reason: "" });
@@ -49,6 +51,12 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
   useEffect(() => { if (id && can("editLeads")) fetchSequences().then(setSequences).catch(() => {}); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const a = data?.account;
+  // Company-level fields belong to the account owner; admins and people with full Radar access can change any account,
+  // and anyone working the Radar can claim an unassigned one. The server enforces the same rule.
+  const me = (user?.email || "").toLowerCase();
+  const isOwner = !!a?.owner && a.owner.toLowerCase() === me;
+  const canEditAccount = !!a && can("editRadar") && (user?.role === "admin" || canAccess(user, "radar", "full") || isOwner);
+  const canClaim = !!a && can("editRadar") && !a.owner && !canEditAccount;
   const dirty = a && (form.owner !== (a.owner || "") || form.status !== a.status || form.notes !== (a.notes || ""));
 
   const act = async (key, fn, ok) => {
@@ -132,7 +140,13 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                   </div>
                 )}
                 <ScoreBreakdown account={a} />
-                {can("editLeads") ? (
+                {!canEditAccount && (canClaim || (can("editRadar") && a.owner)) && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line/10 bg-card p-3 text-xs text-muted-foreground" data-testid="account-owner-lock">
+                    <span>{canClaim ? "Nobody owns this account yet. Claim it to work it and edit its details." : `Owned by ${a.owner_name || a.owner}. Only the owner or an admin can change this account.`}</span>
+                    {canClaim && <Button size="sm" variant="outline" disabled={busy === "claim"} onClick={() => act("claim", () => patchRadarAccount(a.id, { owner: me }), "You now own this account")}>{busy === "claim" ? <Loader2 className="animate-spin" /> : <Check />} Claim it</Button>}
+                  </div>
+                )}
+                {canEditAccount ? (
                   <section className="rounded-2xl border border-line/10 bg-card p-4" data-testid="account-workflow">
                     <div className="grid gap-3 sm:grid-cols-2">
                       <label className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Owner
@@ -168,13 +182,13 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                   <Row label="Existing customer">{a.is_customer ? "Yes" : null}</Row>
                   <Row label="First seen">{a.first_seen_at && fmtDateTime(a.first_seen_at)}</Row>
                 </dl>
-                {can("editLeads") && (
+                {canEditAccount && (
                   <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line/10 bg-card p-3 text-xs text-muted-foreground">
                     <span>Size, HQ and website from public registers (Wikidata, GLEIF, SEC, Companies House) and any company-data key set up. Never overwrites what you typed.{a.firmographics?.at ? ` Last looked up ${fmtDate(a.firmographics.at)}.` : ""}</span>
                     <Button size="sm" variant="outline" disabled={busy === "enrich"} onClick={() => act("enrich", () => enrichRadarAccount(a.id), "Company details looked up")}>{busy === "enrich" ? <Loader2 className="animate-spin" /> : <Search />} Look up size and HQ</Button>
                   </div>
                 )}
-                {can("editLeads") && <AccountDetails account={a} onSave={(body) => act("details", () => patchRadarAccount(a.id, body), "Details saved")} busy={busy === "details"} />}
+                {canEditAccount && <AccountDetails account={a} onSave={(body) => act("details", () => patchRadarAccount(a.id, body), "Details saved")} busy={busy === "details"} />}
                 <RepRule />
               </TabsContent>
 

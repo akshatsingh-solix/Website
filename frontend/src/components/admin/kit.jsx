@@ -159,16 +159,30 @@ export const BarList = ({ rows, valueKey, labelKey, color = SERIES.leads, format
   );
 };
 
+// Each action: the roles that do it by default, and the feature whose access level the admin controls
+// (Settings > Access). Mirrors the server: "full" on the feature grants the action to anyone, and a role's
+// action also needs "edit" on it, so an admin can take it away. The server enforces; this only shapes the UI.
 const PERMS = {
-  editLeads: ["admin", "sales"],
-  editContent: ["admin", "editor"],
-  manage: ["admin"],
-  comply: ["admin", "compliance"],
-  suppress: ["admin", "compliance", "sales"],
+  editLeads: [["admin", "sales"], "leads"],
+  editRadar: [["admin", "sales"], "radar"],
+  editContent: [["admin", "editor"], "content"],
+  manage: [["admin"], "settings"],
+  comply: [["admin", "compliance"], "compliance"],
+  suppress: [["admin", "compliance", "sales"], "compliance"],
 };
+export const LEVEL_RANK = { none: 0, view: 1, edit: 2, full: 3 };
+export const levelOf = (user, feature) => (user?.role === "admin" ? "full" : user?.access?.[feature] || (user?.access ? "none" : "view"));
+export const canAccess = (user, feature, level = "view") => !!user && LEVEL_RANK[levelOf(user, feature)] >= LEVEL_RANK[level];
 export const useCan = () => {
   const { user } = useAdmin();
-  return (action) => !!user && (PERMS[action] || []).includes(user.role);
+  return (action) => {
+    if (!user) return false;
+    const [roles, feature] = PERMS[action] || [[], null];
+    if (user.role === "admin") return true;
+    if (!user.access) return roles.includes(user.role); // an older server without access levels
+    const level = LEVEL_RANK[levelOf(user, feature)];
+    return level >= LEVEL_RANK.full || (roles.includes(user.role) && level >= LEVEL_RANK.edit);
+  };
 };
 
 export const ROLE_LABELS = { admin: "Admin", sales: "Sales", editor: "Content editor", viewer: "Leadership (read-only)", compliance: "Compliance" };
