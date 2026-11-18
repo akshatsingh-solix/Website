@@ -12,13 +12,14 @@ import { AccountStatus, BASIS_LABELS, DiveBadge, FreshTag, NextStep, RepRule, SE
 import { RadarScope } from "@/components/admin/RadarScope";
 import { AccountDrawer } from "@/components/admin/AccountDrawer";
 import { RadarSetup } from "@/components/admin/RadarSetup";
+import { AccuracyPanel } from "@/components/admin/RadarIntel";
 
 const PAGE = 40;
-const FILTERS = ["q", "competitor", "strength", "segment", "country", "state", "territory", "owner", "status", "line", "ready_only"];
+const FILTERS = ["q", "competitor", "strength", "segment", "country", "state", "territory", "owner", "status", "line", "ready_only", "industry", "verified_only"];
 const TABS = [
   ["all", "All accounts"], ["new", "New for you"], ["todo", "To do"], ["territory", "By territory"], ["reps", "Reps"], ["ready", "Ready"], ["dives", "Deep dives"], ["review", "Review"],
   ["jobs", "Competitor jobs"], ["problems", "Problem signals"], ["dns", "DNS"], ["news", "Filings & news"], ["tenders", "Tenders"], ["website", "Website intent"], ["intent", "Researching"],
-  ["surge", "Surging"], ["excluded", "Excluded"], ["setup", "Setup"],
+  ["surge", "Surging"], ["excluded", "Excluded"], ["accuracy", "Data accuracy"], ["setup", "Setup"],
 ];
 const TAB_HINT = {
   all: "Strongest first. Open an account to see every signal, the deep dive, contacts and history.",
@@ -65,7 +66,7 @@ export default function AdminRadar() {
   const load = useCallback(async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
     try {
-      const listTab = ["territory", "reps", "setup", "review"].includes(tab) ? "all" : tab;
+      const listTab = ["territory", "reps", "setup", "review", "accuracy"].includes(tab) ? "all" : tab;
       const [s, list] = await Promise.all([
         fetchRadarSummary(filters, { fresh: silent }),
         fetchRadarAccounts({ ...filters, tab: listTab, page_size: 500, sort: tab === "dives" ? "dives" : "strength" }, { fresh: silent }),
@@ -253,6 +254,10 @@ export default function AdminRadar() {
         {sel("state", "All states", meta?.states?.map((s) => <option key={s} value={s}>{s}</option>))}
         {sel("territory", "All territories", meta?.territories?.map((t) => <option key={t} value={t}>{t}</option>))}
         {sel("status", "All statuses", Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>))}
+        {sel("industry", "All industries", meta?.industries?.map((i) => <option key={i.key} value={i.key}>{i.label}</option>))}
+        <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-line/15 px-3 text-xs text-muted-foreground" title="Only accounts whose industry, HQ country, website and size are all verified">
+          <input type="checkbox" className="h-3.5 w-3.5 accent-[#0088cf]" checked={filters.verified_only === "true"} onChange={(e) => setParam({ verified_only: e.target.checked ? "true" : "" })} /> Verified data only
+        </label>
         {Object.keys(filters).length > 0 && <Button size="sm" variant="ghost" onClick={() => { setSearch(""); setParams(new URLSearchParams(tab !== "all" ? { tab } : {})); }}>Clear filters</Button>}
       </div>
 
@@ -260,7 +265,7 @@ export default function AdminRadar() {
       {/* Wraps on wider screens so no view (Setup is last) hides off the right edge; scrolls sideways on phones. */}
       <nav id="radar-views" className="mt-4 flex scroll-mt-20 gap-1 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible" aria-label="Radar views">
         {TABS.filter(([k]) => k !== "setup" || can("manage")).map(([k, label]) => {
-          const count = k === "all" || k === "territory" ? summary?.accounts : ["review", "reps"].includes(k) ? undefined : summary?.tabs?.[k];
+          const count = k === "all" || k === "territory" ? summary?.accounts : ["review", "reps", "accuracy"].includes(k) ? undefined : summary?.tabs?.[k];
           return (
             <button key={k} type="button" onClick={() => setParam({ tab: k === "all" ? "" : k })} className={cn("inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs", tab === k ? "border-primary bg-primary text-white" : "border-line/15 text-muted-foreground hover:text-foreground")}>
               {label}{count !== undefined && <span className={cn("font-mono tabular-nums", k === "new" && count > 0 && tab !== k ? "text-sky-300" : "opacity-70")}>{count}</span>}
@@ -271,6 +276,7 @@ export default function AdminRadar() {
 
       <div className="mt-4">
         {tab === "setup" ? <RadarSetup meta={meta} onChanged={() => load({ silent: true })} />
+          : tab === "accuracy" ? <AccuracyPanel onOpen={openAccount} />
           : tab === "territory" ? (
             <div className="space-y-5">
               {summary?.territories?.map((t) => (

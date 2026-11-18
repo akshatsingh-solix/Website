@@ -14,6 +14,7 @@ import {
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { CHANNEL_LABELS, StageBadge, canAccess, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
 import { useAdmin } from "@/components/admin/AdminAuth";
+import { FirstTouchButton, PitchPlan, QualityCard } from "@/components/admin/RadarIntel";
 import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SEGMENT_LABELS, SegmentBadge, SIGNAL_LABELS, SIZE_SOURCE_LABELS, SIZE_STATUS_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
 import { cn } from "@/lib/utils";
 
@@ -140,6 +141,9 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                   </div>
                 )}
                 <ScoreBreakdown account={a} />
+                <PitchPlan fit={data.fit} products={meta?.products} canEdit={canEditAccount} busy={busy === "owned"}
+                  onSaveOwned={(owned) => act("owned", () => patchRadarAccount(a.id, { products_owned: owned }), "Products saved")} />
+                <QualityCard accountId={a.id} quality={data.quality} canConfirm={canEditAccount} onChanged={load} />
                 {!canEditAccount && (canClaim || (can("editRadar") && a.owner)) && (
                   <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line/10 bg-card p-3 text-xs text-muted-foreground" data-testid="account-owner-lock">
                     <span>{canClaim ? "Nobody owns this account yet. Claim it to work it and edit its details." : `Owned by ${a.owner_name || a.owner}. Only the owner or an admin can change this account.`}</span>
@@ -291,13 +295,14 @@ function SizeDetail({ a }) {
 
 function AccountDetails({ account, onSave, busy }) {
   const manualSize = account.employees_source?.match === "manual";
-  const [v, setV] = useState({ domains: (account.domains || []).join(", "), country: account.hq?.country || "", state: account.hq?.state || "", zip: account.hq?.zip || "", revenue_band: account.revenue_band || "", is_customer: !!account.is_customer, manual_exclusion: account.manual_exclusion || "", employees: manualSize ? String(account.employees || "") : "" });
+  const [v, setV] = useState({ domains: (account.domains || []).join(", "), country: account.hq?.country || "", state: account.hq?.state || "", zip: account.hq?.zip || "", revenue_band: account.revenue_band || "", industry: account.industry || "", is_customer: !!account.is_customer, manual_exclusion: account.manual_exclusion || "", employees: manualSize ? String(account.employees || "") : "" });
   return (
     <details className="rounded-xl border border-line/10 bg-card p-3 text-sm">
       <summary className="cursor-pointer text-xs uppercase tracking-[0.12em] text-muted-foreground">Account details, HQ and exclusions</summary>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <Input className={inputCls} placeholder="Web domains, comma separated" value={v.domains} onChange={(e) => setV({ ...v, domains: e.target.value })} />
         <Input className={inputCls} placeholder="Revenue band (e.g. $1B+)" value={v.revenue_band} onChange={(e) => setV({ ...v, revenue_band: e.target.value })} />
+        <Input className={cn(inputCls, "sm:col-span-2")} placeholder="Industry (e.g. Commercial banking)" value={v.industry} onChange={(e) => setV({ ...v, industry: e.target.value })} />
         <label className="text-xs text-muted-foreground sm:col-span-2">Employees, if you know them (overrides every lookup; clear it to hand the size back to the lookups)
           <Input className={cn(inputCls, "mt-1")} type="number" min="0" placeholder={account.employees ? `Lookups say ${Number(account.employees).toLocaleString()}` : "e.g. 8500"} value={v.employees} onChange={(e) => setV({ ...v, employees: e.target.value })} />
         </label>
@@ -306,7 +311,7 @@ function AccountDetails({ account, onSave, busy }) {
         <Input className={cn(inputCls, "sm:col-span-2")} placeholder="Exclude from outreach because… (leave empty to allow)" value={v.manual_exclusion} onChange={(e) => setV({ ...v, manual_exclusion: e.target.value })} />
         <label className="flex items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={v.is_customer} onChange={(e) => setV({ ...v, is_customer: e.target.checked })} /> Existing customer (blocks automated outreach)</label>
       </div>
-      <div className="mt-3 flex justify-end"><Button size="sm" disabled={busy} onClick={() => onSave({ domains: v.domains.split(",").map((d) => d.trim()).filter(Boolean), hq: { country: v.country, state: v.state, zip: v.zip }, revenue_band: v.revenue_band || null, is_customer: v.is_customer, manual_exclusion: v.manual_exclusion, ...(v.employees.trim() ? { employees: Math.round(Number(v.employees)) } : manualSize ? { employees: 0 } : {}) })}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Save details</Button></div>
+      <div className="mt-3 flex justify-end"><Button size="sm" disabled={busy} onClick={() => onSave({ domains: v.domains.split(",").map((d) => d.trim()).filter(Boolean), hq: { country: v.country, state: v.state, zip: v.zip }, revenue_band: v.revenue_band || null, industry: v.industry.trim() || null, is_customer: v.is_customer, manual_exclusion: v.manual_exclusion, ...(v.employees.trim() ? { employees: Math.round(Number(v.employees)) } : manualSize ? { employees: 0 } : {}) })}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Save details</Button></div>
     </details>
   );
 }
@@ -454,6 +459,7 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
                     {c.email && !["valid", "invalid"].includes(c.email_status) && <Button size="sm" variant="ghost" className="h-7 text-xs" title="You've confirmed this address another way (e.g. Seamless or a reply)" disabled={busy === `m${c.id}`} onClick={() => act(`m${c.id}`, () => patchContact(c.id, { mark_verified: true }), "Marked verified")}><Check /> Mark verified</Button>}
                     {c.email && <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setPromote({ email: c.email, name: c.name, job_title: c.title })}><UserPlus /> To lead</Button>}
                     {!e && c.email && <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => checkGate(c)}><ShieldAlert /> Check gate</Button>}
+                    <FirstTouchButton contact={c} />
                   </div>
                 )}
               </div>
