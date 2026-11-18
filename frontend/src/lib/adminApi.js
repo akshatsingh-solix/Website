@@ -310,3 +310,7 @@ export const runIntelligenceReview = () => adminApi.post("/admin/intelligence/re
 export const saveIntelligenceSettings = (body) => adminApi.put("/admin/intelligence/settings", body).then((r) => r.data);
 export const applyIntelligence = () => adminApi.post("/admin/intelligence/apply").then((r) => r.data);
 export const revertTuning = (id) => adminApi.post(`/admin/intelligence/tuning/${id}/revert`).then((r) => r.data);
+
+// Phone numbers: a contact's direct line or mobile, and the account's published numbers.
+export const findContactPhone = (id) => adminApi.post(`/admin/outbound/contacts/${id}/find-phone`, null, { timeout: 120000 }).then((r) => r.data);
+export const findAccountPhones = (id) => adminApi.post(`/admin/radar/accounts/${id}/phones`, null, { timeout: 120000 }).then((r) => r.data);
