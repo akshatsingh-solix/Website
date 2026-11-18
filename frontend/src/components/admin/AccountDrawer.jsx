@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Download, ExternalLink, FlaskConical, Loader2, MailCheck, Plus, Search, Send, ShieldAlert, Trash2, UserPlus } from "lucide-react";
+import { Check, Download, ExternalLink, FlaskConical, Loader2, MailCheck, Phone, Plus, Search, Send, ShieldAlert, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  addRadarSignal, createContact, deleteRadarSignal, enrichRadarAccount, enrollContacts, fetchGate, fetchRadarAccount, fetchSequences, findContactEmail, findRadarPeople, formatApiError,
+  addRadarSignal, createContact, deleteRadarSignal, findAccountPhones, findContactPhone, enrichRadarAccount, enrollContacts, fetchGate, fetchRadarAccount, fetchSequences, findContactEmail, findRadarPeople, formatApiError,
   patchContact, patchRadarAccount, promoteToLead, requestResearch, reviewResearch, verifyContact,
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
@@ -440,6 +440,7 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
   return (
     <>
       {can("editLeads") && <PeopleFinder account={account} act={act} busy={busy} />}
+      <CompanyPhones account={account} act={act} busy={busy} />
       {contacts.length === 0 && <p className="text-sm text-muted-foreground">No contacts yet. Find people, add the ones from the deep dive, or anyone you know at {account.name}.</p>}
       <ul className="divide-y divide-line/5 rounded-xl border border-line/10 bg-card">
         {contacts.map((c) => {
@@ -451,6 +452,9 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
                 <div className="min-w-0">
                   <p className="font-medium">{c.name} {c.persona === "target" && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">target persona</span>}</p>
                   <p className="text-xs text-muted-foreground">{c.title || "No title"} · {c.email || "no email"} <span className={EMAIL_TONE[c.email_status]}>({(c.email_status || "").replace("_", " ")})</span>{c.suppressed && <span className="text-red-300"> · suppressed ({c.suppressed})</span>}</p>
+                  {c.phone && <p className="text-xs"><a href={`tel:${c.phone}`} className="font-mono text-teal hover:underline">{c.phone}</a> <span className="text-muted-foreground">({c.phone_type === "mobile" ? "their mobile" : c.phone_type === "direct" ? "their direct line" : c.phone_type || "phone"}{c.phone_source ? `, ${PHONE_SOURCE[c.phone_source] || c.phone_source}` : ""})</span>{c.phone_dnc && <span className="ml-1 text-red-300">on a Do Not Call list: don't cold-call</span>}</p>}
+                  {!c.phone && c.phone_pending && <p className="text-[11px] text-sky-200">Mobile requested from Apollo; it appears here within a few minutes.</p>}
+                  {c.job_change_at && <p className="text-[11px] text-amber-200">Job change detected {fmtDate(c.job_change_at)}: confirm they're still in this role.</p>}
                   {c.lead_id && <Link to={`/admin/leads?lead=${c.lead_id}`} className="mt-1 inline-block text-xs text-teal hover:underline">Also a website lead: open it</Link>}
                   {e && <p className="mt-1 text-xs text-teal">In "{e.sequence_name}" · {e.status.replace("_", " ")} · {e.step_index} of {e.steps_total ?? e.steps?.length ?? "?"} sent</p>}
                 </div>
@@ -459,6 +463,7 @@ function Contacts({ account, contacts, enrollments, sequences, can, busy, act })
                     {c.email ? <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `v${c.id}`} onClick={() => act(`v${c.id}`, () => verifyContact(c.id), (r) => `Email ${String(r.email_status).replace("_", " ")}`)}><MailCheck /> Verify</Button>
                       : <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `f${c.id}`} onClick={() => act(`f${c.id}`, () => findContactEmail(c.id), (r) => (r.found ? `Found ${r.found}` : "No verified address found"))}><Search /> Find email</Button>}
                     {c.email && !["valid", "invalid"].includes(c.email_status) && <Button size="sm" variant="ghost" className="h-7 text-xs" title="You've confirmed this address another way (e.g. Seamless or a reply)" disabled={busy === `m${c.id}`} onClick={() => act(`m${c.id}`, () => patchContact(c.id, { mark_verified: true }), "Marked verified")}><Check /> Mark verified</Button>}
+                    {!c.phone && <Button size="sm" variant="ghost" className="h-7 text-xs" title="Their own number only: a direct line the company lists next to their name (free), else a verified mobile from Prospeo, Tomba or Apollo. Never the switchboard." disabled={busy === `ph${c.id}`} onClick={() => act(`ph${c.id}`, () => findContactPhone(c.id), (r) => (r.found ? `Found their ${r.type}: ${r.found}${r.notes?.length ? ` (${r.notes.join(", ")})` : ""}` : r.detail))}><Phone /> Find phone</Button>}
                     {c.email && <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setPromote({ email: c.email, name: c.name, job_title: c.title })}><UserPlus /> To lead</Button>}
                     {!e && c.email && <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => checkGate(c)}><ShieldAlert /> Check gate</Button>}
                     <FirstTouchButton contact={c} />
@@ -528,7 +533,36 @@ function ScoreBreakdown({ account: a }) {
 
 // Live people search: leadership pages, public LinkedIn profiles found through search engines, and every contact-data
 // source set up (Hunter, Tomba, Snov.io, People Data Labs, Apollo, Companies House), each with its source. Nothing is saved until "Add".
-const VIA_LABELS = { hunter: "Hunter", linkedin_xray: "LinkedIn", tomba: "Tomba", snov: "Snov.io", pdl: "People Data Labs", apollo: "Apollo", companies_house: "Companies House", web: "Web" };
+const VIA_LABELS = { hunter: "Hunter", linkedin_xray: "LinkedIn", tomba: "Tomba", snov: "Snov.io", pdl: "People Data Labs", apollo: "Apollo", companies_house: "Companies House", web: "Web",
+  sec_officers: "SEC filings", prospeo: "Prospeo" };
+const PHONE_SOURCE = { site_phones: "listed by the company", prospeo_mobile: "Prospeo (verified)", apollo_mobile: "Apollo", tomba_phone: "Tomba", sec_phone: "SEC filing", wikidata_phone: "Wikidata", site_switchboard: "company website" };
+const PHONE_LABEL = { switchboard: "Switchboard", direct: "Direct line", media: "Media", investors: "Investor relations", sales: "Sales", support: "Support" };
+
+function CompanyPhones({ account, act, busy }) {
+  const [phones, setPhones] = useState(account.phones || null);
+  const look = async () => {
+    const r = await act("phones", () => findAccountPhones(account.id), (x) => `${x.phones.length} published number${x.phones.length === 1 ? "" : "s"}${x.contacts_updated ? `, ${x.contacts_updated} direct line(s) added to contacts` : ""}`);
+    if (r) setPhones(r.phones);
+  };
+  return (
+    <div className="rounded-xl border border-line/10 bg-card p-3 text-sm" data-testid="company-phones">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p><span className="font-medium">Company phone numbers</span> <span className="text-xs text-muted-foreground">Published on {account.domains?.[0] || "their site"}: switchboard, media, investor and direct lines. Free.</span></p>
+        <Button size="sm" variant="outline" disabled={busy === "phones" || !account.domains?.length} onClick={look}>{busy === "phones" ? <Loader2 className="animate-spin" /> : <Phone />} {phones ? "Look again" : "Find numbers"}</Button>
+      </div>
+      {phones && (phones.length ? (
+        <ul className="mt-2 grid gap-1 sm:grid-cols-2">
+          {phones.map((p) => (
+            <li key={p.e164} className="flex items-center justify-between gap-2 rounded-lg border border-line/10 px-2.5 py-1.5 text-xs">
+              <span className="truncate">{p.person ? `${p.person} (direct)` : PHONE_LABEL[p.label] || p.label}</span>
+              <a href={`tel:${p.e164}`} className="shrink-0 font-mono text-teal hover:underline">{p.number}</a>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="mt-2 text-xs text-muted-foreground">No numbers published on their contact, investor or press pages.</p>)}
+    </div>
+  );
+}
 function PeopleFinder({ account, act, busy }) {
   const [found, setFound] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -568,7 +602,7 @@ function PeopleFinder({ account, act, busy }) {
               {found.people.map((p) => (
                 <li key={p.name} className="flex flex-wrap items-start justify-between gap-2 py-2 text-sm">
                   <div className="min-w-0">
-                    <p className="font-medium">{p.name} {p.relevant && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">relevant</span>}{p.current && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-emerald-300" title="A source shows they work there now">works there now</span>}</p>
+                    <p className="font-medium">{p.name} {p.fills === "missing" && <span className="ml-1 rounded-full border border-amber-400/40 px-1.5 text-[10px] text-amber-200" title="Fills a buying-committee role you have nobody for">fills a gap: {p.persona_label}</span>}{p.fills === "committee" && <span className="ml-1 text-[10px] text-sky-200">{p.persona_label}</span>}{p.relevant && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-teal">relevant</span>}{p.current && <span className="ml-1 text-[10px] uppercase tracking-[0.12em] text-emerald-300" title="A source shows they work there now">works there now</span>}</p>
                     <p className="text-xs text-muted-foreground">{p.title || "Title not given"}{p.email ? ` · ${p.email}${p.email_confidence ? ` (${p.email_confidence}%)` : ""}` : ""}</p>
                     {p.source_url && <a href={p.source_url} target="_blank" rel="noopener noreferrer" className="text-[11px] text-teal hover:underline">Source: {p.source_title || p.source_url}</a>}
                     {(p.also_via || []).length > 0 && <span className="ml-2 text-[11px] text-muted-foreground">also found by {p.also_via.map((v) => VIA_LABELS[v] || v).join(", ")}</span>}
