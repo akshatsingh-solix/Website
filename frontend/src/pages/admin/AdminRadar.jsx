@@ -12,14 +12,14 @@ import { AccountStatus, BASIS_LABELS, DiveBadge, FreshTag, NextStep, RepRule, SE
 import { RadarScope } from "@/components/admin/RadarScope";
 import { AccountDrawer } from "@/components/admin/AccountDrawer";
 import { RadarSetup } from "@/components/admin/RadarSetup";
-import { AccuracyPanel } from "@/components/admin/RadarIntel";
+import { AccuracyPanel, StageChip } from "@/components/admin/RadarIntel";
 
 const PAGE = 40;
-const FILTERS = ["q", "competitor", "strength", "segment", "country", "state", "territory", "owner", "status", "line", "ready_only", "industry", "verified_only"];
+const FILTERS = ["q", "competitor", "strength", "segment", "country", "state", "territory", "owner", "status", "line", "ready_only", "industry", "verified_only", "stage"];
 const TABS = [
   ["all", "All accounts"], ["new", "New for you"], ["todo", "To do"], ["territory", "By territory"], ["reps", "Reps"], ["ready", "Ready"], ["dives", "Deep dives"], ["review", "Review"],
   ["jobs", "Competitor jobs"], ["problems", "Problem signals"], ["dns", "DNS"], ["news", "Filings & news"], ["tenders", "Tenders"], ["website", "Website intent"], ["intent", "Researching"],
-  ["surge", "Surging"], ["excluded", "Excluded"], ["accuracy", "Data accuracy"], ["setup", "Setup"],
+  ["surge", "Surging"], ["lookalikes", "Lookalikes"], ["excluded", "Excluded"], ["accuracy", "Data accuracy"], ["setup", "Setup"],
 ];
 const TAB_HINT = {
   all: "Strongest first. Open an account to see every signal, the deep dive, contacts and history.",
@@ -30,6 +30,7 @@ const TAB_HINT = {
   jobs: "Postings that name a competitor product. Hiring someone to run the tool means it's installed, and often painful.",
   problems: "Postings about archiving, retention or retirement work with no competitor named.",
   surge: "Three or more new signals in the last seven days.",
+  lookalikes: "Accounts that look like the ones that already replied positively or reached a meeting: same industry, size, competitors and signals. Rescored every Monday.",
   excluded: "Existing customers, accounts in a live deal, or excluded by hand. They stay visible but never get automated outreach.",
   website: "Accounts whose people are on the website: leads matched by email domain, and organisations identified from consenting visitors' networks (with any competitor they read about).",
   intent: "Companies researching a competitor or the problem, from intent data you import (G2 Buyer Intent, Bombora, TrustRadius, 6sense…) in Setup.",
@@ -69,7 +70,7 @@ export default function AdminRadar() {
       const listTab = ["territory", "reps", "setup", "review", "accuracy"].includes(tab) ? "all" : tab;
       const [s, list] = await Promise.all([
         fetchRadarSummary(filters, { fresh: silent }),
-        fetchRadarAccounts({ ...filters, tab: listTab, page_size: 500, sort: tab === "dives" ? "dives" : "strength" }, { fresh: silent }),
+        fetchRadarAccounts({ ...filters, tab: listTab, page_size: 500, sort: tab === "dives" ? "dives" : tab === "lookalikes" ? "lookalike" : "strength" }, { fresh: silent }),
       ]);
       setSummary(s);
       setData(list);
@@ -254,6 +255,7 @@ export default function AdminRadar() {
         {sel("state", "All states", meta?.states?.map((s) => <option key={s} value={s}>{s}</option>))}
         {sel("territory", "All territories", meta?.territories?.map((t) => <option key={t} value={t}>{t}</option>))}
         {sel("status", "All statuses", Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>))}
+        {sel("stage", "All buying stages", meta?.stages?.map((s) => <option key={s.key} value={s.key}>{s.label}</option>))}
         {sel("industry", "All industries", meta?.industries?.map((i) => <option key={i.key} value={i.key}>{i.label}</option>))}
         <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-line/15 px-3 text-xs text-muted-foreground" title="Only accounts whose industry, HQ country, website and size are all verified">
           <input type="checkbox" className="h-3.5 w-3.5 accent-[#0088cf]" checked={filters.verified_only === "true"} onChange={(e) => setParam({ verified_only: e.target.checked ? "true" : "" })} /> Verified data only
@@ -323,7 +325,7 @@ export default function AdminRadar() {
                         <li key={a.id}>
                           <button type="button" onClick={() => openAccount(a.id)} className={cn("grid w-full gap-2 rounded-2xl border bg-card p-4 text-left transition-colors hover:border-line/30 sm:grid-cols-[1fr_auto]", a.fresh !== "seen" ? "border-sky-400/25" : "border-line/10")}>
                             <div className="min-w-0">
-                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} status={a.size_status} flags={a.size_flags} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}<NextStep action={a.next_action} /></p>
+                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} status={a.size_status} flags={a.size_flags} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}<NextStep action={a.next_action} /><StageChip journey={a.journey} />{tab === "lookalikes" && a.lookalike && <span className="text-[11px] text-violet-200">{a.lookalike.score}% lookalike</span>}</p>
                               <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                                 {(a.signal_types || []).map((t) => <span key={t}>{SIGNAL_LABELS[t] || t}</span>)}
                                 {(a.competitors || []).length > 0 && <span className="text-red-300/90">{a.competitors.join(", ")}</span>}

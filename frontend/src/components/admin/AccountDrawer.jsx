@@ -14,7 +14,7 @@ import {
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { CHANNEL_LABELS, StageBadge, canAccess, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
 import { useAdmin } from "@/components/admin/AdminAuth";
-import { FirstTouchButton, PitchPlan, QualityCard } from "@/components/admin/RadarIntel";
+import { CommitteeCard, FirstTouchButton, JourneyCard, PitchPlan, QualityCard } from "@/components/admin/RadarIntel";
 import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SEGMENT_LABELS, SegmentBadge, SIGNAL_LABELS, SIZE_SOURCE_LABELS, SIZE_STATUS_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
 import { cn } from "@/lib/utils";
 
@@ -141,6 +141,8 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                   </div>
                 )}
                 <ScoreBreakdown account={a} />
+                <JourneyCard account={a} />
+                <CommitteeCard committee={a.committee} />
                 <PitchPlan fit={data.fit} products={meta?.products} canEdit={canEditAccount} busy={busy === "owned"}
                   onSaveOwned={(owned) => act("owned", () => patchRadarAccount(a.id, { products_owned: owned }), "Products saved")} />
                 <QualityCard accountId={a.id} quality={data.quality} canConfirm={canEditAccount} onChanged={load} />
