@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchRadarConfig, fetchTerritories, formatApiError, importRadar, importRadarIntent, previewRouting, runRadar, saveRadarConfig, saveTerritories } from "@/lib/adminApi";
+import { fetchRadarConfig, fetchTerritories, formatApiError, importRadar, importRadarIntent, previewRouting, recheckRadarSizes, runRadar, saveRadarConfig, saveTerritories } from "@/lib/adminApi";
 import { Panel, inputCls } from "@/components/admin/kit";
 import { RadarDataSources } from "@/components/admin/RadarDataSources";
 
@@ -146,6 +146,8 @@ export function RadarSetup({ meta, onChanged }) {
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["collect", "enrich", "score", "research"])}><Play /> Collect, size, score, research</Button>
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["enrich", "score"])}>Size and locate accounts</Button>
+          <Button variant="outline" size="sm" disabled={busy === "run"} title="Look up again every account whose size is doubtful or unverified (sizes a person entered are kept)"
+            onClick={() => recheckRadarSizes().then((r) => toast.success(`Re-checking ${r.queued} account size(s) in the background.`)).catch((e) => toast.error(formatApiError(e)))}>Re-check doubtful sizes</Button>
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["score"])}>Rescore only</Button>
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["research"])}>Deep dives only</Button>
           <Button variant="outline" size="sm" disabled={busy === "run"} onClick={() => run(["digest"])}>Send digests</Button>

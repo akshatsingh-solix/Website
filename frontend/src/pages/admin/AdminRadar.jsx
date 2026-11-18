@@ -248,7 +248,7 @@ export default function AdminRadar() {
         </div>
         {sel("competitor", "All competitors", meta?.competitors?.map((c) => <option key={c.key} value={c.key}>{c.product}</option>))}
         {sel("strength", "All strengths", STRENGTHS.map((s) => <option key={s} value={s}>{s}</option>))}
-        {sel("segment", "All sizes", [["target", "Mid-market and enterprise"], ...Object.entries(SEGMENT_LABELS), ["unknown", "Size unknown"]].map(([k, v]) => <option key={k} value={k}>{v}{summary?.by_segment?.[k] != null ? ` (${summary.by_segment[k]})` : ""}</option>))}
+        {sel("segment", "All sizes", [["target", "Mid-market and enterprise"], ...Object.entries(SEGMENT_LABELS), ["unknown", "Size unknown or unverified"]].map(([k, v]) => <option key={k} value={k}>{v}{summary?.by_segment?.[k] != null ? ` (${summary.by_segment[k]})` : ""}</option>))}
         {sel("country", "All countries", meta?.countries?.map((c) => <option key={c} value={c}>{c}</option>))}
         {sel("state", "All states", meta?.states?.map((s) => <option key={s} value={s}>{s}</option>))}
         {sel("territory", "All territories", meta?.territories?.map((t) => <option key={t} value={t}>{t}</option>))}
@@ -317,7 +317,7 @@ export default function AdminRadar() {
                         <li key={a.id}>
                           <button type="button" onClick={() => openAccount(a.id)} className={cn("grid w-full gap-2 rounded-2xl border bg-card p-4 text-left transition-colors hover:border-line/30 sm:grid-cols-[1fr_auto]", a.fresh !== "seen" ? "border-sky-400/25" : "border-line/10")}>
                             <div className="min-w-0">
-                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}<NextStep action={a.next_action} /></p>
+                              <p className="flex flex-wrap items-center gap-2"><span className="font-medium text-foreground">{a.name}</span><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} status={a.size_status} flags={a.size_flags} /><FreshTag fresh={a.fresh} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}<NextStep action={a.next_action} /></p>
                               <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                                 {(a.signal_types || []).map((t) => <span key={t}>{SIGNAL_LABELS[t] || t}</span>)}
                                 {(a.competitors || []).length > 0 && <span className="text-red-300/90">{a.competitors.join(", ")}</span>}

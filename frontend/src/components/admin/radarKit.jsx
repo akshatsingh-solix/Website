@@ -34,8 +34,19 @@ export const SIGNAL_LABELS = {
 // Company size from headcount (or revenue): both mid-market and enterprise are targets.
 export const SEGMENT_LABELS = { enterprise: "Enterprise", mid_market: "Mid-market", smb: "Small business" };
 const SEGMENT_TONE = { enterprise: "border-teal/40 bg-teal/10 text-teal", mid_market: "border-sky-400/40 bg-sky-400/10 text-sky-200", smb: "border-line/15 bg-line/5 text-muted-foreground" };
-export const SegmentBadge = ({ segment, employees }) =>
-  segment ? <Badge className={SEGMENT_TONE[segment]} title={employees ? `${Number(employees).toLocaleString()} employees` : undefined}>{SEGMENT_LABELS[segment] || segment}</Badge> : null;
+// How much to trust a size: a person entered it, sources agree, one source by the company's own website, or doubtful.
+export const SIZE_STATUS_LABELS = { verified: "entered by a person", confirmed: "sources agree", estimated: "one source", unverified: "unverified", doubtful: "doubtful" };
+export const SIZE_SOURCE_LABELS = {
+  manual: "entered by a person", wikidata: "Wikidata", pdl_company: "People Data Labs", hunter_company: "Hunter", sec: "SEC EDGAR", theirstack: "TheirStack",
+  crustdata: "Crustdata", intent: "intent data", unknown: "an earlier lookup (source not recorded)",
+};
+export const SegmentBadge = ({ segment, employees, status, flags }) => {
+  if (status === "doubtful" || (status === "unverified" && !segment)) {
+    const why = (flags || []).join("; ") || (employees ? `${Number(employees).toLocaleString()} employees from a single unconfirmed source` : "");
+    return <Badge className="border-amber-400/40 bg-amber-400/10 text-amber-200" title={why}>{segment ? `${SEGMENT_LABELS[segment]}?` : "Size unverified"}</Badge>;
+  }
+  return segment ? <Badge className={SEGMENT_TONE[segment]} title={[employees && `${Number(employees).toLocaleString()} employees`, SIZE_STATUS_LABELS[status]].filter(Boolean).join(" · ") || undefined}>{SEGMENT_LABELS[segment] || segment}</Badge> : null;
+};
 export const BASIS_LABELS = { named: "named account", state: "US state", country: "country", needs_routing: "needs routing", manual: "set by hand" };
 
 export const StrengthBadge = ({ strength = "Unrated" }) => <Badge className={STRENGTH_TONE[strength] || STRENGTH_TONE.Unrated}>{strength}</Badge>;

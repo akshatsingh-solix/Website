@@ -13,7 +13,7 @@ import {
 } from "@/lib/adminApi";
 import { buildBrief, saveBrief } from "@/lib/radarBrief";
 import { CHANNEL_LABELS, StageBadge, fmtDate, fmtDateTime, inputCls, selectCls, useCan } from "@/components/admin/kit";
-import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SEGMENT_LABELS, SegmentBadge, SIGNAL_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
+import { AccountStatus, BASIS_LABELS, DiveBadge, Highlight, RepRule, SCORE_PART_LABELS, SEGMENT_LABELS, SegmentBadge, SIGNAL_LABELS, SIZE_SOURCE_LABELS, SIZE_STATUS_LABELS, STATUS_LABELS, StrengthBadge, useHighlighter } from "@/components/admin/radarKit";
 import { cn } from "@/lib/utils";
 
 const Row = ({ label, children }) => (children || children === 0 ? (
@@ -93,7 +93,7 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
         ) : (
           <>
             <SheetHeader className="text-left">
-              <div className="flex flex-wrap items-center gap-2"><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} /><AccountStatus status={a.status} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}</div>
+              <div className="flex flex-wrap items-center gap-2"><StrengthBadge strength={a.strength} /><SegmentBadge segment={a.segment} employees={a.employees} status={a.size_status} flags={a.size_flags} /><AccountStatus status={a.status} /><DiveBadge score={a.research_score} verdictClass={a.verdict_class} />{a.surge && <span className="text-[11px] text-red-300">Surging</span>}</div>
               <SheetTitle className="font-display text-2xl font-medium">{a.name}</SheetTitle>
               <SheetDescription>
                 {a.territory} · {a.owner_name || "Unassigned"}{a.route_basis ? ` (${BASIS_LABELS[a.route_basis] || a.route_basis})` : ""}{a.domains?.length ? ` · ${a.domains.join(", ")}` : ""}
@@ -162,7 +162,7 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
                   <Row label="Product fit">{a.primary_product && `${a.primary_product.replace(/-/g, " ")} (${a.primary_line})`}</Row>
                   <Row label="Countries">{(a.countries || []).join(", ")}</Row>
                   <Row label="States">{(a.states || []).join(", ")}</Row>
-                  <Row label="Size">{(a.segment || a.employees) && [SEGMENT_LABELS[a.segment], a.employees && `${Number(a.employees).toLocaleString()} employees`, a.revenue_band].filter(Boolean).join(" · ")}</Row>
+                  <Row label="Size">{(a.segment || a.employees || a.size_status) && <SizeDetail a={a} />}</Row>
                   <Row label="HQ">{[a.hq?.location || a.hq?.city, a.hq?.state, a.hq?.country].filter(Boolean).join(", ")}</Row>
                   <Row label="Industry">{a.industry}</Row>
                   <Row label="Existing customer">{a.is_customer ? "Yes" : null}</Row>
@@ -259,20 +259,40 @@ export function AccountDrawer({ id, meta, onClose, onChanged }) {
   );
 }
 
+// Where the size came from and how far to trust it, so nobody plans on a number the system only guessed.
+function SizeDetail({ a }) {
+  const src = a.employees_source || {};
+  const how = src.match === "manual" ? "" : src.match === "domain" ? "matched by the company's website" : src.match === "name" ? "matched by name only" : "";
+  return (
+    <span>
+      {[a.segment ? SEGMENT_LABELS[a.segment] : "Size unverified", a.employees && `${Number(a.employees).toLocaleString()} employees`, a.revenue_band].filter(Boolean).join(" · ")}
+      {a.employees && src.via && <span className="block text-[11px] text-muted-foreground">{src.match === "manual"
+        ? `Entered by ${src.by || "a person"}${src.at ? ` on ${fmtDate(src.at)}` : ""}: no lookup replaces it`
+        : `From ${SIZE_SOURCE_LABELS[src.via] || src.via}${how ? `, ${how}` : ""}${a.size_status ? ` · ${SIZE_STATUS_LABELS[a.size_status] || a.size_status}` : ""}`}</span>}
+      {(a.size_flags || []).map((f) => <span key={f} className="block text-[11px] text-amber-200">{f}: not used for the segment until confirmed.</span>)}
+      {a.size_status === "unverified" && !(a.size_flags || []).length && <span className="block text-[11px] text-amber-200">Only one unconfirmed source: not used for the segment until confirmed.</span>}
+    </span>
+  );
+}
+
 function AccountDetails({ account, onSave, busy }) {
-  const [v, setV] = useState({ domains: (account.domains || []).join(", "), country: account.hq?.country || "", state: account.hq?.state || "", zip: account.hq?.zip || "", revenue_band: account.revenue_band || "", is_customer: !!account.is_customer, manual_exclusion: account.manual_exclusion || "" });
+  const manualSize = account.employees_source?.match === "manual";
+  const [v, setV] = useState({ domains: (account.domains || []).join(", "), country: account.hq?.country || "", state: account.hq?.state || "", zip: account.hq?.zip || "", revenue_band: account.revenue_band || "", is_customer: !!account.is_customer, manual_exclusion: account.manual_exclusion || "", employees: manualSize ? String(account.employees || "") : "" });
   return (
     <details className="rounded-xl border border-line/10 bg-card p-3 text-sm">
       <summary className="cursor-pointer text-xs uppercase tracking-[0.12em] text-muted-foreground">Account details, HQ and exclusions</summary>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <Input className={inputCls} placeholder="Web domains, comma separated" value={v.domains} onChange={(e) => setV({ ...v, domains: e.target.value })} />
         <Input className={inputCls} placeholder="Revenue band (e.g. $1B+)" value={v.revenue_band} onChange={(e) => setV({ ...v, revenue_band: e.target.value })} />
+        <label className="text-xs text-muted-foreground sm:col-span-2">Employees, if you know them (overrides every lookup; clear it to hand the size back to the lookups)
+          <Input className={cn(inputCls, "mt-1")} type="number" min="0" placeholder={account.employees ? `Lookups say ${Number(account.employees).toLocaleString()}` : "e.g. 8500"} value={v.employees} onChange={(e) => setV({ ...v, employees: e.target.value })} />
+        </label>
         <Input className={inputCls} placeholder="HQ country" value={v.country} onChange={(e) => setV({ ...v, country: e.target.value })} />
         <div className="flex gap-2"><Input className={inputCls} placeholder="HQ state" value={v.state} onChange={(e) => setV({ ...v, state: e.target.value })} /><Input className={inputCls} placeholder="ZIP" value={v.zip} onChange={(e) => setV({ ...v, zip: e.target.value })} /></div>
         <Input className={cn(inputCls, "sm:col-span-2")} placeholder="Exclude from outreach because… (leave empty to allow)" value={v.manual_exclusion} onChange={(e) => setV({ ...v, manual_exclusion: e.target.value })} />
         <label className="flex items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={v.is_customer} onChange={(e) => setV({ ...v, is_customer: e.target.checked })} /> Existing customer (blocks automated outreach)</label>
       </div>
-      <div className="mt-3 flex justify-end"><Button size="sm" disabled={busy} onClick={() => onSave({ domains: v.domains.split(",").map((d) => d.trim()).filter(Boolean), hq: { country: v.country, state: v.state, zip: v.zip }, revenue_band: v.revenue_band || null, is_customer: v.is_customer, manual_exclusion: v.manual_exclusion })}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Save details</Button></div>
+      <div className="mt-3 flex justify-end"><Button size="sm" disabled={busy} onClick={() => onSave({ domains: v.domains.split(",").map((d) => d.trim()).filter(Boolean), hq: { country: v.country, state: v.state, zip: v.zip }, revenue_band: v.revenue_band || null, is_customer: v.is_customer, manual_exclusion: v.manual_exclusion, ...(v.employees.trim() ? { employees: Math.round(Number(v.employees)) } : manualSize ? { employees: 0 } : {}) })}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Save details</Button></div>
     </details>
   );
 }
