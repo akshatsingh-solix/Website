@@ -6,6 +6,7 @@ import { fetchHome, formatApiError } from "@/lib/adminApi";
 import { BarList, CHANNEL_LABELS, Panel, SERIES, STAGE_LABELS, StatTile, useLiveRefresh } from "@/components/admin/kit";
 import { useAdmin } from "@/components/admin/AdminAuth";
 import { Segmented } from "@/components/admin/motion";
+import { IntelligenceBrief } from "@/components/admin/RadarIntel";
 
 const ExecutiveDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const VIEWS = [
@@ -51,6 +52,7 @@ export default function AdminHome() {
     return (
       <>
         {switcher}
+        <div className="mb-8"><IntelligenceBrief isAdmin={isAdmin} compact /></div>
         <ExecutiveDashboard />
       </>
     );
@@ -165,6 +167,7 @@ function ManagerView({ d }) {
           <StatTile label="Sizes to confirm" value={cov.sizes_to_check} icon={AlertTriangle} />
         </Grid>
       )}
+      <IntelligenceBrief isAdmin={false} compact />
       {d.reps && (
         <Panel title="Team scorecard" sub="Last 30 days" testId="home-mgr-reps">
           <div className="overflow-x-auto">

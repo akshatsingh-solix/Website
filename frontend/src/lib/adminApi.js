@@ -299,3 +299,14 @@ export const fetchAccess = () => adminApi.get("/admin/access", { fresh: true }).
 export const saveAccess = (body) => adminApi.put("/admin/access", body).then((r) => r.data);
 export const saveUserAccess = (id, body) => adminApi.put(`/admin/access/users/${id}`, body).then((r) => r.data);
 export const fetchHome = (view) => adminApi.get("/admin/home", { params: view ? { view } : {}, fresh: true }).then((r) => r.data);
+
+// Data accuracy (Radar), product fit, persona first touch and the weekly intelligence review.
+export const confirmAccountFields = (id, fields, audit = false) => adminApi.post(`/admin/radar/accounts/${id}/confirm`, { fields, audit }).then((r) => r.data);
+export const fetchAccuracy = (days = 90) => adminApi.get("/admin/radar/accuracy", { params: { days }, fresh: true }).then((r) => r.data);
+export const fetchAccuracyAudit = (n = 15) => adminApi.get("/admin/radar/accuracy/audit", { params: { n }, fresh: true }).then((r) => r.data);
+export const fetchContactBrief = (id) => adminApi.get(`/admin/outbound/contacts/${id}/brief`, { fresh: true, timeout: 60000 }).then((r) => r.data);
+export const fetchIntelligence = () => adminApi.get("/admin/intelligence", { fresh: true }).then((r) => r.data);
+export const runIntelligenceReview = () => adminApi.post("/admin/intelligence/review", {}, { timeout: 120000 }).then((r) => r.data);
+export const saveIntelligenceSettings = (body) => adminApi.put("/admin/intelligence/settings", body).then((r) => r.data);
+export const applyIntelligence = () => adminApi.post("/admin/intelligence/apply").then((r) => r.data);
+export const revertTuning = (id) => adminApi.post(`/admin/intelligence/tuning/${id}/revert`).then((r) => r.data);
