@@ -12,6 +12,7 @@ const AdminLogin = lazy(() => import("@/pages/admin/AdminLogin"));
 const pages = {
   Layout: () => import("@/pages/admin/AdminLayout"),
   Dashboard: () => import("@/pages/admin/AdminDashboard"),
+  Home: () => import("@/pages/admin/AdminHome"),
   Leads: () => import("@/pages/admin/AdminLeads"),
   Submissions: () => import("@/pages/admin/AdminSubmissions"),
   Content: () => import("@/pages/admin/AdminContent"),
@@ -26,7 +27,7 @@ const pages = {
   Outbound: () => import("@/pages/admin/AdminOutbound"),
 };
 const AdminLayout = lazy(pages.Layout);
-const AdminDashboard = lazy(pages.Dashboard);
+const AdminHome = lazy(pages.Home);
 const AdminLeads = lazy(pages.Leads);
 const AdminSubmissions = lazy(pages.Submissions);
 const AdminContent = lazy(pages.Content);
@@ -58,7 +59,7 @@ export default function AdminApp() {
         <Routes>
           <Route path="login" element={<AdminLogin />} />
           <Route element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
-            <Route index element={<AdminDashboard />} />
+            <Route index element={<AdminHome />} />
             <Route path="leads" element={<AdminLeads />} />
             <Route path="radar" element={<AdminRadar />} />
             <Route path="outbound" element={<AdminOutbound />} />

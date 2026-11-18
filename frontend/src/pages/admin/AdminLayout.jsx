@@ -5,7 +5,7 @@ import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users
 import { cn } from "@/lib/utils";
 import { MarkHubLockup, useMarkHubChrome } from "@/components/admin/MarkHubBrand";
 import { useAdmin } from "@/components/admin/AdminAuth";
-import { ROLE_LABELS } from "@/components/admin/kit";
+import { ROLE_LABELS, canAccess } from "@/components/admin/kit";
 import { useAdminTheme } from "@/components/admin/theme";
 import { EASE, LiveDot } from "@/components/admin/motion";
 import { clearAdminCache } from "@/lib/adminApi";
@@ -13,20 +13,23 @@ import { SafePresence } from "@/components/motion/SafePresence";
 import { RouteErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@/components/ui/command";
 
-const links = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/leads", label: "Leads", icon: Users },
-  { to: "/admin/radar", label: "Radar", icon: Crosshair },
-  { to: "/admin/outbound", label: "Outbound", icon: Send },
-  { to: "/admin/conversations", label: "Sol chats", icon: MessagesSquare },
-  { to: "/admin/seo", label: "SEO", icon: Radar },
-  { to: "/admin/content", label: "Content", icon: FileText },
-  { to: "/admin/migrate", label: "Migrate", icon: Globe2 },
-  { to: "/admin/website", label: "Website", icon: MonitorCog },
-  { to: "/admin/events", label: "Events", icon: CalendarDays },
-  { to: "/admin/inbox", label: "Form inbox", icon: Inbox },
+// `feature` is the access area (Settings > Access) that decides whether the section shows. Settings always shows:
+// everyone changes their own password there.
+const ALL_LINKS = [
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true, feature: "dashboard" },
+  { to: "/admin/leads", label: "Leads", icon: Users, feature: "leads" },
+  { to: "/admin/radar", label: "Radar", icon: Crosshair, feature: "radar" },
+  { to: "/admin/outbound", label: "Outbound", icon: Send, feature: "outbound" },
+  { to: "/admin/conversations", label: "Sol chats", icon: MessagesSquare, feature: "sol" },
+  { to: "/admin/seo", label: "SEO", icon: Radar, feature: "seo" },
+  { to: "/admin/content", label: "Content", icon: FileText, feature: "content" },
+  { to: "/admin/migrate", label: "Migrate", icon: Globe2, feature: "migrate" },
+  { to: "/admin/website", label: "Website", icon: MonitorCog, feature: "website" },
+  { to: "/admin/events", label: "Events", icon: CalendarDays, feature: "events" },
+  { to: "/admin/inbox", label: "Form inbox", icon: Inbox, feature: "inbox" },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
+export const visibleLinks = (user) => ALL_LINKS.filter((l) => !l.feature || canAccess(user, l.feature));
 
 const initials = (user) => {
   const src = (user?.name || user?.email || "?").trim();
@@ -71,6 +74,8 @@ export default function AdminLayout() {
     fn();
   };
   const section = location.pathname.split("/").slice(0, 3).join("/");
+  const links = visibleLinks(user);
+  const blocked = ALL_LINKS.find((l) => l.feature && isActive(location.pathname, l) && !canAccess(user, l.feature));
 
   return (
     <div className="min-h-screen text-foreground" data-testid="admin-layout">
@@ -169,7 +174,15 @@ export default function AdminLayout() {
           >
             <RouteErrorBoundary>
               <Suspense fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
-                <Outlet />
+                {blocked ? (
+                  <div className="mx-auto max-w-md py-24 text-center" data-testid="admin-no-access">
+                    <p className="font-display text-lg">You don't have access to {blocked.label}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">An admin can give you access in Settings, under Access.</p>
+                    <Link to={links[0]?.to || "/admin/settings"} className="mt-4 inline-block text-sm text-primary-ink underline">Go to {links[0]?.label || "Settings"}</Link>
+                  </div>
+                ) : (
+                  <Outlet />
+                )}
               </Suspense>
             </RouteErrorBoundary>
           </motion.div>

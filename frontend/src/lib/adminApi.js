@@ -293,3 +293,9 @@ export const saveIntegrations = (body) => adminApi.put("/admin/ops/integrations"
 export const testIntegrations = () => adminApi.post("/admin/ops/integrations/test", null, { timeout: 60000 }).then((r) => r.data);
 export const retryOutbox = (id) => adminApi.post(`/admin/ops/outbox/${id}/retry`).then((r) => r.data);
 export const runOpsTick = () => adminApi.post("/admin/ops/tick", null, { timeout: 180000 }).then((r) => r.data);
+
+// Access control (Settings > Access) and the per-user home dashboard.
+export const fetchAccess = () => adminApi.get("/admin/access", { fresh: true }).then((r) => r.data);
+export const saveAccess = (body) => adminApi.put("/admin/access", body).then((r) => r.data);
+export const saveUserAccess = (id, body) => adminApi.put(`/admin/access/users/${id}`, body).then((r) => r.data);
+export const fetchHome = (view) => adminApi.get("/admin/home", { params: view ? { view } : {}, fresh: true }).then((r) => r.data);
