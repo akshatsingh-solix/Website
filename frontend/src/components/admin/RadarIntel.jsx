@@ -336,6 +336,7 @@ export function IntelligenceBrief({ isAdmin, compact = false }) {
       sub={latest ? `Weekly self-review · ${fmtDate(latest.at)} · learned from ${latest.learned?.outcomes ?? 0} outreach outcomes` : "Runs every Monday: learns from replies and data checks, tunes what's safe, and reports here."}
       action={isAdmin && <Button size="sm" variant="outline" disabled={busy === "run"} onClick={() => act("run", runIntelligenceReview, "Review finished")}>{busy === "run" ? <Loader2 className="animate-spin" /> : <RefreshCw />} Review now</Button>}
       testId="intelligence-brief">
+      {latest?.narrative?.text && <p className="mb-3 rounded-xl bg-line/[0.04] p-3 text-sm leading-relaxed" data-testid="intelligence-narrative">{latest.narrative.text}</p>}
       {!latest ? <p className="text-sm text-muted-foreground">No review yet.{isAdmin ? " Run one now to see what MarkHub finds." : ""}</p> : (
         <ul className="space-y-2">
           {(compact ? items.slice(0, 5) : items).map((i, n) => (
@@ -373,5 +374,62 @@ export function IntelligenceBrief({ isAdmin, compact = false }) {
         </div>
       )}
     </Panel>
+  );
+}
+
+const STAGE_ORDER = ["problem_aware", "exploring", "evaluating", "engaged", "buying"];
+const STAGE_SHORT = { problem_aware: "Problem aware", exploring: "Exploring", evaluating: "Evaluating", engaged: "In conversation", buying: "Buying" };
+
+export const StageChip = ({ journey, className }) => (journey ? (
+  <span className={cn("rounded-full border px-2 py-0.5 text-[10px]", journey.intent === "buying" ? "border-emerald-400/30 text-emerald-200" : "border-sky-400/30 text-sky-200", className)}>
+    {journey.label}
+  </span>
+) : null);
+
+/** Account drawer: where the account is on the way from "has the problem" to "buying", and the play that moves it on. */
+export function JourneyCard({ account }) {
+  const j = account?.journey;
+  if (!j) return null;
+  const at = STAGE_ORDER.indexOf(j.stage);
+  return (
+    <section className="rounded-2xl border border-line/10 bg-card p-4" data-testid="account-journey">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium">Buying stage: {j.label}</p>
+        <span className="text-[11px] text-muted-foreground">{j.since ? `since ${fmtDate(j.since)}` : ""}{account.lookalike?.score ? ` · looks ${account.lookalike.score}% like your best accounts` : ""}</span>
+      </div>
+      <ol className="mt-3 grid grid-cols-5 gap-1" aria-label="Buying stages">
+        {STAGE_ORDER.map((s, i) => (
+          <li key={s} className="min-w-0">
+            <span className={cn("block h-1.5 rounded-full", i <= at ? (i >= 2 ? "bg-emerald-400" : "bg-sky-400") : "bg-line/15")} />
+            <span className={cn("mt-1 block truncate text-[10px]", i === at ? "text-foreground" : "text-muted-foreground")}>{STAGE_SHORT[s]}</span>
+          </li>
+        ))}
+      </ol>
+      {j.evidence?.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Evidence: {j.evidence.join(" · ")}</p>}
+      <p className="mt-2 rounded-lg bg-line/[0.04] p-2 text-xs"><span className={j.intent === "buying" ? "text-emerald-200" : "text-sky-200"}>{j.intent === "buying" ? "Buying play" : "Exploration play"}:</span> {j.play}</p>
+      {account.lookalike?.why?.length > 0 && <p className="mt-2 text-[11px] text-muted-foreground">Shares with your best accounts: {account.lookalike.why.join(", ")}</p>}
+    </section>
+  );
+}
+
+/** Account drawer: the roles the lead product needs, who we have and who's engaged. */
+export function CommitteeCard({ committee }) {
+  if (!committee?.roles?.length) return null;
+  return (
+    <section className="rounded-2xl border border-line/10 bg-card p-4" data-testid="account-committee">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium">Buying committee {committee.coverage}% covered</p>
+        <span className="text-[11px] text-muted-foreground">{committee.engaged} engaged</span>
+      </div>
+      <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
+        {committee.roles.map((r) => (
+          <li key={r.persona} className={cn("flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5 text-xs", r.have ? "border-line/10" : "border-amber-400/30 bg-amber-400/5")}>
+            <span className="truncate">{r.label.split(" (")[0]}</span>
+            <span className={cn("shrink-0", r.engaged ? "text-emerald-300" : r.have ? "text-muted-foreground" : "text-amber-200")}>{r.engaged ? "engaged" : r.have ? `${r.have} contact${r.have > 1 ? "s" : ""}` : "missing"}</span>
+          </li>
+        ))}
+      </ul>
+      {committee.missing?.length > 0 && <p className="mt-2 text-[11px] text-muted-foreground">Next: find someone in {committee.missing[0].split(" (")[0]} (Contacts → Find people).</p>}
+    </section>
   );
 }

@@ -228,7 +228,7 @@ export function RadarSetup({ meta, onChanged }) {
 // Which live data sources are switched on, and what each one adds. Keys are set on the server (Render → Environment).
 const LIVE = [
   ["web_search", "Web research", "any web-search key (FIRECRAWL_API_KEY, TAVILY_API_KEY, SERPER_API_KEY, BRAVE_API_KEY…)", "Searches the web and reads leadership pages in full; deep dives cite them, Find people names leaders from them and the ATS X-ray finds new job boards. Up to ten search providers take over from each other. Repeat searches within a day cost nothing."],
-  ["ai_model", "AI model", "OPENAI_API_KEY (providers in LLM_PII_PROVIDERS)", "Writes the deep dive and pulls names and titles out of the pages. Free tiers never see prospect data. Without it, briefs are rules-based."],
+  ["ai_model", "AI model", "any model key (GEMINI_API_KEY, GROQ_API_KEY… free) or OPENAI_API_KEY", "Writes deep dives, persona openers and reads replies. On free tiers, names, emails, phone numbers and profile links are removed before anything is sent, and leadership pages never leave the server. Without a model, briefs are rules-based."],
   ["hunter", "Work emails", "HUNTER_API_KEY", "Decision makers with work emails and the company's email pattern; Find email asks Hunter first."],
   ["contacts", "More contact sources", "TOMBA_KEY, SNOV_CLIENT_ID, PDL_API_KEY, APOLLO_API_KEY or COMPANIES_HOUSE_API_KEY", "People who work at the account now, merged with Hunter and public LinkedIn profiles; finders take over when Hunter's searches run out."],
   ["crustdata", "Job index", "CRUSTDATA_API_KEY", "The Leads Radar's main job-posting source (paid credits). Without it, only the job boards you list are read."],
@@ -243,7 +243,9 @@ function LiveSources({ live }) {
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
         {LIVE.map(([k, label, env, what]) => (
           <li key={k} className="rounded-xl border border-line/10 p-3 text-xs">
-            <p className="flex items-center gap-2 text-sm font-medium"><span className={live[k] ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-line/30"} />{label}<span className="text-xs font-normal text-muted-foreground">{live[k] ? (k === "web_search" && live.chains?.web_search ? `on · ${live.chains.web_search} provider${live.chains.web_search === 1 ? "" : "s"}` : "on") : `off · set ${env}`}</span></p>
+            <p className="flex items-center gap-2 text-sm font-medium"><span className={live[k] ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-line/30"} />{label}<span className="text-xs font-normal text-muted-foreground">{live[k] ? (k === "web_search" && live.chains?.web_search ? `on · ${live.chains.web_search} provider${live.chains.web_search === 1 ? "" : "s"}`
+              : k === "ai_model" && live.ai_mode ? `on · ${live.ai_mode.mode === "redacted" ? "free, personal data removed" : "cleared for personal data"} · ${live.ai_mode.providers.join(", ")}` : "on")
+              : k === "ai_model" && live.ai_mode?.detail && live.ai_mode.detail !== "No model configured" ? `off · ${live.ai_mode.detail}` : `off · set ${env}`}</span></p>
             <p className="mt-1 text-muted-foreground">{what}</p>
           </li>
         ))}
