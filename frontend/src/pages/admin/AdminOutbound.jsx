@@ -6,8 +6,12 @@ import { fetchOutboundSettings, formatApiError } from "@/lib/adminApi";
 import { useCan } from "@/components/admin/kit";
 import { ApprovalsPanel, ContactsPanel, OverviewPanel, RepliesPanel, SequencesPanel } from "@/components/admin/OutboundPanels";
 import { CompliancePanel, HealthPanel } from "@/components/admin/OutboundOps";
+import { CountryPolicyPanel, DeliverabilityPanel, RetentionPanel, ReviewPanel } from "@/components/admin/OutboundControls";
 
-const TABS = [["overview", "Overview"], ["approvals", "Approvals"], ["contacts", "Contacts"], ["sequences", "Sequences"], ["replies", "Replies"], ["compliance", "Compliance"], ["health", "Health"]];
+// The tabs follow the spec's five stages: source (Contacts), compose & approve (Approvals), send (Sequences,
+// Deliverability), respond & hand off (Replies, Review), with Compliance and Health across all of them.
+const TABS = [["overview", "Overview"], ["approvals", "Approvals"], ["contacts", "Contacts"], ["sequences", "Sequences"], ["replies", "Replies"], ["review", "Review"],
+  ["deliverability", "Deliverability & channels"], ["compliance", "Compliance"], ["health", "Health"]];
 
 export default function AdminOutbound() {
   const can = useCan();
@@ -48,7 +52,17 @@ export default function AdminOutbound() {
         {tab === "contacts" && <ContactsPanel />}
         {tab === "sequences" && <SequencesPanel />}
         {tab === "replies" && <RepliesPanel />}
-        {tab === "compliance" && <CompliancePanel settings={settings} onSaved={setSettings} />}
+        {tab === "review" && <ReviewPanel />}
+        {tab === "deliverability" && <DeliverabilityPanel />}
+        {tab === "compliance" && (
+          <div className="space-y-6">
+            <CompliancePanel settings={settings} onSaved={setSettings} />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <CountryPolicyPanel />
+              <RetentionPanel settings={settings} onSaved={(r) => setSettings({ ...settings, ...r })} />
+            </div>
+          </div>
+        )}
         {tab === "health" && <HealthPanel />}
       </div>
     </div>

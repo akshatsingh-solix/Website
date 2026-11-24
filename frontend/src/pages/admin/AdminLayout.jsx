@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
-import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog, Radar, MessagesSquare, Crosshair, Send, Search, Moon, Sun, RefreshCw } from "lucide-react";
+import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog, Radar, MessagesSquare, Crosshair, Send, Search, Moon, Sun, RefreshCw, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MarkHubLockup, useMarkHubChrome } from "@/components/admin/MarkHubBrand";
 import { useAdmin } from "@/components/admin/AdminAuth";
@@ -27,6 +27,7 @@ const ALL_LINKS = [
   { to: "/admin/website", label: "Website", icon: MonitorCog, feature: "website" },
   { to: "/admin/events", label: "Events", icon: CalendarDays, feature: "events" },
   { to: "/admin/inbox", label: "Form inbox", icon: Inbox, feature: "inbox" },
+  { to: "/admin/tools", label: "AI tools", icon: Bot },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 export const visibleLinks = (user) => ALL_LINKS.filter((l) => !l.feature || canAccess(user, l.feature));
