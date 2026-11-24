@@ -275,6 +275,28 @@ export const runOutboundTick = () => adminApi.post("/admin/outbound/tick", null,
 export const runLearning = () => adminApi.post("/admin/outbound/learn", null, { timeout: 120000 }).then((r) => r.data);
 export const connectInstantly = () => adminApi.post("/admin/outbound/instantly/connect").then((r) => r.data);
 
+export const fetchReviewQueue = () => adminApi.get("/admin/outbound/review", { fresh: true }).then((r) => r.data);
+export const resolveReply = (id, label) => adminApi.post(`/admin/outbound/replies/${id}/resolve`, { label }, { timeout: 60000 }).then((r) => r.data);
+export const fetchDeliverability = () => adminApi.get("/admin/outbound/deliverability", { fresh: true }).then((r) => r.data);
+export const fetchLedger = (params) => adminApi.get("/admin/outbound/ledger", { params: clean(params), fresh: true }).then((r) => r.data);
+export const recordLedger = (body) => adminApi.post("/admin/outbound/ledger", body).then((r) => r.data);
+export const releaseLedger = (key) => adminApi.post(`/admin/outbound/ledger/${encodeURIComponent(key)}/release`).then((r) => r.data);
+export const enrichSeamless = (id) => adminApi.post(`/admin/outbound/contacts/${id}/enrich-seamless`, null, { timeout: 90000 }).then((r) => r.data);
+export const fetchCountryPolicies = () => adminApi.get("/admin/compliance/country-policies", { fresh: true }).then((r) => r.data);
+export const fetchRetention = () => adminApi.get("/admin/compliance/retention", { fresh: true }).then((r) => r.data);
+
+// --- Tools & MCP (tool registry, policy layer, MCP tokens) ---------------------------------
+export const fetchTools = () => adminApi.get("/admin/tools", { fresh: true }).then((r) => r.data);
+export const routeTools = (q, surface = "mcp") => adminApi.get("/admin/tools/route", { params: { q, surface }, fresh: true }).then((r) => r.data);
+export const dryRunTool = (tool, args) => adminApi.post("/admin/tools/dry-run", { tool, args }).then((r) => r.data);
+export const executeTool = (tool, args, confirm_token) => adminApi.post("/admin/tools/execute", { tool, args, confirm_token }, { timeout: 90000 }).then((r) => r.data);
+export const fetchToolAudit = (params) => adminApi.get("/admin/tools/audit", { params: clean(params), fresh: true }).then((r) => r.data);
+export const saveToolPolicy = (body) => adminApi.put("/admin/tools/policy", body).then((r) => r.data);
+export const fetchMcpTokens = () => adminApi.get("/admin/tools/mcp-tokens", { fresh: true }).then((r) => r.data);
+export const createMcpToken = (body) => adminApi.post("/admin/tools/mcp-tokens", body).then((r) => r.data);
+export const revokeMcpToken = (jti) => adminApi.delete(`/admin/tools/mcp-tokens/${jti}`);
+export const runRouterEval = () => adminApi.get("/admin/tools/router-eval", { fresh: true, timeout: 60000 }).then((r) => r.data);
+
 // --- Compliance and operations ---------------------------------------------------------
 export const fetchOutboundSettings = () => adminApi.get("/admin/compliance/settings", { fresh: true }).then((r) => r.data);
 export const saveOutboundSettings = (body) => adminApi.put("/admin/compliance/settings", body).then((r) => r.data);

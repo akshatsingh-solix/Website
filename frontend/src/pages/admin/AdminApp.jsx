@@ -25,6 +25,7 @@ const pages = {
   Conversations: () => import("@/pages/admin/AdminConversations"),
   Radar: () => import("@/pages/admin/AdminRadar"),
   Outbound: () => import("@/pages/admin/AdminOutbound"),
+  Tools: () => import("@/pages/admin/AdminTools"),
 };
 const AdminLayout = lazy(pages.Layout);
 const AdminHome = lazy(pages.Home);
@@ -40,6 +41,7 @@ const AdminSeo = lazy(pages.Seo);
 const AdminConversations = lazy(pages.Conversations);
 const AdminRadar = lazy(pages.Radar);
 const AdminOutbound = lazy(pages.Outbound);
+const AdminTools = lazy(pages.Tools);
 
 // Fetch the other admin pages while the browser is idle, one at a time, so
 // switching tabs later never waits on the network.
@@ -72,6 +74,7 @@ export default function AdminApp() {
             <Route path="website" element={<AdminWebsite />} />
             <Route path="seo" element={<AdminSeo />} />
             <Route path="conversations" element={<AdminConversations />} />
+            <Route path="tools" element={<AdminTools />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

@@ -8,13 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   createContact, createSequence, enrollContacts, fetchContacts, fetchEnrollments, fetchOutboundKpis, fetchReplies, fetchSequences, formatApiError, importContacts,
-  logReply, patchContact, patchEnrollment, updateSequence, verifyContact,
+  enrichSeamless, logReply, patchContact, patchEnrollment, updateSequence, verifyContact,
 } from "@/lib/adminApi";
 import { Panel, StatTile, ago, fmtDateTime, inputCls, selectCls, useCan, useLiveRefresh } from "@/components/admin/kit";
+import { GroundingNote } from "@/components/admin/OutboundControls";
 
 const REPLY_LABELS = { interested: "Interested", meeting: "Meeting", objection: "Objection", referral: "Referral", forward: "Forwarded", ooo: "Out of office", not_interested: "Not interested", unsubscribe: "Unsubscribe", neutral: "Neutral" };
 const REPLY_TONE = { interested: "text-emerald-300", meeting: "text-emerald-300", objection: "text-amber-300", referral: "text-sky-300", forward: "text-sky-300", ooo: "text-muted-foreground", not_interested: "text-red-300", unsubscribe: "text-red-300", neutral: "text-muted-foreground" };
-const ENR_STATUS = { pending_approval: "Waiting for approval", scheduled: "Scheduled", active: "Sending", paused: "Paused", replied: "Replied", completed: "Finished", stopped: "Stopped", bounced: "Bounced" };
+const ENR_STATUS = { pending_approval: "Waiting for approval", scheduled: "Scheduled", active: "Sending", paused: "Paused", replied: "Replied", completed: "Finished", stopped: "Stopped", bounced: "Bounced",
+  needs_review: "Reply needs a person" };
 const EMAIL_TONE = { valid: "text-emerald-300", mx_only: "text-amber-300", catch_all: "text-amber-300", risky: "text-amber-300", invalid: "text-red-300" };
 
 const errDetail = (e) => {
@@ -117,6 +119,7 @@ export function ApprovalsPanel() {
                     <p className="font-medium">{e.contact_name} <span className="text-muted-foreground">· {e.company_name}</span></p>
                     <p className="text-xs text-muted-foreground">{e.sequence_name} · variant {e.variant} · {ENR_STATUS[e.status] || e.status}{e.status !== "pending_approval" ? ` · step ${e.step_index}/${e.steps.length}` : ""} · opener by {e.opener_provider}</p>
                     <p className="mt-1 text-xs italic text-foreground/80">“{e.opener}”</p>
+                    <GroundingNote e={e} />
                   </button>
                   <div className="flex flex-wrap items-center gap-1">
                     {can("editLeads") && e.status === "pending_approval" && <Button size="sm" disabled={busy === e.id} onClick={() => act(e, { action: "approve" }, "Approved: it sends at the next window")}><Check /> Approve</Button>}
@@ -222,6 +225,7 @@ export function ContactsPanel() {
                   <td className="py-2 pr-2 text-xs text-muted-foreground">{c.source}{c.source_url && <> · <a className="text-teal hover:underline" href={c.source_url} target="_blank" rel="noopener noreferrer">where</a></>}</td>
                   <td className="whitespace-nowrap py-2 text-right">{can("editLeads") && c.email && <>
                     <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === c.id} onClick={() => run(c.id, () => verifyContact(c.id), (r) => `Email ${String(r.email_status).replace("_", " ")}`)}><MailCheck /> Verify</Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === c.id} title="Research on Seamless.AI (keeps only what the gate needs)" onClick={() => run(c.id, () => enrichSeamless(c.id), (r) => (r.pending ? "Seamless is still researching: try again in a minute" : "Enriched from Seamless.AI"))}>Seamless</Button>
                     {!["valid", "invalid"].includes(c.email_status) && <Button size="sm" variant="ghost" className="h-7 text-xs" disabled={busy === `m${c.id}`} onClick={() => run(`m${c.id}`, () => patchContact(c.id, { mark_verified: true }), "Marked verified")}><Check /> Mark verified</Button>}
                   </>}</td>
                 </tr>
@@ -264,7 +268,8 @@ export function SequencesPanel() {
   const save = async () => {
     setBusy(true);
     try {
-      const body = { name: editing.name, region: editing.region, steps: editing.steps, active: editing.active, provider: editing.provider || null, instantly_campaign_id: editing.instantly_campaign_id || null };
+      const body = { name: editing.name, region: editing.region, steps: editing.steps, active: editing.active, provider: editing.provider || null, instantly_campaign_id: editing.instantly_campaign_id || null,
+        channel: editing.channel || "email", dripify_campaign_id: editing.dripify_campaign_id || null };
       await (editing.id ? updateSequence(editing.id, body) : createSequence(body));
       toast.success("Sequence saved");
       setEditing(null);
@@ -284,7 +289,9 @@ export function SequencesPanel() {
         <div className="grid gap-2 sm:grid-cols-4">
           <Input className={cn(inputCls, "sm:col-span-2")} placeholder="Name" value={editing.name} onChange={(e) => set({ name: e.target.value })} />
           <select className={selectCls} value={editing.region} onChange={(e) => set({ region: e.target.value })}>{["eu", "uk", "us", "global"].map((r) => <option key={r} value={r}>{r.toUpperCase()}</option>)}</select>
-          <select className={selectCls} value={editing.provider || ""} onChange={(e) => set({ provider: e.target.value || null })}><option value="">Provider: use the default</option><option value="dry_run">Dry run</option><option value="smtp">SMTP</option><option value="instantly">Instantly</option></select>
+          <select className={selectCls} value={editing.channel || "email"} onChange={(e) => set({ channel: e.target.value })} aria-label="Channel"><option value="email">Channel: email</option><option value="linkedin">Channel: LinkedIn (Dripify)</option></select>
+          {editing.channel === "linkedin" ? <Input className={cn(inputCls, "sm:col-span-2")} placeholder="Dripify campaign ID (built and switched on in Dripify)" value={editing.dripify_campaign_id || ""} onChange={(e) => set({ dripify_campaign_id: e.target.value })} /> : (
+                    <select className={selectCls} value={editing.provider || ""} onChange={(e) => set({ provider: e.target.value || null })}><option value="">Provider: use the default</option><option value="dry_run">Dry run</option><option value="smtp">SMTP</option><option value="instantly">Instantly</option></select>)}
           {editing.provider === "instantly" && <Input className={cn(inputCls, "sm:col-span-2")} placeholder="Instantly campaign ID" value={editing.instantly_campaign_id || ""} onChange={(e) => set({ instantly_campaign_id: e.target.value })} />}
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={editing.active} onChange={(e) => set({ active: e.target.checked })} /> Active</label>
         </div>
