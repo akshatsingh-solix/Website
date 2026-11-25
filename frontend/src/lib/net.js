@@ -1,20 +1,31 @@
 /**
  * Network resilience shared by the public and admin API clients, for slow
- * connections and for a backend that sleeps when idle (it can take up to a
- * minute to wake):
- *  - GET/HEAD requests retry twice, with backoff, on a network error,
- *    timeout or gateway error (502/503/504). They also wait for the browser
- *    to come back online. Writes are never retried automatically.
- *  - Requests running longer than SLOW_MS are counted, so the UI can say
- *    the server is waking up rather than looking frozen (see useSlowNetwork).
+ * connections and for a backend that restarts or sleeps (Render's free plan:
+ * a deploy or a replaced instance is 30-120 s; waking from sleep up to a minute):
+ *  - Every write carries an Idempotency-Key header, generated once and kept on
+ *    retries. The server stores the first response for that key and replays it
+ *    to a retry, so a retried write never happens twice (backend resilience.py).
+ *  - GET/HEAD requests, and writes on clients created with { retryWrites: true }
+ *    (the admin), retry with backoff for about 90 seconds on a network error,
+ *    timeout or gateway error (502/503/504): long enough to ride out a restart.
+ *    A write the server is still processing (409 "in_progress") is retried too.
+ *    They also wait for the browser to come back online.
+ *  - Requests running longer than SLOW_MS, and requests waiting to retry, are
+ *    counted, so the UI says the server is reconnecting rather than freezing or
+ *    showing "Network Error" (see useSlowNetwork).
  */
 import { useEffect, useState } from "react";
 
 const SLOW_MS = 4000;
-const BACKOFF_MS = [1500, 4000];
+// About 90 s in all: a Render restart or deploy finishes inside this window.
+const BACKOFF_MS = [1500, 3000, 5000, 8000, 12000, 15000, 15000, 15000, 15000];
 const IDEMPOTENT = new Set(["get", "head", "options"]);
 
-export const isRetryable = (err) => !err.response || err.code === "ECONNABORTED" || [502, 503, 504].includes(err.response?.status);
+export const isRetryable = (err) => !err.response || err.code === "ECONNABORTED" || [502, 503, 504].includes(err.response?.status)
+  || (err.response?.status === 409 && err.response?.data?.code === "in_progress");
+
+const newKey = () => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID()
+  : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -58,9 +69,16 @@ export const slowConnection = () => {
   return !!c && (c.saveData || /(^|-)2g|3g/.test(c.effectiveType || ""));
 };
 
-/** Add retries and slow-request tracking to an axios instance. */
-export const makeResilient = (instance, { retries = BACKOFF_MS.length } = {}) => {
+/** Add retries, idempotency keys and slow-request tracking to an axios instance. */
+export const makeResilient = (instance, { retries = BACKOFF_MS.length, retryWrites = false } = {}) => {
   instance.interceptors.request.use((config) => {
+    const method = (config.method || "get").toLowerCase();
+    if (!IDEMPOTENT.has(method)) {
+      // One key per action, kept across retries (axios reuses this config object when it retries).
+      config.__idemKey = config.__idemKey || newKey();
+      config.headers = config.headers || {};
+      config.headers["Idempotency-Key"] = config.__idemKey;
+    }
     startTimer(config);
     return config;
   });
@@ -71,12 +89,19 @@ export const makeResilient = (instance, { retries = BACKOFF_MS.length } = {}) =>
       stopTimer(config);
       const method = (config?.method || "get").toLowerCase();
       const attempt = config?.__attempt || 0;
-      if (!config || config.noRetry || !IDEMPOTENT.has(method) || !isRetryable(err) || attempt >= retries || err.code === "ERR_CANCELED") {
+      const canRetry = IDEMPOTENT.has(method) || (retryWrites && config?.__idemKey);
+      if (!config || config.noRetry || !canRetry || !isRetryable(err) || attempt >= retries || err.code === "ERR_CANCELED") {
         throw err;
       }
       config.__attempt = attempt + 1;
-      await waitForOnline();
-      await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)] + Math.random() * 400);
+      // While waiting to retry, count as "slow" so the reconnecting notice stays up.
+      slow += 1; emit();
+      try {
+        await waitForOnline();
+        await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)] + Math.random() * 400);
+      } finally {
+        slow = Math.max(0, slow - 1); emit();
+      }
       return instance.request(config);
     },
   );

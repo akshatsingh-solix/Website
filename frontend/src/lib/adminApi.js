@@ -22,7 +22,8 @@ adminApi.interceptors.response.use(
     return Promise.reject(err);
   }
 );
-makeResilient(adminApi);
+// Admin writes retry through a restart too: every write carries an Idempotency-Key, so a retry never repeats it.
+makeResilient(adminApi, { retryWrites: true });
 
 // Short-lived cache for admin reads, so moving between admin pages (or
 // reopening a lead) is instant on a slow link, and identical requests in
@@ -64,6 +65,12 @@ adminApi.interceptors.response.use(
 window.addEventListener("solix:admin-logout", clearAdminCache);
 
 export const formatApiError = (err) => {
+  if (err && !err.response && err.code !== "ERR_CANCELED") {
+    // No answer at all, even after retrying for about a minute and a half: say what that means, not "Network Error".
+    return typeof navigator !== "undefined" && navigator.onLine === false
+      ? "You're offline. Check your connection and try again."
+      : "Can't reach the MarkHub server right now. It may be restarting; we kept trying for about a minute and a half. Please try again in a moment.";
+  }
   const detail = err?.response?.data?.detail;
   if (!detail) return err?.message || "Something went wrong.";
   if (typeof detail === "string") return detail;
