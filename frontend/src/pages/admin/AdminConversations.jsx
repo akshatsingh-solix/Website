@@ -5,10 +5,11 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge, ago, fmtDateTime, inputCls, useLiveRefresh } from "@/components/admin/kit";
+import { Badge, ago, fmtDateTime, inputCls, useCan, useLiveRefresh } from "@/components/admin/kit";
+import { InternalBadge, InternalToggle, InternalViewNote } from "@/components/admin/InternalTraffic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SolControlTab, SolKnowledgeTab, SolQualityTab } from "@/components/admin/SolControl";
-import { fetchChat, fetchChats, fetchSolConfig, fetchSolProfile, formatApiError } from "@/lib/adminApi";
+import { fetchChat, fetchChats, fetchSolConfig, fetchSolProfile, formatApiError, setChatInternal } from "@/lib/adminApi";
 
 const PAGE_SIZE = 25;
 const LEAD_LABEL = { demo: "Demo booked", contact: "Expert question", chat: "Contact shared" };
@@ -16,7 +17,8 @@ const LEAD_LABEL = { demo: "Demo booked", contact: "Expert question", chat: "Con
 // Sol's replies use **bold**, bullets and [label](/path) links; show them as plain text here.
 const plain = (text) => text.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, "$1 ($2)");
 
-const Transcript = ({ sessionId, onClose }) => {
+const Transcript = ({ sessionId, onClose, onChanged }) => {
+  const can = useCan();
   const [messages, setMessages] = useState(null);
   const [profile, setProfile] = useState(null);
   useEffect(() => {
@@ -36,6 +38,14 @@ const Transcript = ({ sessionId, onClose }) => {
           <DialogTitle>Conversation</DialogTitle>
           <DialogDescription className="font-mono text-xs">{sessionId}</DialogDescription>
         </DialogHeader>
+        {messages && (messages.some((m) => m.internal) || can("flagChats")) && (
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line/10 px-3 py-2 text-xs text-muted-foreground" data-testid="admin-chat-internal">
+            <span className="flex items-center gap-2">{messages.some((m) => m.internal) ? <><InternalBadge /> A colleague or a test: left out of chat metrics and Sol's gap list.</> : "Counted as a visitor conversation"}</span>
+            {can("flagChats") && (
+              <InternalToggle internal={messages.some((m) => m.internal)} onSet={async (v) => { await setChatInternal(sessionId, v); setMessages(await fetchChat(sessionId)); onChanged?.(); }} />
+            )}
+          </div>
+        )}
         {facts?.length > 0 && (
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 rounded-xl border border-line/10 bg-muted/40 px-4 py-3 text-xs" data-testid="admin-chat-profile">
             {facts.flatMap(([k, v]) => [<dt key={`${k}-k`} className="text-muted-foreground">{k}</dt>, <dd key={`${k}-v`}>{v}</dd>])}
@@ -112,6 +122,7 @@ const ConversationsTab = () => {
         </div>
         <p className="text-sm text-muted-foreground">{data.total} conversation{data.total === 1 ? "" : "s"}</p>
       </div>
+      <InternalViewNote noun="conversations" className="mt-3" />
 
       <div className="mt-4 divide-y divide-line/10 rounded-2xl border border-line/10 bg-card">
         {loading && !data.items.length ? (
@@ -132,6 +143,7 @@ const ConversationsTab = () => {
                   {c.messages} messages{c.pages.length > 0 && <> · {c.pages.join(", ")}</>}{c.models.length > 0 && <> · {c.models.join(", ")}</>}
                 </span>
               </span>
+              {c.internal && <InternalBadge />}
               {c.lead && <Badge className="border-primary/30 bg-primary/10 text-primary-ink">{LEAD_LABEL[c.lead] || c.lead}</Badge>}
               <span className="shrink-0 text-xs text-muted-foreground" title={fmtDateTime(c.last_at)}>{ago(c.last_at)}</span>
             </button>
@@ -147,7 +159,7 @@ const ConversationsTab = () => {
         </div>
       )}
 
-      <Transcript sessionId={open} onClose={() => setOpen(null)} />
+      <Transcript sessionId={open} onClose={() => setOpen(null)} onChanged={() => load({ silent: true })} />
     </div>
   );
 };

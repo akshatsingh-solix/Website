@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { TOKEN_KEY, adminLogin, adminMe } from "@/lib/adminApi";
+import { TOKEN_KEY, adminLogin, adminMe, markThisBrowser } from "@/lib/adminApi";
 
 const AdminContext = createContext(null);
 const USER_KEY = "solix_admin_user";
@@ -16,6 +16,19 @@ const writeCached = (u) => {
   try { if (u) localStorage.setItem(USER_KEY, JSON.stringify(u)); else localStorage.removeItem(USER_KEY); } catch { /* private mode */ }
 };
 
+// Whoever signs in to MarkHub is staff: their browser's visits to the site are internal traffic from now on
+// (Settings > Internal traffic can turn this off). Once per browser session; never in the way of signing in.
+const MARKED_KEY = "markhub_browser_marked";
+const markBrowserOnce = () => {
+  try {
+    if (sessionStorage.getItem(MARKED_KEY)) return;
+    sessionStorage.setItem(MARKED_KEY, "1");
+  } catch { /* private mode: mark anyway */ }
+  markThisBrowser().catch(() => {
+    try { sessionStorage.removeItem(MARKED_KEY); } catch { /* ignore */ }
+  });
+};
+
 export const AdminAuthProvider = ({ children }) => {
   const [user, setUserState] = useState(() => (localStorage.getItem(TOKEN_KEY) ? readCached() : false));
   const setUser = useCallback((u) => { writeCached(u || null); setUserState(u); }, []);
@@ -25,7 +38,7 @@ export const AdminAuthProvider = ({ children }) => {
       setUser(false);
       return;
     }
-    adminMe().then(setUser).catch((err) => {
+    adminMe().then((u) => { setUser(u); markBrowserOnce(); }).catch((err) => {
       // Signed out only when the server says the session is over (401/403). If it is restarting or unreachable,
       // keep the person signed in: pages show the reconnecting notice and load once the server answers.
       const status = err?.response?.status;
@@ -44,6 +57,7 @@ export const AdminAuthProvider = ({ children }) => {
     const data = await adminLogin(email, password);
     localStorage.setItem(TOKEN_KEY, data.access_token);
     setUser(data.user);
+    markBrowserOnce();
     return data.user;
   }, [setUser]);
 

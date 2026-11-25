@@ -7,6 +7,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieCh
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { clearAdminCache, fetchLeadsMeta, fetchOutboundKpis, fetchOverview, fetchRadarSummary, formatApiError } from "@/lib/adminApi";
+import { InternalViewNote } from "@/components/admin/InternalTraffic";
 import { BarList, CHANNEL_LABELS, LINE_SHORT, Panel, SERIES, STAGE_LABELS, StatTile, productName, selectCls, useLiveRefresh } from "@/components/admin/kit";
 import { useAdmin } from "@/components/admin/AdminAuth";
 import { useChartInk } from "@/components/admin/theme";
@@ -127,6 +128,9 @@ export default function AdminDashboard() {
           <LiveDot /> {syncedAt ? `Synced ${syncedAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", second: "2-digit" })}` : "Connecting…"}
         </div>
       </div>
+
+      {/* Never a silent filter: how many of the team's own leads these numbers leave out, one click to see them. */}
+      <InternalViewNote hidden={data?.internal ? data.internal.leads + data.internal.visitors : 0} noun="leads and visitors" className="mt-6" />
 
       {/* Filters: one row above every chart */}
       <div className="admin-glass mt-8 flex flex-wrap items-center gap-2 rounded-2xl p-2.5" data-testid="dashboard-filters">

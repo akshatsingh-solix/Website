@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
-import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog, Radar, MessagesSquare, Crosshair, Send, Search, Moon, Sun, RefreshCw, Bot } from "lucide-react";
+import { ExternalLink, FileText, Inbox, LayoutDashboard, LogOut, Settings, Users, CalendarDays, Globe2, MonitorCog, Radar, MessagesSquare, Crosshair, Send, Search, Moon, Sun, RefreshCw, Bot, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MarkHubLockup, useMarkHubChrome } from "@/components/admin/MarkHubBrand";
 import { useAdmin } from "@/components/admin/AdminAuth";
@@ -9,6 +9,8 @@ import { ROLE_LABELS, canAccess } from "@/components/admin/kit";
 import { useAdminTheme } from "@/components/admin/theme";
 import { EASE, LiveDot } from "@/components/admin/motion";
 import { clearAdminCache } from "@/lib/adminApi";
+import { InternalViewSwitch } from "@/components/admin/InternalTraffic";
+import { INTERNAL_VIEWS, useInternalView } from "@/lib/internalTraffic";
 import { SafePresence } from "@/components/motion/SafePresence";
 import { RouteErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@/components/ui/command";
@@ -57,6 +59,7 @@ export default function AdminLayout() {
   const reduce = useReducedMotion();
   const now = useClock();
   const [palette, setPalette] = useState(false);
+  const [internalView, setInternalView] = useInternalView();
   useMarkHubChrome();
 
   useEffect(() => {
@@ -98,6 +101,7 @@ export default function AdminLayout() {
             </button>
 
             <div className="flex shrink-0 items-center gap-1.5">
+              <InternalViewSwitch className="hidden lg:inline-flex" />
               <span className="mr-1 hidden items-center gap-1.5 font-mono text-[10px] text-muted-foreground xl:inline-flex">
                 <LiveDot className="h-1.5 w-1.5 [&>span]:h-1.5 [&>span]:w-1.5" /> Live · {now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
               </span>
@@ -135,6 +139,8 @@ export default function AdminLayout() {
             </div>
           </div>
 
+          {/* Below lg the internal-traffic switch gets its own row, so it is always one tap away. */}
+          <div className="container flex justify-end pb-2 lg:hidden"><InternalViewSwitch /></div>
           {/* Its own row at every width: twelve sections never fit beside the logo and account buttons. */}
           <LayoutGroup id="admin-nav">
             <nav className="container flex gap-1 overflow-x-auto pb-2.5 [scrollbar-width:none]" aria-label="Admin sections">
@@ -174,7 +180,8 @@ export default function AdminLayout() {
             transition={{ duration: 0.34, ease: EASE }}
           >
             <RouteErrorBoundary>
-              <Suspense fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
+              {/* Keyed on the internal-traffic view: the page remounts and reloads its numbers, whose reads carry the view. */}
+              <Suspense key={internalView} fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
                 {blocked ? (
                   <div className="mx-auto max-w-md py-24 text-center" data-testid="admin-no-access">
                     <p className="font-display text-lg">You don't have access to {blocked.label}</p>
@@ -207,6 +214,11 @@ export default function AdminLayout() {
             <CommandItem value="new lead view mql unassigned" onSelect={run(() => navigate("/admin/leads?stage=mql&owner=unassigned"))}>
               <Users className="mr-2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> Unassigned MQLs
             </CommandItem>
+            {INTERNAL_VIEWS.filter((m) => m.value !== internalView).map((m) => (
+              <CommandItem key={m.value} value={`internal traffic staff solix ${m.label}`} onSelect={run(() => setInternalView(m.value))}>
+                <Building2 className="mr-2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> {m.label} traffic in metrics
+              </CommandItem>
+            ))}
             <CommandItem value="refresh data reload" onSelect={run(() => { clearAdminCache(); window.dispatchEvent(new CustomEvent("solix:admin-refresh")); })}>
               <RefreshCw className="mr-2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> Refresh data
             </CommandItem>

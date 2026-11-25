@@ -6,7 +6,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchLead, formatApiError, patchLead, rescoreLead } from "@/lib/adminApi";
+import { fetchLead, formatApiError, patchLead, rescoreLead, setLeadInternal } from "@/lib/adminApi";
+import { InternalBadge, InternalToggle } from "@/components/admin/InternalTraffic";
 import { CHANNEL_LABELS, LineBadge, SERIES, STAGE_HELP, STAGE_LABELS, StageBadge, fmtDateTime, productName, selectCls, useCan } from "@/components/admin/kit";
 import { cn } from "@/lib/utils";
 import { AccountStatus, StrengthBadge } from "@/components/admin/radarKit";
@@ -126,6 +127,17 @@ export function LeadDrawer({ id, meta, onClose, onChanged }) {
               <SheetTitle className="font-display text-2xl font-medium">{lead.name || lead.email}</SheetTitle>
               <SheetDescription>{[lead.job_title, lead.company].filter(Boolean).join(" · ") || "No company given"} · <a href={`mailto:${lead.email}`} className="text-teal hover:underline">{lead.email}</a></SheetDescription>
               {lead.stage_reason && <p className="text-xs text-muted-foreground">{lead.stage_reason}</p>}
+              {/* Internal traffic: one of our own people (or a test). Left out of every metric; can be corrected here. */}
+              {(lead.internal || can("editLeads")) && (
+                <div className={cn("mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs", lead.internal ? "border-violet-400/30 bg-violet-400/5" : "border-line/10")} data-testid="lead-internal">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    {lead.internal ? <><InternalBadge reason={lead.internal_reason} /> {lead.internal_reason?.label}{lead.internal_reason?.detail ? `: ${lead.internal_reason.detail}` : ""}</> : "Counted as a prospect"}
+                  </span>
+                  {can("editLeads") && (
+                    <InternalToggle internal={!!lead.internal} onSet={async (v) => { await setLeadInternal(lead.id, v); setData(await fetchLead(lead.id)); onChanged?.(); }} />
+                  )}
+                </div>
+              )}
             </SheetHeader>
 
             <div className="mt-6 grid grid-cols-3 gap-2 text-center">

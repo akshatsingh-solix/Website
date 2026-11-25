@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { bulkPatchLeads, createView, deleteView, exportPeople, fetchLeadsMeta, fetchPeople, fetchViews, formatApiError } from "@/lib/adminApi";
 import { CHANNEL_LABELS, LineBadge, ScoreBar, STAGE_LABELS, StageBadge, ago, productName, selectCls, useCan, useLiveRefresh } from "@/components/admin/kit";
 import { LeadDrawer } from "@/components/admin/LeadDrawer";
+import { InternalBadge, InternalViewNote } from "@/components/admin/InternalTraffic";
 
 const PAGE_SIZE = 25;
 const FILTER_KEYS = ["q", "line", "product", "stage", "owner", "channel", "country", "industry", "min_score", "date_field", "date_from", "date_to", "active_days", "linked"];
@@ -172,6 +173,8 @@ export default function AdminLeads() {
         </div>
       </div>
 
+      <InternalViewNote hidden={data.internal?.hidden} noun="leads" className="mt-6" />
+
       {/* Views */}
       <div className="mt-6 flex flex-wrap items-center gap-2" data-testid="lead-views">
         {presets(threshold).map((v) => (
@@ -299,7 +302,7 @@ export default function AdminLeads() {
               <tr key={l.id} className="cursor-pointer border-b border-line/5 transition-colors hover:bg-line/5" onClick={() => setOpenId(l.id)} data-testid="lead-row">
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}><Checkbox checked={selected.has(l.id)} onCheckedChange={() => toggle(l.id)} aria-label={`Select ${l.email}`} /></td>
                 <td className="max-w-[240px] px-2 py-3">
-                  <p className="truncate font-medium text-foreground">{l.name || l.email}</p>
+                  <p className="flex items-center gap-2 font-medium text-foreground"><span className="truncate">{l.name || l.email}</span>{l.internal && <InternalBadge reason={l.internal_reason} />}</p>
                   <p className="truncate text-xs text-muted-foreground">{[l.company, l.job_title].filter(Boolean).join(" · ") || l.email}</p>
                 </td>
                 <td className="px-2 py-3"><LineBadge line={l.primary_line} /></td>
