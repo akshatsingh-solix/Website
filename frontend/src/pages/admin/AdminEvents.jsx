@@ -11,6 +11,7 @@ import {
 } from "@/lib/adminApi";
 import { Badge, Panel, StatTile, ago, inputCls, selectCls, useCan } from "@/components/admin/kit";
 import { EMPOWER_URL } from "@/lib/empower";
+import { InternalBadge, InternalViewNote } from "@/components/admin/InternalTraffic";
 
 const STATUS_LABELS = {
   confirmed: "Confirmed", paid: "Paid", payment_reported: "Payment reported", pending_payment: "Awaiting payment",
@@ -95,6 +96,7 @@ function Registrations({ slug, event }) {
 
   return (
     <div className="space-y-6">
+      <InternalViewNote hidden={s?.internal?.registrations} noun="registrations (staff, speakers, tests; they still take seats)" />
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile label="Registered" value={s?.registered} sub={event?.capacity ? `of ${event.capacity} seats` : "no cap set"} testId="events-stat-registered" />
         <StatTile label="Checked in" value={s?.checked_in} sub={s?.registered ? `${Math.round((s.checked_in / s.registered) * 100)}% of registered` : null} />
@@ -160,7 +162,7 @@ function Registrations({ slug, event }) {
               {data?.items.map((r) => (
                 <tr key={r.id} className="border-b border-line/5 align-top">
                   <td className="py-3 pr-3">
-                    <p className="font-medium text-foreground">{r.first_name} {r.last_name}</p>
+                    <p className="flex items-center gap-2 font-medium text-foreground">{r.first_name} {r.last_name}{r.internal && <InternalBadge reason={r.internal_reason} />}</p>
                     <p className="text-xs text-muted-foreground">{r.job_title} · {r.company}</p>
                     <p className="text-xs text-muted-foreground">{r.email}</p>
                   </td>

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API } from "./api";
 import { makeResilient } from "./net";
+import { getInternalView, setMarkedInternal } from "./internalTraffic";
 
 export const TOKEN_KEY = "solix_admin_token";
 
@@ -36,6 +37,9 @@ export const clearAdminCache = () => getCache.clear();
 const rawGet = adminApi.get.bind(adminApi);
 adminApi.get = (url, config = {}) => {
   const { fresh, ...rest } = config;
+  // Every admin read follows the internal-traffic switch in the header (hide / include / only Solix's own people).
+  // It is a query parameter, not a header, so each view is its own URL for every cache along the way.
+  if (url.startsWith("/admin/") && !(rest.params && "internal" in rest.params)) rest.params = { ...(rest.params || {}), internal: getInternalView() };
   if (rest.responseType) return rawGet(url, rest);
   const key = url + "?" + JSON.stringify(rest.params || {});
   const hit = getCache.get(key);
@@ -92,6 +96,22 @@ export const fetchNotifications = () => adminApi.get("/admin/notifications", { f
 export const fetchChats = (params, opts = {}) => adminApi.get("/admin/chats", { params, ...opts }).then((r) => r.data);
 export const fetchChat = (sessionId) => adminApi.get(`/admin/chats/${sessionId}`).then((r) => r.data);
 export const fetchSolStatus = () => adminApi.get("/chat/status").then((r) => r.data);
+export const setChatInternal = (sessionId, internal) => adminApi.post(`/admin/chats/${sessionId}/internal`, { internal }).then((r) => r.data);
+export const setSubmissionInternal = (id, internal) => adminApi.post(`/admin/submissions/${id}/internal`, { internal }).then((r) => r.data);
+
+// --- Internal traffic (Settings > Internal traffic) ---
+export const fetchInternal = () => adminApi.get("/admin/internal", { fresh: true }).then((r) => r.data);
+export const saveInternal = (body) => adminApi.put("/admin/internal", body).then((r) => r.data);
+export const rescanInternal = () => adminApi.post("/admin/internal/rescan", null, { timeout: 120000 }).then((r) => r.data);
+/** Mark the browser MarkHub runs in as internal, so its visits to the site are the team's, not a prospect's. */
+export const markThisBrowser = async ({ internal = true, explicit = false } = {}) => {
+  let visitorId = null;
+  try { visitorId = localStorage.getItem("solix_vid"); } catch { /* storage blocked */ }
+  const r = await adminApi.post("/admin/internal/this-browser", { visitor_id: visitorId || null, internal, explicit });
+  if (r.data.internal) setMarkedInternal(true);
+  else if (explicit && !internal) setMarkedInternal(false);
+  return r.data;
+};
 // --- Sol control (Admin > Conversations): routing, knowledge, learning, quality ---
 export const fetchSolConfig = (opts = {}) => adminApi.get("/admin/sol/config", opts).then((r) => r.data);
 export const saveSolConfig = (body) => adminApi.put("/admin/sol/config", body).then((r) => r.data);
@@ -117,6 +137,7 @@ export const fetchLead = (id) => adminApi.get(`/admin/leads/${id}`).then((r) => 
 export const patchLead = (id, body) => adminApi.patch(`/admin/leads/${id}`, body).then((r) => r.data);
 export const bulkPatchLeads = (body) => adminApi.post("/admin/leads/bulk", body).then((r) => r.data);
 export const rescoreLead = (id) => adminApi.post(`/admin/leads/${id}/rescore`).then((r) => r.data);
+export const setLeadInternal = (id, internal) => adminApi.post(`/admin/leads/${id}/internal`, { internal }).then((r) => r.data);
 export const fetchOverview = (params, opts = {}) => adminApi.get("/admin/reports/overview", { params: clean(params), ...opts }).then((r) => r.data);
 export const fetchViews = () => adminApi.get("/admin/views").then((r) => r.data);
 export const createView = (body) => adminApi.post("/admin/views", body).then((r) => r.data);

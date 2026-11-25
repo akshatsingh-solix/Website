@@ -8,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { deleteLead, downloadLeadsCsv, fetchLeads, fetchSettings, fetchStats, fetchTeam, formatApiError, updateLead } from "@/lib/adminApi";
+import { deleteLead, downloadLeadsCsv, fetchLeads, fetchSettings, fetchStats, fetchTeam, formatApiError, setSubmissionInternal, updateLead } from "@/lib/adminApi";
+import { InternalBadge, InternalToggle, InternalViewNote } from "@/components/admin/InternalTraffic";
+import { useCan } from "@/components/admin/kit";
 import { useLiveRefresh } from "@/components/admin/kit";
 
 const TYPES = [
@@ -95,6 +97,7 @@ const Detail = ({ label, value }) => value ? (
 ) : null;
 
 export default function AdminSubmissions() {
+  const can = useCan();
   const [stats, setStats] = useState(null);
   const [type, setType] = useState("all");
   const [status, setStatus] = useState("all");
@@ -190,6 +193,8 @@ export default function AdminSubmissions() {
         </Button>
       </div>
 
+      <InternalViewNote hidden={stats?.internal?.submissions} noun="form fills" className="mt-6" />
+
       <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-6">
         <Stat label="Total leads" value={stats?.total} testId="admin-stat-total" />
         <Stat label="Last 7 days" value={stats?.last_7_days} tone="text-teal" testId="admin-stat-week" />
@@ -249,7 +254,7 @@ export default function AdminSubmissions() {
                   <TableCell><StatusBadge status={s.status} /></TableCell>
                   <TableCell className="hidden text-sm xl:table-cell" data-testid="lead-owner-cell">{s.owner ? <span className="inline-flex items-center gap-1.5 text-foreground"><UserCircle2 className="h-3.5 w-3.5 text-teal" /> {ownerName(s.owner)}</span> : <span className="text-muted-foreground">Unassigned</span>}</TableCell>
                   <TableCell>
-                    <p className="font-medium">{s.name || "—"}</p>
+                    <p className="flex items-center gap-2 font-medium">{s.name || "—"}{s.internal && <InternalBadge reason={s.internal_reason} />}</p>
                     <p className="text-xs text-muted-foreground">{s.email}</p>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{s.company || "—"}</TableCell>
@@ -277,7 +282,7 @@ export default function AdminSubmissions() {
           {selected && (
             <>
               <DialogHeader>
-                <div className="flex items-center gap-3"><TypeBadge type={selected.type} /><StatusBadge status={selected.status} />{selected.source === "chat" && <span className="inline-flex items-center gap-1 text-xs text-teal"><Bot className="h-3.5 w-3.5" /> Booked by Sol</span>}</div>
+                <div className="flex items-center gap-3"><TypeBadge type={selected.type} /><StatusBadge status={selected.status} />{selected.internal && <InternalBadge reason={selected.internal_reason} />}{selected.source === "chat" && <span className="inline-flex items-center gap-1 text-xs text-teal"><Bot className="h-3.5 w-3.5" /> Booked by Sol</span>}</div>
                 <DialogTitle className="font-display text-2xl font-medium tracking-tight">{selected.name || selected.email}</DialogTitle>
                 <DialogDescription className="font-mono text-xs">{fmt(selected.created_at)} · {selected.id}</DialogDescription>
               </DialogHeader>
@@ -292,9 +297,11 @@ export default function AdminSubmissions() {
                 <Detail label="Message" value={selected.message} />
                 <Detail label="Owner" value={selected.owner ? ownerName(selected.owner) : null} />
                 <Detail label="Source" value={selected.source === "chat" ? "AI concierge chat" : selected.source_page || "web"} />
+                <Detail label="Internal" value={selected.internal ? `${selected.internal_reason?.label || "Yes"}${selected.internal_reason?.detail ? `: ${selected.internal_reason.detail}` : ""}` : null} />
               </dl>
               <LeadWorkflow key={selected.id + (selected.updated_at || "")} lead={selected} team={team} onSaved={onSaved} />
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex justify-end gap-2">
+                {can("flagInbox") && <InternalToggle internal={!!selected.internal} onSet={async (v) => onSaved(await setSubmissionInternal(selected.id, v))} />}
                 <Button variant="outline" size="sm" onClick={() => onDelete(selected.id)} data-testid="admin-delete-lead" className="border-red-500/30 text-red-300 hover:border-red-500/60 hover:bg-red-500/10"><Trash2 /> Delete</Button>
               </div>
             </>

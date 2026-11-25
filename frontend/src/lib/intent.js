@@ -9,6 +9,7 @@
 // Nothing is tracked until the visitor accepts analytics cookies, and
 // browsers sending Global Privacy Control / Do Not Track are never tracked.
 import { API } from "@/lib/api";
+import { isMarkedInternal } from "@/lib/internalTraffic";
 
 const CONSENT_KEY = "solix-consent"; // "all" | "essential"
 const VID_KEY = "solix_vid";
@@ -93,7 +94,8 @@ const context = () => {
     ctx = landingTouch;
     store.set("sessionStorage", TOUCH_KEY, JSON.stringify(ctx));
   }
-  return { ...ctx, lang: document.documentElement.lang || "en" };
+  // A colleague's browser (signed in to MarkHub, or opened with ?solix_internal=1): their browsing is the team's.
+  return { ...ctx, lang: document.documentElement.lang || "en", ...(isMarkedInternal() ? { internal: 1 } : {}) };
 };
 
 const BASENAME = "/Website";

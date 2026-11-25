@@ -169,6 +169,8 @@ const PERMS = {
   manage: [["admin"], "settings"],
   comply: [["admin", "compliance"], "compliance"],
   suppress: [["admin", "compliance", "sales"], "compliance"],
+  flagInbox: [["admin", "sales"], "inbox"],
+  flagChats: [["admin", "sales", "editor"], "sol"],
 };
 export const LEVEL_RANK = { none: 0, view: 1, edit: 2, full: 3 };
 export const levelOf = (user, feature) => (user?.role === "admin" ? "full" : user?.access?.[feature] || (user?.access ? "none" : "view"));
