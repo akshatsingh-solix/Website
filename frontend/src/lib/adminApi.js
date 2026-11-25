@@ -69,7 +69,7 @@ export const formatApiError = (err) => {
     // No answer at all, even after retrying for about a minute and a half: say what that means, not "Network Error".
     return typeof navigator !== "undefined" && navigator.onLine === false
       ? "You're offline. Check your connection and try again."
-      : "Can't reach the MarkHub server right now. It may be restarting; we kept trying for about a minute and a half. Please try again in a moment.";
+      : "Can't reach the MarkHub server right now. It may be restarting; we kept trying for over a minute. Please try again in a moment.";
   }
   const detail = err?.response?.data?.detail;
   if (!detail) return err?.message || "Something went wrong.";
