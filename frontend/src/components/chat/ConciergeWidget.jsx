@@ -5,7 +5,7 @@ import { ArrowUpRight, Bot, CalendarCheck, Check, MailCheck, MessageSquare, Rota
 import { cn } from "@/lib/utils";
 import { CHAT_SUGGESTIONS } from "@/data/site";
 import { Button } from "@/components/ui/button";
-import { captureChat, clearChatHistory, fetchChatHistory, streamChat } from "@/lib/api";
+import { captureChat, clearChatHistory, fetchChatHistory, streamChat, warmBackend } from "@/lib/api";
 import { createLocalConcierge, detectTopics, isPricingQuestion } from "@/lib/localConcierge";
 import { pageTopics, track, visitorId } from "@/lib/intent";
 import { useTranslation } from "react-i18next";
@@ -134,9 +134,10 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [sessionId, setSessionId] = useState(getSession);
-  // "ai" until the backend turns out to have no model (or is unreachable);
-  // after that the built-in concierge answers for the rest of the session.
+  // "ai" until the backend fails twice in a row; then the built-in concierge answers for the rest of the
+  // session. One slow reply used to be enough, which left most visitors on the scripted answers.
   const [mode, setMode] = useState("ai");
+  const misses = useRef(0);
   const local = useRef(null);
   if (!local.current) local.current = createLocalConcierge();
   const scrollRef = useRef(null);
@@ -150,6 +151,7 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
 
   useEffect(() => {
     if (!open) return;
+    warmBackend(); // a sleeping host wakes while the visitor types, not after they hit send
     fetchChatHistory(sessionId).then((h) => h.length && setMessages(h.map((m) => ({ role: m.role, content: m.content })))).catch(() => {});
     setTimeout(() => inputRef.current?.focus(), 250);
   }, [open, sessionId]);
@@ -234,8 +236,11 @@ export const ConciergeWidget = ({ defaultOpen = false }) => {
       if (status === "rate_limited") {
         append(tx("You're sending messages quickly. Please wait a moment and try again."));
       } else if (status === "unavailable") {
-        setMode("local");
+        misses.current += 1;
+        if (misses.current >= 2) setMode("local");
         await answerLocally();
+      } else {
+        misses.current = 0;
       }
     } catch {
       append(tx("The concierge is unavailable right now. Please try again shortly."));
