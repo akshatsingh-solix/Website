@@ -68,7 +68,7 @@ export const captureChat = ({ sessionId, message, language, page, visitorId }) =
  * the caller then answers with the built-in concierge instead. `page` and
  * `pageTitle` tell Sol what the visitor is looking at.
  */
-export async function streamChat({ sessionId, message, language = "en", page, pageTitle, visitorId, onDelta, onEvent, onError, timeoutMs = 8000 }) {
+export async function streamChat({ sessionId, message, language = "en", page, pageTitle, visitorId, onDelta, onEvent, onError, timeoutMs = 25000 }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res;
