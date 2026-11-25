@@ -270,6 +270,12 @@ export const createLocalConcierge = () => {
         break;
     }
 
+    // A visitor who just shares an email wants it acknowledged, not a menu. The widget has already
+    // saved it to the lead list (captureChat), so say what happens next.
+    const sharedEmail = (raw.match(/[^\s@]+@[^\s@]+\.[^\s@]+/) || [""])[0].replace(/[.,;]+$/, "");
+    if (sharedEmail && EMAIL_RX.test(sharedEmail)) {
+      return { text: tx("Thanks, I've noted {{email}}. A Solix expert will follow up with material that fits what you've described, usually within one business day. Anything you'd like me to answer in the meantime?", { email: sharedEmail }) };
+    }
     if (intent.key === "help" || text.split(" ").length <= 2) {
       return { text: `${tx("Here's what I can help with:")}\n- ${tx("Products such as Enterprise Archiving, Application Retirement and Enterprise AI")}\n- ${tx("How Solix works in your industry")}\n- ${tx("The free Solix ECS trial")}\n- ${tx("Booking a demo with a Solix expert")}\n\n${tx("What would you like to know?")}` };
     }
