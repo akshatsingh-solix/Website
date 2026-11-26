@@ -100,12 +100,15 @@ const Sources = ({ sources }) => {
   return (
     <div className="mt-2 flex flex-wrap gap-1.5 border-t border-line/10 pt-2" data-testid="chat-sources">
       <span className="w-full text-[11px] text-muted-foreground">{tx("Related pages")}</span>
-      {sources.map((s) => (
-        <Link key={s.url} to={s.url} className="inline-flex items-center gap-1 rounded-full border border-line/15 bg-background px-2.5 py-1 text-xs text-foreground transition-colors hover:border-primary/50 hover:text-primary-ink">
-          {s.title}
-          <ArrowUpRight className="h-3 w-3" />
-        </Link>
-      ))}
+      {sources.map((s) => {
+        const chip = "inline-flex items-center gap-1 rounded-full border border-line/15 bg-background px-2.5 py-1 text-xs text-foreground transition-colors hover:border-primary/50 hover:text-primary-ink";
+        // Site pages use the router; pages Sol learned from www.solix.com are full addresses and open in a new tab.
+        return s.url.startsWith("/") ? (
+          <Link key={s.url} to={s.url} className={chip}>{s.title}<ArrowUpRight className="h-3 w-3" /></Link>
+        ) : (
+          <a key={s.url} href={s.url} target="_blank" rel="noreferrer" className={chip}>{s.title}<ArrowUpRight className="h-3 w-3" /></a>
+        );
+      })}
     </div>
   );
 };
