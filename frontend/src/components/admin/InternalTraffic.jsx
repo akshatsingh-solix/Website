@@ -157,6 +157,10 @@ export function InternalTrafficCard() {
   const allReasons = {};
   for (const k of ["leads", "visitors", "submissions", "registrations"]) for (const [r, n] of Object.entries(s[k].by_reason || {})) allReasons[r] = (allReasons[r] || 0) + n;
   const shareLink = `${window.location.origin}${process.env.PUBLIC_URL || ""}/?solix_internal=1`;
+  // www.solix.com is a separate site with its own browser storage: a browser marked here (or by signing in to
+  // MarkHub) is not marked there. Its MarkHub tag reads the same ?solix_internal=1 link.
+  const mainSiteLink = `${(process.env.REACT_APP_MAIN_SITE_URL || "https://www.solix.com").replace(/\/$/, "")}/?solix_internal=1`;
+  const copy = (link) => navigator.clipboard?.writeText(link).then(() => toast.success("Link copied"));
 
   return (
     <section className="rounded-2xl border border-line/10 bg-card p-6" data-testid="internal-traffic-card">
@@ -257,7 +261,8 @@ export function InternalTrafficCard() {
           <div>
             <p className="text-foreground">This browser is {marked ? "internal" : "counted as a visitor"}</p>
             <p className="text-xs text-muted-foreground">
-              Colleagues who never sign in to MarkHub can open <button type="button" className="font-mono underline underline-offset-2" onClick={() => navigator.clipboard?.writeText(shareLink).then(() => toast.success("Link copied"))}>{shareLink.replace(/^https?:\/\//, "")}</button> once on each device.
+              Colleagues who never sign in to MarkHub can open <button type="button" className="font-mono underline underline-offset-2" onClick={() => copy(shareLink)}>{shareLink.replace(/^https?:\/\//, "")}</button> once on each device.
+              {" "}www.solix.com is a separate site: everyone, signed in or not, opens <button type="button" className="font-mono underline underline-offset-2" onClick={() => copy(mainSiteLink)} data-testid="internal-main-site-link">{mainSiteLink.replace(/^https?:\/\//, "")}</button> once in each browser they use (<span className="font-mono">?solix_internal=0</span> undoes it).
             </p>
           </div>
         </div>
